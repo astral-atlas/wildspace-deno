@@ -5,6 +5,5 @@ export default {
   build: {
     sorucemap: true
   },
-  base: 'wildspace-deno'
 };
 

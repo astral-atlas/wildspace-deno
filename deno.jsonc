@@ -3,7 +3,7 @@
     "dev:docs": "deno run -A npm:vite@^4.3.9 docs --port 5001",
     "dev:web": "deno run -A npm:vite@^4.3.9 web --port 5000",
     "dev": "deno run -A npm:concurrently \"deno task dev:docs\" \"deno task dev:web\"",
-    "build:docs": "deno run -A npm:vite build docs"
+    "build:docs": "deno run -A npm:vite build docs --base /wildspace-deno"
   },
   "imports": {
     "vite-css": "./lib/vite-types.d.ts"
