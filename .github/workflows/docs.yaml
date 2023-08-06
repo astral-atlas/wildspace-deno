@@ -1,4 +1,4 @@
-name: publish-doc-site
+name: Publish Documentation Github Page
 
 permissions:
   contents: read
@@ -9,6 +9,11 @@ on:
   push:
     branches: ["master"]
   workflow_dispatch:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
     environment:
@@ -22,12 +27,12 @@ jobs:
           deno-version: v1.x
       - run: deno task build:docs
       - name: Setup Pages
-        uses: actions/configure-pages@v1
+        uses: actions/configure-pages@v3
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           # Upload entire repository
           path: './docs/dist'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@main
+        uses: actions/deploy-pages@2
