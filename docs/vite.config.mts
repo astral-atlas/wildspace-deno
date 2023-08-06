@@ -3,7 +3,7 @@
 export default {
   //plugins: [denoResolve()],
   build: {
-    sorucemap: true
+    sourcemap: true
   },
 };
 

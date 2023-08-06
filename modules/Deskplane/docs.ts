@@ -2,7 +2,7 @@ import { h, Component } from "https://esm.sh/v126/@lukekaalim/act@2.6.0";
 import { Vector2 } from "https://esm.sh/three@0.155.0";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { GridSVG } from './GridSVG.ts';
-import { useContext, useEffect, useMemo, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useContext, useEffect, useMemo, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { useKeyboardElementRef } from "../Keyboard/useKeyboardElementRef.ts";
 import { keyboardStateControllerContext } from "../Keyboard/keyboardStateController.ts";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
@@ -46,7 +46,18 @@ export const GridSVGDemo: Component = () => {
 }
 
 export const DeskPlaneDemo = () => {
-  return h(Deskplane);
+  const [pos, setPos] = useState(new Vector2());
+  const ref = useRef(null);
+  useDraggableSurface(ref, (delta) => {
+    setPos(pos => pos.clone().add(delta))
+  });
+  const style = {
+    transform: `translate(${pos.x}px, ${pos.y}px)`,
+    userSelect: 'none'
+  };
+  return h(Deskplane, {}, [
+    h('h2', { ref, style }, "Hello!")
+  ]);
 };
 
 export const DraggableSurfaceDemo = () => {

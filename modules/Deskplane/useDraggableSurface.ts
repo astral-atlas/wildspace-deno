@@ -19,12 +19,14 @@ export const useDraggableSurface = (
       return;
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!(event.target instanceof Element))
+      console.log('DOWN', event.target);
+      if (event.target !== draggable)
         return;
-      setDragging(event.target);
+      setDragging(draggable);
       draggable.setPointerCapture(event.pointerId);
     };
     const onPointerUp = (event: PointerEvent) => {
+      console.log('UP', event.target);
       setDragging(null);
       draggable.releasePointerCapture(event.pointerId);
     };
