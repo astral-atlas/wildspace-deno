@@ -53,9 +53,10 @@ export const DraggableSurfaceDemo = () => {
   const ref = useRef<null | HTMLElement>(null);
   const dragged = useRef(new Vector2(0, 0)).current;
 
-  const onDrag = useMemo(() => (delta: Vector2, event: PointerEvent, element: HTMLElement) => {
+  const onDrag = useMemo(() => (delta: Vector2, element: Element) => {
     dragged.add(delta);
-    element.innerText = `Drag me!\n${dragged.x}, ${dragged.y}`
+    if (element instanceof HTMLElement)
+      element.innerText = `Drag me!\n${dragged.x}, ${dragged.y}`
   }, []);
 
   useDraggableSurface(ref, onDrag)
