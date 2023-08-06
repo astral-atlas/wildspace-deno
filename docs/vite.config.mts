@@ -4,6 +4,7 @@ export default {
   //plugins: [denoResolve()],
   build: {
     sorucemap: true
-  }
+  },
+  base: 'wildspace-deno'
 };
 
