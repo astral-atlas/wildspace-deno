@@ -1,0 +1,24 @@
+.sheetList {
+  display: flex;
+  flex-direction: row;
+
+  list-style-type: none;
+  border-bottom: 1px solid black;
+}
+
+.sheetList li {
+  display: flex;
+}
+
+.sheetList a {
+  padding: 4px;
+  margin: 8px 8px 0 0 ;
+  border-radius: 8px 8px 0 0 ;
+  border: 1px solid black;
+  border-bottom: none;
+  color: black;
+}
+.sheetList a.selected {
+  background-color: black;
+  color: white;
+}
