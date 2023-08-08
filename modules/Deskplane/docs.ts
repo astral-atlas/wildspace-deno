@@ -8,6 +8,7 @@ import { keyboardStateControllerContext } from "../Keyboard/keyboardStateControl
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
 import { Deskplane } from "./Deskplane.ts";
 import { useDraggableSurface } from "./useDraggableSurface.ts";
+import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
 
 export const GridSVGDemo: Component = () => {
   const ref = useRef(null);
@@ -55,9 +56,28 @@ export const DeskPlaneDemo = () => {
     transform: `translate(${pos.x}px, ${pos.y}px)`,
     userSelect: 'none'
   };
-  return h(Deskplane, {}, [
-    h('h2', { ref, style }, "Hello!")
-  ]);
+  const overlayStyle = {
+    position: 'absolute',
+  }
+  return h(FramePresenter, {}, [
+    h(Deskplane, { overlayChildren: [h('h2', { style: overlayStyle }, 'Hello')] }, [
+      h('h2', { ref, style }, "World!"),
+      h('svg', {
+        width: 1024,
+        height: 1024,
+        style: { pointerEvents: 'none', position: 'absolute', top: 0, left: 0 } }, [
+        h('rect', { 
+          width: 512,
+          height: 512,
+          stroke: 'black',
+          fill: 'none',
+          'stroke-width': '4px',
+          x: 64,
+          y: 64
+        })
+      ])
+    ])
+  ])
 };
 
 export const DraggableSurfaceDemo = () => {

@@ -13,47 +13,45 @@ export const useDraggableSurface = (
 ): DraggableSurface => {
   const [dragging, setDragging] = useState<null | Element>(null);
 
+  const change = useRef(new Vector2(0, 0)).current;
   useEffect(() => {
     const { current: draggable } = draggableElementRef;
     if (!draggable)
       return;
 
+    let isDragging = false;
+
     const onPointerDown = (event: PointerEvent) => {
-      console.log('DOWN', event.target);
       if (event.target !== draggable)
         return;
+      
+      isDragging = true;
       setDragging(draggable);
       draggable.setPointerCapture(event.pointerId);
     };
     const onPointerUp = (event: PointerEvent) => {
-      console.log('UP', event.target);
+      isDragging = false;
       setDragging(null);
       draggable.releasePointerCapture(event.pointerId);
     };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!isDragging)
+        return;
+      change.set(event.movementX, event.movementY)
+    };
+
     draggable.addEventListener('pointerdown', onPointerDown);
     draggable.addEventListener('pointerup', onPointerUp);
+    draggable.addEventListener('pointermove', onPointerMove);
 
     return () => {
       draggable.removeEventListener('pointerdown', onPointerDown);
       draggable.removeEventListener('pointerup', onPointerUp);
+      draggable.removeEventListener('pointermove', onPointerMove);
     }
   }, []);
 
-  const change = useRef(new Vector2(0, 0)).current;
-  useEffect(() => {
-    const { current: draggable } = draggableElementRef;
-    if (!draggable || !dragging)
-      return;
-
-    const onPointerMove = (event: PointerEvent) => {
-      change.set(event.movementX, event.movementY)
-    };
-
-    draggable.addEventListener('pointermove', onPointerMove);
-    return () => {
-      draggable.removeEventListener('pointermove', onPointerMove);
-    }
-  }, [dragging, onDrag]);
 
   useAnimation('useDraggableSurface', () => {
     if (!dragging)

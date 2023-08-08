@@ -1,0 +1,32 @@
+.bigTable {
+  border-collapse: collapse;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-bottom: 1px solid black;;
+}
+
+.bigTable tr {
+  display: flex;
+}
+
+.bigTable td, .bigTable th {
+  border: 1px solid black;
+  border-right: 0;
+  border-bottom: 0;
+  border-collapse: collapse;
+  padding: 4px;
+  flex: 1;
+}
+.bigTable td:last-child, .bigTable th:last-child {
+  border-right: 1px solid black;
+}
+.bigTable tr:last-child {
+  border-bottom: 1px solid black;
+}
+
+.bigTable tbody {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}

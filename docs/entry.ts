@@ -6,6 +6,7 @@ import { componentDocDocs } from "../modules/ComponentDoc/docs.ts";
 import { boxParticleDocs } from "../modules/BoxParticle/docs.ts";
 import { deskplaneDocs } from "../modules/Deskplane/docs.ts";
 import { keyboardDocs } from "../modules/Keyboard/docs.ts";
+import { bigTableDocs } from "../modules/BigTable/docs.ts";
 
 const sheets = [
   frameSchedulerDocs,
@@ -13,6 +14,7 @@ const sheets = [
   boxParticleDocs,
   deskplaneDocs,
   keyboardDocs,
+  bigTableDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {

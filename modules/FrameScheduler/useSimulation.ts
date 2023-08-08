@@ -12,6 +12,7 @@ export const useSimulation = (
 
   useEffect(() => {
     const subscription = scheduler.simulation.subscribe(key, onSimulationTick);
+    onSimulationTick(scheduler.currentTick)
     return subscription.unsubscribe;
   }, [key, scheduler, ...deps]);
 };

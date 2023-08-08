@@ -6,7 +6,8 @@
     "build:docs": "deno run -A npm:vite build docs --base /wildspace-deno"
   },
   "imports": {
-    "vite-css": "./lib/vite-types.d.ts"
+    "vite-css": "./lib/vite-css.d.ts",
+    "vite-text": "./lib/vite-text.d.ts"
   },
   "compilerOptions": {
     "lib": [

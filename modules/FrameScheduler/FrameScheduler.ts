@@ -14,6 +14,9 @@ export type SimulationTick = {
 export type FrameScheduler = {
   animation: FrameSchedulerEmitter<AnimationFrame>;
   simulation: FrameSchedulerEmitter<SimulationTick>;
+
+  currentTick: SimulationTick,
+  currentFrame: AnimationFrame,
 };
 
 export type FrameSchedulerController = {
@@ -49,10 +52,6 @@ export const createFrameScheduler = (
     clearInterval,
     simulationTimePerTick,
   } = options;
-  const scheduler: FrameScheduler = {
-    animation: createFrameSchedulerEmitter(),
-    simulation: createFrameSchedulerEmitter(),
-  };
 
   const animationFrame: AnimationFrame = {
     now: performance.now(),
@@ -67,6 +66,14 @@ export const createFrameScheduler = (
   };
   const simulationTick: SimulationTick = {
     tickNumber: 0,
+  };
+  
+  const scheduler: FrameScheduler = {
+    animation: createFrameSchedulerEmitter(),
+    simulation: createFrameSchedulerEmitter(),
+
+    currentTick: simulationTick,
+    currentFrame: animationFrame,
   };
   
   const onSimulation = () => {

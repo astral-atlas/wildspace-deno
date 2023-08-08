@@ -36,6 +36,7 @@
   },
   "npm": {
     "specifiers": {
+      "@types/node": "@types/node@18.16.19",
       "concurrently": "concurrently@8.2.0",
       "vite": "vite@4.4.7",
       "vite@^4.3.9": "vite@4.4.7"
@@ -133,6 +134,10 @@
       },
       "@esbuild/win32-x64@0.18.17": {
         "integrity": "sha512-fGEb8f2BSA3CW7riJVurug65ACLuQAzKq0SSqkY2b2yHHH0MzDfbLyKIGzHwOI/gkHcxM/leuSW6D5w/LMNitA==",
+        "dependencies": {}
+      },
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
         "dependencies": {}
       },
       "ansi-regex@5.0.1": {

@@ -12,6 +12,7 @@ export const useAnimation = (
 
   useEffect(() => {
     const subscription = scheduler.animation.subscribe(key, onAnimationFrame);
+    onAnimationFrame(scheduler.currentFrame);
     return subscription.unsubscribe;
   }, [key, scheduler, ...deps]);
 };
