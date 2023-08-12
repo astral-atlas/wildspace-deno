@@ -1,18 +1,17 @@
 import { useRenderSetup, RenderSetupOverrides } from "./mod.ts";
 
 import { renderSetupContext } from "./RenderSetupContext.ts";
-import {
-  h, scene, Component, SceneProps
-} from './deps.ts';
+import { act, actThree, three } from './deps.ts';
+const { h } = act;
 
 export type SimpleCanvasProps = {
   className?: string,
   canvasProps?: { [prop: string]: unknown },
-  sceneProps?: SceneProps,
+  sceneProps?: actThree.SceneProps,
   overrides?: RenderSetupOverrides,
 }
 
-export const SimpleCanvas: Component<SimpleCanvasProps> = ({
+export const SimpleCanvas: act.Component<SimpleCanvasProps> = ({
   children,
   className = '',
   canvasProps = {},
@@ -30,7 +29,7 @@ export const SimpleCanvas: Component<SimpleCanvasProps> = ({
       tabIndex: 0,
       className,
     }),
-    h(scene, { ...sceneProps, ref: render.sceneRef },
+    h(actThree.scene, { ...sceneProps, ref: render.sceneRef },
       h(renderSetupContext.Provider, { value: render },
         children)),
   ];

@@ -1,30 +1,19 @@
-import { Deps, Ref, useEffect, useMemo, useRef } from "./deps.ts";
-
-import {
-  FrameSchedulerEmitter,
-  createFrameSchedulerEmitter,
-  AnimationFrame,
-  useFrameScheduler,
-
-  PerspectiveCamera, Scene,
-  SRGBColorSpace, WebGLRenderer,
-  CSS2DRenderer,
-} from "./deps.ts";
+import { act, css2d, schedule, three } from "./deps.ts"
 
 export type RenderSetup = {
-  canvasRef:  Ref<null | HTMLCanvasElement>,
-  cameraRef:  Ref<null | PerspectiveCamera>,
-  rootRef:    Ref<null | HTMLElement>,
-  sceneRef:   Ref<null | Scene>,
+  canvasRef:  act.Ref<null | HTMLCanvasElement>,
+  cameraRef:  act.Ref<null | three.PerspectiveCamera>,
+  rootRef:    act.Ref<null | HTMLElement>,
+  sceneRef:   act.Ref<null | three.Scene>,
 
-  renderEmitter: FrameSchedulerEmitter<RenderFrame>
+  renderEmitter: schedule.FrameSchedulerEmitter<RenderFrame>
 };
 
 export type RenderSetupOverrides = {
-  canvasRef?: Ref<null | HTMLCanvasElement>,
-  cameraRef?: Ref<null | PerspectiveCamera>,
-  sceneRef?:  Ref<null | Scene>,
-  rootRef?:   Ref<null | HTMLElement>,
+  canvasRef?: act.Ref<null | HTMLCanvasElement>,
+  cameraRef?: act.Ref<null | three.PerspectiveCamera>,
+  sceneRef?:  act.Ref<null | three.Scene>,
+  rootRef?:   act.Ref<null | HTMLElement>,
 
   onResize?: (
     width: number,
@@ -32,33 +21,33 @@ export type RenderSetupOverrides = {
   ) => void,
 };
 
-const useOverridableRef = <T>(override: void | Ref<null | T>): Ref<null | T> => {
-  const localRef = useRef<null | T>(null);
+const useOverridableRef = <T>(override: void | act.Ref<null | T>): act.Ref<null | T> => {
+  const localRef = act.useRef<null | T>(null);
   return override || localRef;
 }
 
-export type RenderFrame = AnimationFrame & {
-  camera: PerspectiveCamera,
+export type RenderFrame = schedule.AnimationFrame & {
+  camera: three.PerspectiveCamera,
   canvas: HTMLCanvasElement,
-  scene: Scene,
+  scene: three.Scene,
 };
 
 export const useRenderSetup = (
   overrides: RenderSetupOverrides = {},
-  deps: Deps = []
+  deps: act.Deps = []
 ): RenderSetup => {
   const canvasRef = useOverridableRef(overrides.canvasRef);
   const cameraRef = useOverridableRef(overrides.cameraRef);
   const sceneRef = useOverridableRef(overrides.sceneRef);
   const rootRef = useOverridableRef(overrides.rootRef);
 
-  const scheduler = useFrameScheduler();
+  const scheduler = schedule.useFrameScheduler();
 
-  const renderEmitter = useRef(
-    createFrameSchedulerEmitter<RenderFrame>()
+  const renderEmitter = act.useRef(
+    schedule.createFrameSchedulerEmitter<RenderFrame>()
   ).current;
 
-  useEffect(() => {
+  act.useEffect(() => {
     const { current: canvas } = canvasRef;
     const { current: camera } = cameraRef;
     const { current: scene } = sceneRef;
@@ -69,11 +58,10 @@ export const useRenderSetup = (
 
     const options = {
       canvas,
-      alpha: true,
     }
-    const renderer = new WebGLRenderer(options);
-    const css2dRenderer = root && new CSS2DRenderer({ element: root });
-    renderer.outputColorSpace = SRGBColorSpace;
+    const renderer = new three.WebGLRenderer(options);
+    const css2dRenderer = root && new css2d.CSS2DRenderer({ element: root });
+    renderer.outputColorSpace = three.SRGBColorSpace;
     
     const renderEvent: RenderFrame = {
       deltaMs: 0,
@@ -82,7 +70,7 @@ export const useRenderSetup = (
       canvas,
       scene,
     };
-    const onRender = (frame: AnimationFrame) => {
+    const onRender = (frame: schedule.AnimationFrame) => {
       renderEvent.deltaMs = frame.deltaMs;
       renderEvent.now = frame.now;
       renderEmitter.invoke(renderEvent);
@@ -114,7 +102,7 @@ export const useRenderSetup = (
     }
   }, deps)
 
-  const setup = useMemo(() => ({
+  const setup = act.useMemo(() => ({
     canvasRef,
     cameraRef,
     sceneRef,

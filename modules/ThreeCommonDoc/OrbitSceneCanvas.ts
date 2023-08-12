@@ -1,28 +1,19 @@
-import {
-  PerspectiveCamera,
-  SimpleCanvas,
-  Vector3,
-  useAnimation,
-  perspectiveCamera,
-  Component,
-  h,
-  useRef,
-Color,
-} from "./deps.ts";
+import { act, actThree, schedule, three, threeCommon } from "./deps.ts";
+const { h } = act;
 
 export type OrbitSceneCanvasProps = {
   speed?: number;
   distance?: number;
 };
 
-export const OrbitSceneCanvas: Component<OrbitSceneCanvasProps> = ({
+export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
   speed = .1,
   distance = 50,
   children,
 }) => {
-  const cameraRef = useRef<PerspectiveCamera | null>(null);
+  const cameraRef = act.useRef<three.PerspectiveCamera | null>(null);
 
-  useAnimation("OrbitSceneCanvas", ({ now }) => {
+  schedule.useAnimation("OrbitSceneCanvas", ({ now }) => {
     const camera = cameraRef?.current;
     if (!camera) return;
 
@@ -31,14 +22,13 @@ export const OrbitSceneCanvas: Component<OrbitSceneCanvasProps> = ({
       distance,
       Math.cos((now / 1000) * speed * Math.PI * 2) * distance
     );
-    camera.lookAt(new Vector3(0, 0, 0));
+    camera.lookAt(new three.Vector3(0, 0, 0));
   });
 
-  return h(SimpleCanvas, {
+  return h(threeCommon.SimpleCanvas, {
     overrides: { cameraRef },
-    //sceneProps: { background: new Color('white') }
   }, [
-    h(perspectiveCamera, { ref: cameraRef }),
+    h(actThree.perspectiveCamera, { ref: cameraRef }),
     children,
   ]);
 };
