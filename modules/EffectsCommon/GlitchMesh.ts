@@ -1,33 +1,25 @@
-import { act, actThree , three, gltf } from "./deps.ts";
-// @deno-types="vite-text" 
-import glyphsURL from './glyphs.png';
-// @deno-types="vite-text" 
-import glitchMeshesURL from './glitch_meshes.glb';
-import { useEffect, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { act, actThree, three, gltf } from "./deps.ts";
+// @deno-types="vite-text"
+import glyphsURL from "./glyphs.png";
+// @deno-types="vite-text"
+import glitchMeshesURL from "./glitch_meshes.glb";
 
-const { h } = act;
+const { h, useEffect, useState } = act;
 
 const textureLoader = new three.TextureLoader();
-const gltfLoader = new gltf.GLTFLoader()
+const gltfLoader = new gltf.GLTFLoader();
 
-const map = textureLoader.load(glyphsURL)
+const map = textureLoader.load(glyphsURL);
 map.flipY = false;
 
 const material = new three.MeshBasicMaterial({
   map,
-  color: 'grey',
+  color: "grey",
   transparent: true,
   side: three.DoubleSide,
-})
+});
 map.minFilter = three.NearestFilter;
 map.magFilter = three.NearestFilter;
-
-const glitchMeshScene = await gltfLoader.loadAsync(glitchMeshesURL);
-
-const glitchMeshMap = new Map(glitchMeshScene.scene.children
-  .map(mesh => [mesh.name, mesh]))
-
-console.log(glitchMeshScene.scene.children)
 
 export const glitchNames = [
   "BaseGrid",
@@ -35,36 +27,54 @@ export const glitchNames = [
   "GlitchBGrid",
   "GlitchCGrid",
   "GlitchDGrid",
-]
+];
 
-const tiledMeshes = Array.from({ length: 4 }).flatMap((_, tileX) => {
-  return Array.from({ length: 4 }).flatMap((_, tileY) => {
-    return glitchNames.map((name) => {
-      const mesh = glitchMeshMap.get(name);
-      if (!mesh || !(mesh instanceof three.Mesh))
-        throw new Error(`glitch_meshes is missing ${name}`);
-      const originalGeometry = mesh.geometry;
-      if (!(originalGeometry instanceof three.BufferGeometry))
-        throw new Error();
-    
-      const geo = originalGeometry.clone();
-      const uvs = geo.getAttribute('uv');
-      for (let i = 0; i < uvs.count; i++) {
-        const x = (uvs.getX(i) / 4) + tileX/4;
-        const y = (uvs.getY(i) / 4) + tileY/4;
-        uvs.setXY(i, x, y);
-      }
-      return [tileX, tileY, name, geo] as const;
-    })
+const loadTiledMeshes = async () => {
+  const glitchMeshScene = await gltfLoader.loadAsync(glitchMeshesURL);
+
+  const glitchMeshMap = new Map(
+    glitchMeshScene.scene.children.map((mesh) => [mesh.name, mesh])
+  );
+
+  const tiledMeshes = Array.from({ length: 4 }).flatMap((_, tileX) => {
+    return Array.from({ length: 4 }).flatMap((_, tileY) => {
+      return glitchNames.map((name) => {
+        const mesh = glitchMeshMap.get(name);
+        if (!mesh || !(mesh instanceof three.Mesh))
+          throw new Error(`glitch_meshes is missing ${name}`);
+        const originalGeometry = mesh.geometry;
+        if (!(originalGeometry instanceof three.BufferGeometry))
+          throw new Error();
+
+        const geo = originalGeometry.clone();
+        const uvs = geo.getAttribute("uv");
+        for (let i = 0; i < uvs.count; i++) {
+          const x = uvs.getX(i) / 4 + tileX / 4;
+          const y = uvs.getY(i) / 4 + tileY / 4;
+          uvs.setXY(i, x, y);
+        }
+        return [tileX, tileY, name, geo] as const;
+      });
+    });
   });
-})
+  return tiledMeshes;
+};
 
 export type GlitchMeshProps = {
-  tile: three.Vector2,
-  state?: typeof glitchNames[number]
-}
+  tile: three.Vector2;
+  state?: (typeof glitchNames)[number];
+};
 
 export const GlitchMesh: act.Component<GlitchMeshProps> = ({ tile }) => {
+  const [tiledMeshes, setTiledMeshes] = useState<
+    null | (readonly [number, number, string, three.BufferGeometry])[]
+  >(null);
+  useEffect(() => {
+    loadTiledMeshes()
+      .then((tiledMeshes) => setTiledMeshes(tiledMeshes))
+      .catch(console.error);
+  }, []);
+
   const [glitchState, setGlitchState] = useState(0);
 
   useEffect(() => {
@@ -75,12 +85,14 @@ export const GlitchMesh: act.Component<GlitchMeshProps> = ({ tile }) => {
     const runNormal = () => {
       setGlitchState(0);
       id = setTimeout(runGlitch, Math.random() * 1000);
-    }
+    };
     let id = setTimeout(runGlitch, 1000);
     return () => {
       clearTimeout(id);
-    }
-  }, [])
+    };
+  }, []);
+
+  if (!tiledMeshes) return null;
 
   const state = glitchNames[glitchState];
 
@@ -88,12 +100,11 @@ export const GlitchMesh: act.Component<GlitchMeshProps> = ({ tile }) => {
     return tileX === tile.x && tileY === tile.y && tileState === state;
   });
 
-
   console.log(tileSet);
 
   return h(actThree.mesh, {
     material,
     scale: new three.Vector3(10, 10, 10),
-    geometry: tileSet && tileSet[3] || tiledMeshes[0][3],
+    geometry: (tileSet && tileSet[3]) || tiledMeshes[0][3],
   });
 };
