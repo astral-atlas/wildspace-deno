@@ -5,7 +5,7 @@ Ref,
 } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
 import { Particle2D, ParticleSettings } from "../BoxParticle/particle.ts";
-import { Box2, Vector2 } from "https://esm.sh/three";
+import { Box2, Vector2 } from "https://esm.sh/three@0.155.0";
 import { simulateParticle2D } from "../BoxParticle/mod.ts";
 import { useSimulation } from "../FrameScheduler/useSimulation.ts";
 import { useKeyboardElementRef } from "../Keyboard/useKeyboardElementRef.ts";
