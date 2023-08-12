@@ -26,6 +26,7 @@ export const SimpleCanvas: act.Component<SimpleCanvasProps> = ({
       ...canvasProps,
       ref: render.canvasRef,
       width: 600, height: 300,
+      style: { flex: 1 },
       tabIndex: 0,
       className,
     }),

@@ -1,3 +1,4 @@
+import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
 import { act, actThree, schedule, three, threeCommon } from "./deps.ts";
 const { h } = act;
 
@@ -25,10 +26,12 @@ export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
     camera.lookAt(new three.Vector3(0, 0, 0));
   });
 
-  return h(threeCommon.SimpleCanvas, {
-    overrides: { cameraRef },
-  }, [
-    h(actThree.perspectiveCamera, { ref: cameraRef }),
-    children,
+  return h(FramePresenter, {}, [
+    h(threeCommon.SimpleCanvas, {
+      overrides: { cameraRef },
+    }, [
+      h(actThree.perspectiveCamera, { ref: cameraRef }),
+      children,
+    ])
   ]);
 };

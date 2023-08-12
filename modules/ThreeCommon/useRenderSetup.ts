@@ -58,6 +58,7 @@ export const useRenderSetup = (
 
     const options = {
       canvas,
+      alpha: true,
     }
     const renderer = new three.WebGLRenderer(options);
     const css2dRenderer = root && new css2d.CSS2DRenderer({ element: root });

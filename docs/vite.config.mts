@@ -2,5 +2,9 @@ export default {
   build: {
     sourcemap: true
   },
-  assetsInclude: ['**/*.md']
+  assetsInclude: [
+    '**/*.md',
+    '**/*.gltf',
+    '**/*.glb',
+  ]
 };
