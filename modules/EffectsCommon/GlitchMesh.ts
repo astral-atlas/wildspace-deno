@@ -1,10 +1,9 @@
 import { act, actThree, three, gltf } from "./deps.ts";
-// @deno-types="vite-text"
-import glyphsURL from "./glyphs.png";
-// @deno-types="vite-text"
-import glitchMeshesURL from "./glitch_meshes.glb";
-
 const { h, useEffect, useState } = act;
+
+const glyphsURL       = new URL('./glyphs.png', import.meta.url).href
+const glitchMeshesURL = new URL('./glitch_meshes.glb', import.meta.url).href
+
 
 const textureLoader = new three.TextureLoader();
 const gltfLoader = new gltf.GLTFLoader();
