@@ -1,6 +1,6 @@
-export type UserID = string;
-export type User = {
-  id: UserID,
+export type SesameUserID = string;
+export type SesameUser = {
+  id: SesameUserID,
 
   name: string,
 }
