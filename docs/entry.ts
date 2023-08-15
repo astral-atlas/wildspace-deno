@@ -10,6 +10,7 @@ import { keyboardDocs } from "../modules/Keyboard/docs.ts";
 import { bigTableDocs } from "../modules/BigTable/docs.ts";
 import { threeCommonDocDocs } from "../modules/ThreeCommonDoc/docs.ts";
 import { effectsCommonDocs } from "../modules/EffectsCommon/docs.ts";
+import { sesameDataServiceDocs } from "../modules/Data/SesameDataService/docs.ts";
 
 const sheets = [
   frameSchedulerDocs,
@@ -20,6 +21,7 @@ const sheets = [
   bigTableDocs,
   threeCommonDocDocs,
   effectsCommonDocs,
+  sesameDataServiceDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {

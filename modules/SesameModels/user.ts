@@ -1,6 +1,12 @@
-export type SesameUserID = string;
-export type SesameUser = {
-  id: SesameUserID,
+import { OfModelType } from "../Models/model.ts";
 
-  name: string,
-}
+export const userDefinition = {
+  type: 'object',
+  properties: {
+    id: { type: 'string' },
+    name: { type: 'string' },
+    passwordSecretId: { type: 'string' },
+  }
+} as const;
+export type SesameUser = OfModelType<typeof userDefinition>;
+export type SesameUserID = SesameUser["id"];
