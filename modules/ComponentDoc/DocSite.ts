@@ -42,24 +42,30 @@ export const DocSite: Component<DocSiteProps> = ({ sheets, initialSheet }) => {
   return h(
     navigationContext.Provider,
     { value: navigation },
-    h("div", {}, [
-      h("nav", { class: docSiteStyles.sheetList }, [
-        ...sheets.map((sheet) =>
-          h("li",
-            {},
-            h("a", {
-                href: sheet.id,
-                onClick: onNavClick(sheet.id),
-                classList: [
-                  sheet.id === selectedSheet.id && docSiteStyles.selected,
-                ],
-              },
-              sheet.id
+    h("div", { class: docSiteStyles.site }, [
+      h('div', { class: docSiteStyles.sheetListContainer }, [
+        h("nav", { class: docSiteStyles.sheetList }, [
+          ...sheets.map((sheet) =>
+            h("li",
+              {},
+              h("a", {
+                  href: sheet.id,
+                  onClick: onNavClick(sheet.id),
+                  classList: [
+                    sheet.id === selectedSheet.id && docSiteStyles.selected,
+                  ],
+                },
+                sheet.id
+              )
             )
-          )
-        ),
+          ),
+        ]),
       ]),
-      !!selectedSheet && h(DocPage, { elements: selectedSheet.elements }),
+      h('div', { class: docSiteStyles.pageContainer }, [
+        h('div', { class: docSiteStyles.page }, [
+          !!selectedSheet && h(DocPage, { elements: selectedSheet.elements }),
+        ])
+      ])
     ])
   );
 };

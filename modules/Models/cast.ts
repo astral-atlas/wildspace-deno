@@ -1,28 +1,34 @@
-import { Model, ModelOf, ModeledType, OfModelType } from "./model.ts";
+// @ts-nocheck This file does to mean things to the type system.
+// best just to trust it's types.
+import { Model, OfModelType } from "./model.ts";
 
 export type Cast<T> = (value: unknown) => T;
 
-export const createModelCaster = <T extends ModeledType>(
-  modelDefinition: ModelOf<T>,
-): Cast<T> => {
+export const createModelCaster = <I extends Model>(
+  modelDefinition: I,
+): Cast<OfModelType<I>> => {
   switch (modelDefinition.type) {
     case 'number':
-      return castNumber as Cast<T>;
+      return castNumber as Cast<OfModelType<I>>;
     case 'string':
-      return castString as Cast<T>;
+      return castString as Cast<OfModelType<I>>;
     case 'boolean':
-      return castBoolean as Cast<T>;
+      return castBoolean as Cast<OfModelType<I>>;
     case 'object':
       return createObjectCaster(
         Object.fromEntries(
           Object.entries(modelDefinition)
             .map(([key, model]) => [key, createModelCaster(model)])
         )
-      ) as Cast<T>;
+      ) as any;
     case 'array':
       return createArrayCaster(
+        // @ts-ignore j
         createModelCaster(modelDefinition.elements)
-      ) as Cast<T>;
+      ) as any;
+    case 'literal':
+    case 'enum':
+    case 'union':
     default:
       throw new Error();
   }

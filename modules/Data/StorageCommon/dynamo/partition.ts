@@ -1,27 +1,88 @@
-import { createModelCaster } from "../../../Models/cast.ts";
-import { ModelOf } from "../../../Models/model.ts";
+import { castString, createModelCaster } from "../../../Models/cast.ts";
+import { ModelOf, OfModelType } from "../../../Models/model.ts";
 import { dynamo } from "../deps.ts";
 import { AttributeRecord, TypeOfAttributeValue, attributeMapToObject, objectToAttributeMap, valueToAttribute } from "./attributes.ts";
 import { DynamoTableDefinition } from "./table.ts";
 
 export type DynamoPartitionType = {
   value: { readonly [key: string]: TypeOfAttributeValue },
+  part?: string | undefined,
+  sort: string
 };
+export type AnyDynamoPartitionType = {
+  value: any,
+  part?: string,
+  sort: string,
+}
+export type DynamoKey<T extends DynamoPartitionType> = {
+  //part: T["part"] extends string ? T["part"] : undefined,
+  sort: T["sort"],
+} & DynamoPartitionKey<T>;
+
+export type DynamoPartitionKey<T extends DynamoPartitionType> =
+  T["part"] extends string ?
+    { part: T["part"] }
+    : T["part"] extends undefined ?
+      { part?: undefined }
+      : { part?: any }
+
+export type DynamoPartitionCondition =
+  | 'equal' | 'less_than'
+  | 'greater_than' | 'between'
+  | 'begins_with'
+export type DynamoPartitionQuery<T extends DynamoPartitionType> = (
+  | { type: 'all' }
+  | { type: 'equal', sort: string }
+  | { type: 'less_than', sort: string }
+  | { type: 'greater_than', sort: string }
+) & DynamoPartitionKey<T>
 
 export type DynamoPartitionDefinition<T extends DynamoPartitionType> = {
-  partitionPrefix: string,
-  model: ModelOf<T["value"]>,
-  partitionKey: keyof T["value"],
-  sortKey: keyof T["value"],
+  partitionPrefix:  string,
+  model:            ModelOf<T["value"]>,
 }
 
 export type DynamoQueryResults<T extends DynamoPartitionType> = {
-  items: T["value"][];
-};
+  value: T["value"];
+  key: DynamoKey<T>;
+}[];
+
+const createQueryCommand = <T extends DynamoPartitionType>(
+  query: DynamoPartitionQuery<T>,
+  { partitionPrefix }: DynamoPartitionDefinition<T>,
+  { partitionKeyName, sortKeyName, tableName }: DynamoTableDefinition
+) => {
+  const partition = partitionPrefix + (query.part || '');
+  if (query.type === 'all')
+    return new dynamo.QueryCommand({
+      TableName: tableName,
+      KeyConditionExpression: `${partitionKeyName} = :partition`,
+      ExpressionAttributeValues: { ":partition": valueToAttribute(partition) },
+    });
+  
+  const conditionSyntaxMap = {
+    'equal':        '=',
+    'less_than':    '<',
+    'greater_than': '<',
+  }
+  const conditionSyntax = conditionSyntaxMap[query.type];
+  return new dynamo.QueryCommand({
+    TableName: tableName,
+    KeyConditionExpression: `${partitionKeyName} = :partition AND ${sortKeyName} ${conditionSyntax} :sort`,
+    ExpressionAttributeValues: {
+      ":partition": valueToAttribute(partition),
+      ":sort": valueToAttribute(query.sort),
+    },
+  });
+}
 
 export type DynamoPartitionClient<T extends DynamoPartitionType> = {
-  put: (value: T["value"]) => Promise<void>;
-  query: (partition: string, sort?: string) => Promise<DynamoQueryResults<T>>;
+  definition: DynamoPartitionDefinition<T>,
+
+  put: (key: DynamoKey<T>, value: T["value"] | null) => Promise<void>;
+  delete: (key: DynamoKey<T>) => Promise<void>;
+  get: (key: DynamoKey<T>) => Promise<T["value"]>;
+  query: (query: DynamoPartitionQuery<T>) => Promise<DynamoQueryResults<T>>;
 };
 
 export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
@@ -29,33 +90,6 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
   definition: DynamoPartitionDefinition<T>,
   client: dynamo.DynamoDBClient,
 ): DynamoPartitionClient<T> => {
-  type Partition = T["value"][typeof definition.partitionKey];
-  type Sort = T["value"][typeof definition.sortKey];
-
-  const encodeKeyAttributes = (
-    partition: Partition,
-    sort?: Sort
-  ) => {
-    const partitionKey = {
-      [table.partitionKeyName]: definition.partitionPrefix + partition,
-    }
-    if (!sort)
-      return partitionKey;
-
-    return {
-      ...partitionKey,
-      [table.sortKeyName]: sort,
-    }
-  }
-  const encode = (value: T["value"]) => {
-    return objectToAttributeMap({
-      ...encodeKeyAttributes(
-        value[definition.partitionKey],
-        value[definition.sortKey],
-      ),
-      [table.valueKeyName]: value,
-    });
-  }
   const decode = (attributes: AttributeRecord) => {
     const map = attributeMapToObject(attributes);
     return cast(map[table.valueKeyName]);
@@ -63,35 +97,61 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
   const cast = createModelCaster(definition.model);
 
   return {
-    async put(value: T["value"]) {
+    definition,
+    async put(key, value) {
+      const partition = definition.partitionPrefix + (key.part || '');
       await client.send(
         new dynamo.PutItemCommand({
           TableName: table.tableName,
-          Item: encode(value),
+          Item: objectToAttributeMap({
+            [table.partitionKeyName]: partition,
+            [table.sortKeyName]: key.sort,
+            [table.valueKeyName]: value,
+          })
         })
       );
     },
-    async query(partition, sort) {
-      const sortInput = sort && {
-        KeyConditionExpression: `${table.partitionKeyName} = :partition AND ${table.sortKeyName} = :sort`,
-        ExpressionAttributeValues: {
-          ":partition": valueToAttribute(partition),
-          ":sort": valueToAttribute(sort),
-        },
-      };
-      const input = {
-        TableName: table.tableName,
-        KeyConditionExpression: `${table.partitionKeyName} = :partition`,
-        ExpressionAttributeValues: { ":partition": valueToAttribute(partition) },
-        ...(sortInput || {}),
-      }
-
-      const results = await client.send(
-        new dynamo.QueryCommand(input)
+    async delete(key) {
+      const partition = definition.partitionPrefix + (key.part || '');
+      await client.send(
+        new dynamo.DeleteItemCommand({
+          TableName: table.tableName,
+          Key: objectToAttributeMap({
+            [table.partitionKeyName]: partition,
+            [table.sortKeyName]: key.sort,
+          })
+        })
       );
-      if (!results.Items) return { items: [] };
-      const items = results.Items.map((item) => decode(item));
-      return { items };
+    },
+    async get(key) {
+      const partition = definition.partitionPrefix + (key.part || '');
+      const { Item } = await client.send(new dynamo.GetItemCommand({
+        TableName: table.tableName,
+        Key: objectToAttributeMap({
+          [table.partitionKeyName]: partition,
+          [table.sortKeyName]: key.sort,
+        })
+      }))
+      if (!Item)
+        throw new Error();
+      return cast(decode(Item));
+    },
+    async query(queryInput) {
+      const results = await client.send(
+        createQueryCommand(queryInput, definition, table)
+      );
+      if (!results.Items)
+        throw new Error();
+      return results.Items
+        .map((item) => decode(item))
+        .map(item => ({
+          key: {
+            part: castString(item[table.partitionKeyName])
+              .slice(definition.partitionPrefix.length),
+            sort: castString(item[table.sortKeyName])
+          } as unknown as DynamoKey<T>,
+          value: cast(item[table.valueKeyName])
+        }))
     }
   };
 };

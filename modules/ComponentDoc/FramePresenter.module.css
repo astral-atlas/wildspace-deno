@@ -1,5 +1,6 @@
 .framePresenterContainer {
-  border: 1px solid black;
+  border: 1px dotted black;
+  border-radius: 2px;
   background-color: beige;
 
   width: auto;

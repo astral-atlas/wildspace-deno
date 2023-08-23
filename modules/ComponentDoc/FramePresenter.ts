@@ -8,6 +8,7 @@ import { randomSoftColor } from "../RandomThingGenerator/random.ts";
 
 export type FramePresenterProps = {
   height?: string,
+  negativeMargin?: number,
   padding?: string,
   backgroundColor?: string,
 };
@@ -16,13 +17,16 @@ export const FramePresenter: Component<FramePresenterProps> = ({
   children,
   //style,
   height = '512px',
+  negativeMargin = 0,
   padding = '0px',
   backgroundColor = randomSoftColor()
 }) => {
   return [
     h('div', { class: styles.framePresenterContainer, style: {
       height, 
-      backgroundColor
+      backgroundColor,
+      marginLeft: `${-negativeMargin}px`,
+      marginRight: `${-negativeMargin}px`,
     } }, [
       h('div', { class: styles.framePresenterContent, style: {
         position: 'relative',

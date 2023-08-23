@@ -1,48 +1,63 @@
-import { h, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { createContext, h, useContext, useEffect, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { markdownToSheet, DocSheet } from "../../ComponentDoc/mod.ts";
 
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
-import { createMemoryDynamoStore } from "../StorageCommon/mod.ts";
+import { AnyDynamoPartitionType, DynamoPartitionClient, MemoryStoreItem, createMemoryDynamoStore } from "../StorageCommon/mod.ts";
 import { createStoredSesameDataService } from "./mod.ts";
 import { models } from "./deps.ts";
+import { BigTable } from "../../BigTable/BigTable.ts";
+import { FramePresenter } from "../../ComponentDoc/FramePresenter.ts";
+import { act } from "../../EffectsCommon/deps.ts";
+import { MemorySesameStore, createMemorySesameStore } from "./stores.ts";
+import { DynamoMemoryStoreExtension, DynamoPartitionType } from "../StorageCommon/dynamo/mod.ts";
+import { StoreVisualzer } from "../DataDoc/mod.ts";
 
-const Demo = () => {
-  const users = useRef(
-    createMemoryDynamoStore<{ value: models.SesameUser }>({
-      partitionKey: "id",
-      sortKey: "id",
-    })
-  ).current;
-  const secrets = useRef(
-    createMemoryDynamoStore<{ value: models.SesameSecret }>({
-      partitionKey: "id",
-      sortKey: "id",
-    })
-  ).current;
-  const sesame = useRef(createStoredSesameDataService(users, secrets)).current;
+const demoContext = createContext<{ store: MemorySesameStore } | null>(null);
+const useDemoContext = () => {
+  const context = useContext(demoContext);
+  if (!context)
+    throw new Error();
+  return context;
+}
+const DemoContextProvider: act.Component = ({ children }) => {
+  const store = useRef(createMemorySesameStore()).current;
 
-  const [allUsers, setAllUsers] = useState<models.SesameUser[]>([]);
+  return h(demoContext.Provider, { value: { store }}, children);
+};
+
+const ServiceDemo = () => {
+  const { store } = useDemoContext();
+  const sesame = useRef(createStoredSesameDataService(store, { type: 'guest' })).current;
 
   const onClick = async () => {
-    const user = await sesame.addUser("Luke", "Kaalim");
-    setAllUsers(users.memory());
-    console.log(await sesame.getUser(user.id));
+    await sesame.user.create({
+      name: "Luke",
+      password: "secret"
+    });
   };
+
+  return h('button', { onClick }, [
+    'Add user'
+  ]);
+};
+
+
+const StoreDemo = () => {
+  const { store } = useDemoContext();
   return [
-    h("button", { onClick }, "Click"),
-    h(
-      "ol",
-      {},
-      allUsers.map((user) => h("li", {}, user.name))
-    ),
+    h(StoreVisualzer, { store: store.users, name: 'Users' }),
+    h(StoreVisualzer, { store: store.apps, name: 'Apps' }),
+    h(StoreVisualzer, { store: store.secrets, name: 'Secrets' }),
+    h(StoreVisualzer, { store: store.userNamesById, name: 'Usernames' }),
   ];
 };
 
 const demos = {
-  demo: Demo,
+  service_demo: ServiceDemo,
+  store_demo: StoreDemo,
 };
 
 export const sesameDataServiceDocs: DocSheet[] = [
-  markdownToSheet("SesameDataService", readme, demos),
+  markdownToSheet("SesameDataService", readme, demos, DemoContextProvider),
 ];

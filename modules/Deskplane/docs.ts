@@ -41,8 +41,10 @@ export const GridSVGDemo: Component = () => {
     patternRef.current?.setAttribute('y', (Math.sin(now / 1000) * 100).toString());
   })
 
-  return h('div', { ref, tabIndex: 0 }, [
-    h(GridSVG, { patternRef })
+  return h(FramePresenter, {}, [
+    h('div', { ref, tabIndex: 0, style: { display: 'flex', flex: 1 } }, [
+      h(GridSVG, { patternRef, style: { flex: 1, } })
+    ])
   ]);
 }
 

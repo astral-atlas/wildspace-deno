@@ -1,73 +1,159 @@
+import { SesameApp } from "../../SesameModels/app.ts";
 import { SesameSecret } from "../../SesameModels/secret.ts";
-import { SesameUser } from "../../SesameModels/user.ts";
-import { models, nanoid, network, storage } from "./deps.ts";
+import { SesameUser, SesameUserID } from "../../SesameModels/user.ts";
+import { m } from "../NetworkCommon/deps.ts";
+import { CRUDType } from "../ServiceCommon/crudService.ts";
+import { AuthenticatedCRUDService, AuthenticatedMethod, UnauthenticatedMethod, UnauthorizedError, createAuthenticatedService } from "./auth.ts";
+import { models, nanoid, network, rxjs, service, storage } from "./deps.ts";
+import { SesameStores } from "./stores.ts";
+
+export * from './stores.ts';
+export * from './auth.ts';
+
+const userServiceDefinition = service.createCRUDDefinition({
+  path: '/users',
+  name: 'Users',
+  resource: models.userDefinition,
+  create: m.object({ name: m.string, password: m.string }),
+  update: m.object({ name: m.string }),
+  id: m.object({ id: m.string }),
+  filter: m.object({ }),
+} as const);
+type UserServiceType = service.TypeOfCRUDDefinition<typeof userServiceDefinition>;
+
+const appServiceDefinition = service.createCRUDDefinition({
+  path: '/apps',
+  name: "Applications",
+  resource: models.appDefinition,
+  create: m.object({ name: m.string }),
+  update: m.object({ name: m.string }),
+  id:     m.object({ id: m.string }),
+  filter: m.object({ userId: m.string }),
+})
+type AppServiceType = service.TypeOfCRUDDefinition<typeof appServiceDefinition>;
 
 export type SesameDataService = {
-  addUser: (name: string, password: string) => Promise<models.SesameUser>,
-  getUser: (id: models.SesameUserID) => Promise<models.SesameUser>,
-  validateUser: (id: models.SesameUserID, secret: string) => Promise<boolean>,
+  user: service.CRUDService<UserServiceType>,
+  apps: service.CRUDService<AppServiceType>,
+
+  userEvents: rxjs.Observable<{ user: models.SesameUser }>,
+  loginUser: (username: string, password: string) => Promise<{ user: null | models.SesameUser }>,
 };
 
-export const userPartitionDefinition = {
-  partitionPrefix: 'user',
-
-  model: models.userDefinition,
-  partitionKey: 'id',
-  sortKey: 'id',
-} as const;
-
-export const createStoredSesameDataService = (
-  userStore: storage.DynamoPartitionClient<{ value: SesameUser }>,
-  secretStore: storage.DynamoPartitionClient<{ value: SesameSecret }>,
-): SesameDataService => {
-  const addUser = async (name: string, password: string) => {
-    const passwordSecretId = nanoid.nanoid(32);
-    const passwordSecret = { id: passwordSecretId, value: password };
-    await secretStore.put(passwordSecret)
-    const userId = nanoid.nanoid(32);
-    const user = { id: userId, name, passwordSecretId };
-    await userStore.put(user);
+const createStoredUserService = (
+  role: models.SesameRole,
+  stores: SesameStores
+): SesameDataService["user"] => ({
+  async create({ name, password }) {
+    const passwordSecret: models.SesameSecret = {
+      id: nanoid.nanoid(),
+      value: password
+    }
+    await stores.secrets.put({ sort: passwordSecret.id }, passwordSecret)
+    const user: models.SesameUser = {
+      id: nanoid.nanoid(),
+      name,
+      passwordSecretId: passwordSecret.id
+    }
+    await stores.userNamesById.put({ sort: user.name }, { userId: user.id });
+    await stores.users.put({ sort: user.id }, user);
+    stores.userEvents.next({ user })
     return user;
-  };
-  const getUser = async (id: models.SesameUserID) => {
-    const { items } = await userStore.query(id);
-    return items[0];
-  };
-  const validateUser = async (id: models.SesameUserID, providedSecret: string) => {
-    const { items: users } = await userStore.query(id);
-    const user = users[0];
-    const { items: secrets } = await secretStore.query(user.passwordSecretId);
-    const realSecret = secrets[0];
-    return providedSecret === realSecret.value; 
-  };
-
-  return { addUser, getUser, validateUser };
-}
-
-export const createClientSesameDataService = (
-  userEndpoint: network.RESTResource<{
-    resource: models.SesameUser,
-    post: { name: string, password: string },
-    id: { id: models.SesameUserID }
-  }>,
-  validationEndpoint: network.RESTResource<{
-    resource: boolean,
-    post: { id: models.SesameSecretID, secret: string }
-  }>,
-): SesameDataService => ({
-  async addUser(name, password) {
-    return await userEndpoint.post({ name, password })
   },
-  async getUser(id) {
-    return await userEndpoint.get({ id })
+  async update({ id }, { name }) {
+    const prevUser = await stores.users.get({ sort: id });
+    const nextUser = {
+      ...prevUser,
+      name,
+    }
+    await stores.users.put({ sort: id }, nextUser)
+    stores.userEvents.next({ user: nextUser })
   },
-  async validateUser(id, secret) {
-    return await validationEndpoint.post({ id, secret });
+  async list() {
+    const items = await stores.users.query({ type: 'all' });
+    return items.map(item => item.value);
   },
+  async delete({ id }) {
+    await stores.users.delete({ sort: id })
+  },
+  async read({ id }) {
+    return await stores.users.get({ sort: id });
+  }
 })
 
-export const createServerSesameDataService = (
+const createStoredAppService = (
+  role: models.SesameRole,
+  stores: SesameStores,
+): SesameDataService["apps"] => ({
+  async create({ name }) {
+    if (role.type === 'guest')
+      throw new UnauthorizedError()
+    const app: SesameApp = {
+      id: nanoid.nanoid(),
+      owner: role.userId,
+      name,
+      type: role.type === 'user' ? 'third-party' : 'first-party',
+    };
+    await stores.apps.put({ part: app.owner, sort: app.id }, app);
+    return app;
+  },
+  async update({ id }, { name }) {
+    if (role.type === 'guest')
+      throw new UnauthorizedError()
+    const prevApp = await stores.apps.get({ part: role.userId, sort: id });
+    if (role.userId !== prevApp.owner)
+      throw new UnauthorizedError()
+    const nextApp = {
+      ...prevApp,
+      name,
+    }
+    await stores.apps.put({ part: role.userId, sort: id }, nextApp);
+  },
+  async list({ userId }) {
+    const items = await stores.apps.query({ type: 'all', part: userId });
+    return items.map(item => item.value)
+  },
+  async delete({ id }) {
+    if (role.type === 'guest')
+      throw new UnauthorizedError()
+    await stores.apps.delete({ part: role.userId, sort: id })
+  },
+  async read({ id }) {
+    if (role.type === 'guest')
+      throw new UnauthorizedError()
+    return await stores.apps.get({ part: role.userId, sort: id });
+  }
+})
 
-) => {
-
+export const createStoredSesameDataService = (
+  stores: SesameStores,
+  role: models.SesameRole,
+): SesameDataService => {
+  return {
+    user: createStoredUserService(role, stores),
+    apps: createStoredAppService(role, stores),
+    userEvents: stores.userEvents,
+    async loginUser(username, password) {
+      const allusers = await stores.users.query({ type: 'all' })
+      const user = allusers
+        .map(r => r.value)
+        .find((user) => user.name === username)
+      if (!user)
+        return { user: null };
+      const secret = await stores.secrets.get({ sort: user.passwordSecretId });
+      if (!secret)
+        return { user: null }
+      if (secret.value !== password)
+        return { user: null }
+      return { user };
+    }
+  }
 }
+
+export type UnauthenticatedSesameDataService = {
+  user: service.CRUDService<UserServiceType>,
+  apps: service.CRUDService<AppServiceType>,
+
+  userEvents: rxjs.Observable<{ user: models.SesameUser }>
+  loginUser: UnauthenticatedMethod<SesameDataService["loginUser"]>,
+};

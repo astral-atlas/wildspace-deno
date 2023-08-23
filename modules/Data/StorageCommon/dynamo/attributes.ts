@@ -9,6 +9,10 @@ export type TypeOfAttributeValue =
   | { readonly [key: string]: TypeOfAttributeValue }
   | ReadonlyArray<TypeOfAttributeValue>;
 
+export type TypeOfScalarAttributeValue =
+  | string
+  | number
+
 export type AttributeRecord = Record<string, dynamo.AttributeValue>;
 
 export const isAttributeValueEqual = (
