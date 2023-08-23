@@ -3,6 +3,7 @@ import { h, Component } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import {
   useRootNavigation,
   navigationContext,
+    Navigation,
 } from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
 
 import { DocSheet } from "./DocElement.ts";
@@ -13,10 +14,15 @@ import docSiteStyles from "./DocSite.module.css";
 export type DocSiteProps = {
   sheets: DocSheet[];
   initialSheet: string;
+
+  overrideNavigation?: Navigation,
 };
 
-export const DocSite: Component<DocSiteProps> = ({ sheets, initialSheet }) => {
-  const navigation = useRootNavigation();
+export const DocSite: Component<DocSiteProps> = ({
+  sheets, initialSheet, overrideNavigation
+}) => {
+  const localNavigation = useRootNavigation();
+  const navigation = overrideNavigation || localNavigation;
 
   const sheetMap = new Map(sheets.map((s) => [s.id, s]));
 
@@ -42,24 +48,30 @@ export const DocSite: Component<DocSiteProps> = ({ sheets, initialSheet }) => {
   return h(
     navigationContext.Provider,
     { value: navigation },
-    h("div", {}, [
-      h("nav", { class: docSiteStyles.sheetList }, [
-        ...sheets.map((sheet) =>
-          h("li",
-            {},
-            h("a", {
-                href: sheet.id,
-                onClick: onNavClick(sheet.id),
-                classList: [
-                  sheet.id === selectedSheet.id && docSiteStyles.selected,
-                ],
-              },
-              sheet.id
+    h("div", { class: docSiteStyles.site }, [
+      h('div', { class: docSiteStyles.sheetListContainer }, [
+        h("nav", { class: docSiteStyles.sheetList }, [
+          ...sheets.map((sheet) =>
+            h("li",
+              {},
+              h("a", {
+                  href: sheet.id,
+                  onClick: onNavClick(sheet.id),
+                  classList: [
+                    sheet.id === selectedSheet.id && docSiteStyles.selected,
+                  ],
+                },
+                sheet.id
+              )
             )
-          )
-        ),
+          ),
+        ]),
       ]),
-      !!selectedSheet && h(DocPage, { elements: selectedSheet.elements }),
+      h('div', { class: docSiteStyles.pageContainer }, [
+        h('div', { class: docSiteStyles.page }, [
+          !!selectedSheet && h(DocPage, { elements: selectedSheet.elements }),
+        ])
+      ])
     ])
   );
 };

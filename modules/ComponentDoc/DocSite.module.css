@@ -1,9 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@300;400;700&display=swap');
+
 .sheetList {
+  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: row;
 
   list-style-type: none;
   border-bottom: 1px solid black;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.page pre {
+  font-family: 'Roboto Mono', sans-serif;
+}
+
+.sheetListContainer {
+  overflow-x: scroll;
+  display: flex;
+  flex-direction: row;
 }
 
 .sheetList li {
@@ -21,4 +36,49 @@
 .sheetList a.selected {
   background-color: black;
   color: white;
+}
+
+.pageContainer {
+  overflow-y: scroll;
+  flex: 1;
+  padding-right: 40px;
+  padding-left: 40px;
+}
+.page {
+  font-family: 'Roboto', sans-serif;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 64px;
+  padding-bottom: 64px;
+}
+
+.site {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.headingLink {
+  display: inline-block;
+  padding: 8px;
+  margin: -8px;
+  color: rgb(74, 124, 225);
+  transform: scale(1);
+  transition: all 0.2s;
+  position: relative;
+  text-decoration: underline;
+  transform-origin: 50% 50%;
+}
+.headingLink > * {
+  display: inline-block;
+  text-decoration: underline;
+}
+.headingLink:hover {
+  transform: scale(1.1);
+  color: red;
 }

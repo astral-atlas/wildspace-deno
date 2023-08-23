@@ -1,0 +1,12 @@
+.labeledInput {
+  display: flex;
+  flex-direction: column;
+}
+
+.labeledInput > div {
+
+}
+
+.labeledInput > input {
+  
+}

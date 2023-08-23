@@ -11,8 +11,16 @@ import { bigTableDocs } from "../modules/BigTable/docs.ts";
 import { threeCommonDocDocs } from "../modules/ThreeCommonDoc/docs.ts";
 import { effectsCommonDocs } from "../modules/EffectsCommon/docs.ts";
 import { sesameDataServiceDocs } from "../modules/Data/SesameDataService/docs.ts";
+import { authenticationDocs } from "../modules/Authentication/docs.ts";
+import { formulaDocs } from "../modules/Formula/docs.ts";
+import { sesameModelsDocs } from "../modules/SesameModels/docs.ts";
+
+// @deno-types="vite-text"
+import changelog from '../CHANGELOG.md?raw';
+import { markdownToSheet } from "../modules/ComponentDoc/mod.ts";
 
 const sheets = [
+  [markdownToSheet('Changelog', changelog)],
   frameSchedulerDocs,
   componentDocDocs,
   boxParticleDocs,
@@ -22,6 +30,9 @@ const sheets = [
   threeCommonDocDocs,
   effectsCommonDocs,
   sesameDataServiceDocs,
+  authenticationDocs,
+  formulaDocs,
+  sesameModelsDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {

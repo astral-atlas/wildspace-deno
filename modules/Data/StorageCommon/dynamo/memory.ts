@@ -1,40 +1,77 @@
+import { Observable, Subject } from "https://esm.sh/rxjs@7.8.1";
+import { DynamoPartitionKey } from "./mod.ts";
 import {
+DynamoKey,
   DynamoPartitionClient,
   DynamoPartitionDefinition,
   DynamoPartitionType,
 } from "./partition.ts";
+import { rxjs } from "../../SesameDataService/deps.ts";
+
+export type DynamoMemoryStoreExtension<T extends DynamoPartitionType> = {
+  memory(): MemoryStoreItem<T>[],
+  onMemoryUpdate: Subject<MemoryStoreItem<T>[]>,
+}
+export type MemoryStoreItem<T extends DynamoPartitionType> = {
+  value: T["value"],
+  key: DynamoKey<T>
+}
 
 export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
-  definition:
-    & Pick<DynamoPartitionDefinition<T>, 'partitionKey'>
-    & Pick<DynamoPartitionDefinition<T>, 'sortKey'>,
-): DynamoPartitionClient<T> & {
-  memory: () => T["value"][];
-} => {
-  type Item = { value: T["value"], pk: string, sk: string }
-  let allItems: Item[] = [];
+  definition: DynamoPartitionDefinition<T>,
+): (
+  DynamoPartitionClient<T> & DynamoMemoryStoreExtension<T>
+ ) => {
+  let allItems: MemoryStoreItem<T>[] = [];
+  let operations = [];
+
+  const isKeyEqual = (keyA: DynamoKey<T>, keyB: DynamoKey<T>) => {
+    return keyA.part === keyB.part && keyA.sort == keyB.sort
+  }
+  const onMemoryUpdate = new rxjs.Subject<MemoryStoreItem<T>[]>();
 
   return {
+    definition,
+    onMemoryUpdate,
     memory() {
-      return allItems.map(i => i.value);
+      return allItems;
     },
-    put(value) {
+    put(key, value) {
       const item = {
         value,
-        pk: value[definition.partitionKey],
-        sk: value[definition.sortKey]
-      } as Item;
+        key,
+      } as MemoryStoreItem<T>;
       allItems = [item, ...allItems];
+      operations.push({ type: 'put', key, value })
+      onMemoryUpdate.next(allItems);
       return Promise.resolve();
     },
-    query(partition, sort) {
-      const items = allItems
-        .filter(
-          (item) => item.value[definition.partitionKey] === partition
-            && (!sort || item.value[definition.sortKey] === sort)
-        )
-        .map(item => item.value);
-      return Promise.resolve({ items });
+    delete(key) {
+      allItems = allItems.filter(item => isKeyEqual(item.key, key))
+      operations.push({ type: 'delete', key })
+      onMemoryUpdate.next(allItems);
+      return Promise.resolve();
+    },
+    get(key) {
+      const item = allItems.find(item => isKeyEqual(item.key, key));
+
+      operations.push({ type: 'get', key })
+      if (!item)
+        return Promise.reject()
+      return Promise.resolve(item.value);
+    },
+    async query(query) {
+      operations.push({ type: 'query', query })
+      switch (query.type) {
+        case 'all':
+          return allItems
+            .filter(item => item.key.part === query.part)
+        case 'equal':
+          return allItems
+            .filter(item => isKeyEqual(item.key, query));
+        default:
+          throw new Error('Unimplemented');
+      }
     },
   };
 };

@@ -1,3 +1,5 @@
+import { m } from "./deps.ts";
+
 export type JSONValue =
   | string
   | number
@@ -9,10 +11,14 @@ export type JSONValue =
 export type QueryValue = { readonly [key: string]: string };
 
 export type RESTType = {
-  resource?: JSONValue,
-  post?: JSONValue,
-  filter?: QueryValue,
-  id?: QueryValue,
+  resource: JSONValue,
+  post:     JSONValue,
+  filter:   QueryValue,
+  id:       QueryValue,
+};
+
+export type RESTResourceDefinition<T extends RESTType> = {
+  resource: m.ModelOf<T["resource"]>,
 };
 
 export type RESTResource<T extends RESTType> = {
