@@ -15,40 +15,9 @@ Finally, at the root of your application or
 docs page you create a DocSite component, which
 imports all the docs you made, and displays the UI.
 
-## DocElement
+## DocSite {#docsite}
+
+The DocSite component contains a navigation component
+for routing around the page (which can be overriden)
 
 ::docsite
-
-## But what if
-
-
-## THere is a lot of
-
-
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content
-## Content
-
-## Content

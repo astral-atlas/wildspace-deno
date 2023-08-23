@@ -27,6 +27,11 @@ username: Luke
 password: secret
 ```
 
+TODO
+
+ - [ ] Collision checks for duplicate usernames
+ - [ ] Rejection of low sec passwords
+
 ### SesameStore
 
 The sesame store represents various low-level

@@ -3,6 +3,7 @@ import { h, Component } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import {
   useRootNavigation,
   navigationContext,
+    Navigation,
 } from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
 
 import { DocSheet } from "./DocElement.ts";
@@ -13,10 +14,15 @@ import docSiteStyles from "./DocSite.module.css";
 export type DocSiteProps = {
   sheets: DocSheet[];
   initialSheet: string;
+
+  overrideNavigation?: Navigation,
 };
 
-export const DocSite: Component<DocSiteProps> = ({ sheets, initialSheet }) => {
-  const navigation = useRootNavigation();
+export const DocSite: Component<DocSiteProps> = ({
+  sheets, initialSheet, overrideNavigation
+}) => {
+  const localNavigation = useRootNavigation();
+  const navigation = overrideNavigation || localNavigation;
 
   const sheetMap = new Map(sheets.map((s) => [s.id, s]));
 
