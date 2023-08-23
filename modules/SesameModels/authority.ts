@@ -23,7 +23,7 @@ export const identityGrantDefinition = m.union({
     userId: m.string,
   }),
   app: m.object({
-    type: m.literal("app"),
+    type: m.literal("application"),
     grantId: m.string,
     appId: m.string,
   }),
