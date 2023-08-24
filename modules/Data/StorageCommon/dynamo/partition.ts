@@ -6,12 +6,14 @@ import { DynamoTableDefinition } from "./table.ts";
 
 export type DynamoPartitionType = {
   value: { readonly [key: string]: TypeOfAttributeValue },
-  part?: string | undefined,
+  part?: string | undefined | typeof anyPart,
   sort: string
 };
+
+declare const anyPart: unique symbol;
 export type AnyDynamoPartitionType = {
   value: any,
-  part?: string,
+  part: typeof anyPart,
   sort: string,
 }
 export type DynamoKey<T extends DynamoPartitionType> = {
@@ -24,7 +26,7 @@ export type DynamoPartitionKey<T extends DynamoPartitionType> =
     { part: T["part"] }
     : T["part"] extends undefined ?
       { part?: undefined }
-      : { part?: any }
+      : any
 
 export type DynamoPartitionCondition =
   | 'equal' | 'less_than'

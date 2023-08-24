@@ -1,5 +1,5 @@
 import { ModelOf, OfModelType } from "../../Models/model.ts";
-import { QueryValue } from "../NetworkCommon/rest.ts";
+import { QueryValue } from "../NetworkCommon/http/JSONTransaction.ts";
 import { storage, network, m } from "./deps.ts";
 
 export type ResourceType = {
@@ -8,10 +8,10 @@ export type ResourceType = {
 
 export type CRUDType = {
   resource: { [key: string]: m.ModeledType },
-  create: { [key: string]: m.ModeledType },
-  update: { [key: string]: m.ModeledType },
+  create:   { [key: string]: m.ModeledType },
+  update:   { [key: string]: m.ModeledType },
 
-  id: QueryValue,
+  id:     QueryValue,
   filter: QueryValue,
 };
 
@@ -77,17 +77,6 @@ export type CRUDService<T extends CRUDType> = {
   read  (filter: T["id"]):                      Promise<T["resource"]>,
   update(filter: T["id"], update: T["update"]): Promise<void>,
   delete(filter: T["id"]):                      Promise<void>,
-}
-
-export type FunctionEnhancer<Enhancement, T extends (...args: any) => any> =
-  (enhancement: Enhancement, ...args: Parameters<T>) => ReturnType<T>
-
-export type CRUDServiceEnhancer<Enhancement, T extends CRUDService<CRUDType>> = {
-  create: FunctionEnhancer<Enhancement, T["create"]>,
-  list:   FunctionEnhancer<Enhancement, T["list"]>,
-  read:   FunctionEnhancer<Enhancement, T["read"]>,
-  update: FunctionEnhancer<Enhancement, T["update"]>,
-  delete: FunctionEnhancer<Enhancement, T["delete"]>,
 }
 
 export const createCRUDHTTPTransactionDefinitions = <T extends CRUDType>(

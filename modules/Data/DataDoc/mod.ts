@@ -1,17 +1,27 @@
+import { rxjs } from "../SesameDataService/deps.ts";
 import { act, big, storage } from "./deps.ts";
 const { h, useState, useEffect } = act;
 
+type AnyType = { part: any; sort: any; value: any };
+
+type AnyTypeNoPart = { part?: undefined; sort: any; value: any };
+type AnyMemoryClient =
+  | (storage.DynamoPartitionClient<AnyType> &
+      storage.DynamoMemoryStoreExtension<AnyType>)
+  | (storage.DynamoPartitionClient<AnyTypeNoPart> &
+      storage.DynamoMemoryStoreExtension<AnyTypeNoPart>);
+
 export const StoreVisualzer: act.Component<{
   name: string;
-  store: storage.DynamoMemoryStoreExtension<storage.AnyDynamoPartitionType> &
-    storage.DynamoPartitionClient<storage.AnyDynamoPartitionType>;
+  store: AnyMemoryClient;
 }> = ({ name, store }) => {
-  const [items, setItems] = useState<
-    storage.MemoryStoreItem<storage.DynamoPartitionType>[]
-  >([]);
+  type Item = storage.MemoryStoreItem<storage.DynamoPartitionType>;
+
+  const [items, setItems] = useState<Item[]>([]);
   useEffect(() => {
     setItems(store.memory());
-    const sub = store.onMemoryUpdate.subscribe((items) => {
+    const observer = store.onMemoryUpdate as rxjs.Observable<Item[]>;
+    const sub = observer.subscribe((items) => {
       setItems(items);
     });
     return () => sub.unsubscribe();

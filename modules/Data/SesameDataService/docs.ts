@@ -13,7 +13,13 @@ import { MemorySesameStore, createMemorySesameStore } from "./stores.ts";
 import { DynamoMemoryStoreExtension, DynamoPartitionType } from "../StorageCommon/dynamo/mod.ts";
 import { StoreVisualzer } from "../DataDoc/mod.ts";
 
-const demoContext = createContext<{ store: MemorySesameStore } | null>(null);
+import { MarkdownDirectiveComponentProps, ComponentMap } from "https://esm.sh/@lukekaalim/act-markdown@1.8.0";
+
+const demoContext = createContext<{
+  store: MemorySesameStore,
+  output: string | null,
+  setOutput: (output: null | string) => void
+} | null>(null);
 const useDemoContext = () => {
   const context = useContext(demoContext);
   if (!context)
@@ -22,24 +28,9 @@ const useDemoContext = () => {
 }
 const DemoContextProvider: act.Component = ({ children }) => {
   const store = useRef(createMemorySesameStore()).current;
+  const [output, setOutput] = useState<null | string>(null)
 
-  return h(demoContext.Provider, { value: { store }}, children);
-};
-
-const ServiceDemo = () => {
-  const { store } = useDemoContext();
-  const sesame = useRef(createStoredSesameDataService(store, { type: 'guest' })).current;
-
-  const onClick = async () => {
-    await sesame.user.create({
-      name: "Luke",
-      password: "secret"
-    });
-  };
-
-  return h('button', { onClick }, [
-    'Add user'
-  ]);
+  return h(demoContext.Provider, { value: { store, output, setOutput } }, children);
 };
 
 
@@ -53,9 +44,45 @@ const StoreDemo = () => {
   ];
 };
 
-const demos = {
-  service_demo: ServiceDemo,
+const demos: ComponentMap<MarkdownDirectiveComponentProps> = {
+  service_action({ node }) {
+    const { store, setOutput } = useDemoContext();
+    const sesame = useRef(createStoredSesameDataService(store, { type: 'guest' })).current;
+
+    const actions = {
+      async userCreate() {
+        setOutput(JSON.stringify(
+          await sesame.user.create({
+            name: 'luke',
+            password: 'secret'
+          }),
+          null,
+          2
+        ))
+      },
+      async userRead() {
+        setOutput(JSON.stringify(
+          await sesame.user.read({ id: store.users.memory()[0].value.id }),
+          null,
+          2
+        ))
+      }
+    } as Record<string, () => unknown>;
+    const attributes = node.attributes as Record<string, string>;
+    const name = attributes["name"];
+    const onClick = actions[name] || (() => {});
+
+    return h('button', { onClick }, name);
+  },
   store_demo: StoreDemo,
+  output() {
+    const { output, setOutput } = useDemoContext();
+
+    return [
+      h('button', { onClick() { setOutput(null) } }, 'Clear output'),
+      h('pre', {}, output || "[No output]")
+    ];
+  }
 };
 
 export const sesameDataServiceDocs: DocSheet[] = [

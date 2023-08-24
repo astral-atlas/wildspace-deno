@@ -1,14 +1,5 @@
 import { m } from "./deps.ts";
-
-export type JSONValue =
-  | string
-  | number
-  | boolean
-  | null
-  | { readonly [key: string]: JSONValue }
-  | ReadonlyArray<JSONValue>
-
-export type QueryValue = { readonly [key: string]: string };
+import { JSONValue, QueryValue } from "./http/JSONTransaction.ts";
 
 export type RESTType = {
   resource: JSONValue,

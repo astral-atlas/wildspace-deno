@@ -18,7 +18,13 @@ This sesame service assumes you'll be making
 requests from a single [*role*](./SesameModels#role) that will have
 been assigned earlier.
 
-#### Add User :service_demo{action=addUser}
+---
+
+#### Output
+
+::output
+
+#### User Create :service_action{name=userCreate}
 
 Create a new user by providing a username and password.
 
@@ -31,6 +37,8 @@ TODO
 
  - [ ] Collision checks for duplicate usernames
  - [ ] Rejection of low sec passwords
+
+#### User Read :service_action{name=userRead}
 
 ### SesameStore
 

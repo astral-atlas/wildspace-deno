@@ -18,8 +18,9 @@ import { sesameModelsDocs } from "../modules/SesameModels/docs.ts";
 // @deno-types="vite-text"
 import changelog from '../CHANGELOG.md?raw';
 import { markdownToSheet } from "../modules/ComponentDoc/mod.ts";
+import { kayoDocs } from "../modules/Kayo/docs.ts";
 
-const sheets = [
+export const sheets = [
   [markdownToSheet('Changelog', changelog)],
   frameSchedulerDocs,
   componentDocDocs,
@@ -33,10 +34,13 @@ const sheets = [
   authenticationDocs,
   formulaDocs,
   sesameModelsDocs,
+  kayoDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {
-  return h(DocSite, { sheets, initialSheet: sheets[0].id })
+  return h(DocSite, {
+    sheets, initialSheet: sheets[0].id,
+  })
 };
 
 const entry = () => {

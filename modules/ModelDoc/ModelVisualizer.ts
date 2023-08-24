@@ -8,7 +8,7 @@ export type ModelVisualizerProps = {
 export const ModelVisualizer: act.Component<ModelVisualizerProps> = ({
   model,
 }) => {
-  return h("pre", { style: { lineHeight: "24px" } }, h(ModelPart, { model }));
+  return h("pre", { style: { lineHeight: "28px" } }, h(ModelPart, { model }));
 };
 
 const Keyword: act.Component = ({ children }) => {
