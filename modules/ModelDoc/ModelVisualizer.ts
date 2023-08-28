@@ -44,6 +44,8 @@ const ModelPart: act.Component<{ model: models.Model }> = ({ model }) => {
   switch (model.type) {
     case "string":
       return h(Keyword, {}, "string");
+    case "number":
+      return h(Keyword, {}, "number");
     case "literal":
       return h(Literal, {}, model.value?.toString() || "null");
     case "object":
@@ -92,7 +94,12 @@ const ModelPart: act.Component<{ model: models.Model }> = ({ model }) => {
           ]),
         ]
       );
+    case 'array':
+      return ['Array<', h(ModelPart, { model: model.elements }), `>`]
+    case 'never':
+      return h(Keyword, {}, 'never');
     default:
+      console.log('Unknown model', model)
       return "???";
   }
 };

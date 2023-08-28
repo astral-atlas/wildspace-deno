@@ -1,5 +1,5 @@
 import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { render } from "https://esm.sh/@lukekaalim/act-three@5.12.4?sourcemap";
+import { render } from "../modules/AtlasRenderer/mod.ts";
 
 import { DocSite } from "../modules/ComponentDoc/DocSite.ts";
 import { frameSchedulerDocs } from "../modules/FrameScheduler/docs.ts";
@@ -19,9 +19,13 @@ import { sesameModelsDocs } from "../modules/SesameModels/docs.ts";
 import changelog from '../CHANGELOG.md?raw';
 import { markdownToSheet } from "../modules/ComponentDoc/mod.ts";
 import { kayoDocs } from "../modules/Kayo/docs.ts";
+import { renderCool } from "../modules/AtlasRenderer/renderer.ts";
+import { dataDocs } from "../modules/Data/docs.ts";
+import { sesameDocs } from "../www/sesame/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
+  sesameDocs,
   frameSchedulerDocs,
   componentDocDocs,
   boxParticleDocs,
@@ -35,6 +39,7 @@ export const sheets = [
   formulaDocs,
   sesameModelsDocs,
   kayoDocs,
+  dataDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {
@@ -44,7 +49,7 @@ export const DocsApp: Component = () => {
 };
 
 const entry = () => {
-  render(h(DocsApp), document.body)
+  renderCool(h(DocsApp), document.body)
 };
 
 entry();

@@ -3,20 +3,17 @@ import {
   createEffectService,
   createBoundaryService,
   createSchedule2,
-} from "https://esm.sh/@lukekaalim/act-reconciler@3.7.3";
+} from "https://esm.sh/@lukekaalim/act-reconciler@3.7.5";
 import {
   createWebRenderer,
   setNodeChildren2,
-} from "https://esm.sh/@lukekaalim/act-web@2.5.3";
+} from "https://esm.sh/@lukekaalim/act-web@2.5.5";
 import { Element } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import {
   Renderer2,
   createNullRenderer2,
-} from "https://esm.sh/@lukekaalim/act-renderer-core@3.5.3";
-import { createObjectRenderer } from "https://esm.sh/@lukekaalim/act-three@5.10.5";
-
-// @deno-types="https://esm.sh/v130/@types/three@0.155.0/index.d.ts"
-import { Object3D } from "https://esm.sh/three@0.155.0";
+} from "https://esm.sh/@lukekaalim/act-renderer-core@3.5.5";
+import { three, actThree } from "./deps.ts";
 
 export const render = (element: Element, node: HTMLElement) => {
   const web = createWebRenderer();
@@ -41,29 +38,34 @@ export const render = (element: Element, node: HTMLElement) => {
 };
 
 export const renderCool = (element: Element, node: HTMLElement) => {
-  const webToThree = createNullRenderer2<Object3D, Node>(
+  const webToThree = createNullRenderer2<three.Object3D, Node>(
     () => object,
     ["three"]
-  );
-  const threeToWeb = createNullRenderer2<Node, Object3D>(() => web, ["web"]);
+  ) as Renderer2<Node>;
+  const threeToWeb = createNullRenderer2<Node, three.Object3D>(
+    () => web,
+    ["web"]
+  ) as Renderer2<three.Object3D>;
 
-  const object = createObjectRenderer((type): null | Renderer2<Object3D> => {
-    switch (type) {
-      case "web":
-        return threeToWeb as Renderer2<Object3D>;
-      default:
-        return null;
+  const object = actThree.createObjectRenderer(
+    (type): null | Renderer2<three.Object3D> => {
+      switch (type) {
+        case "web":
+          return threeToWeb as Renderer2<three.Object3D>;
+        default:
+          return null;
+      }
     }
-  });
+  ) as Renderer2<three.Object3D>;
   const web = createWebRenderer((type) => {
     switch (type) {
-      case "scene":
+      case actThree.scene:
       case "three":
         return webToThree;
       default:
         return null;
     }
-  });
+  })  as Renderer2<Node>;
 
   const scheduler = createSchedule2((callback) => {
     const id = requestAnimationFrame(() => callback(16));

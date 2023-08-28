@@ -17,7 +17,7 @@ export const createModelCaster = <I extends Model>(
     case 'object':
       return createObjectCaster(
         Object.fromEntries(
-          Object.entries(modelDefinition)
+          Object.entries(modelDefinition.properties)
             .map(([key, model]) => [key, createModelCaster(model)])
         )
       ) as any;
@@ -29,8 +29,11 @@ export const createModelCaster = <I extends Model>(
     case 'literal':
     case 'enum':
     case 'union':
+      throw new Error('Unimplemented caster')
+    case 'never':
+      return () => { throw new Error('Never Caster cannot return'); }
     default:
-      throw new Error();
+      throw new Error('Unknown caster');
   }
 };
 

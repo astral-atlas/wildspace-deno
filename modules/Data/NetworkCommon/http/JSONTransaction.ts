@@ -13,18 +13,18 @@ export type JSONValue =
 export type QueryValue = { readonly [key: string]: string };
 
 export type JSONTransactionType = {
-  request: JSONValue;
+  request:  JSONValue;
   response: JSONValue;
-  query: QueryValue;
+  query:    QueryValue;
 };
 
 export type JSONTransactionDefinition<T extends JSONTransactionType> = {
   path: string;
   name: string;
   method: HTTPMethod;
-  request: m.ModelOf<T["request"]>;
-  response: m.ModelOf<T["response"]>;
-  query: m.ModelOf<T["query"]>;
+  request:  m.ModelOf<T["request"]>   | m.ModelsByType["never"];
+  response: m.ModelOf<T["response"]>  | m.ModelsByType["never"];
+  query:    m.ModelOf<T["query"]>     | m.ModelsByType["never"];
 };
 
 export type JSONTransactionServiceDefinition = {

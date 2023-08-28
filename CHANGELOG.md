@@ -1,5 +1,10 @@
 # Changelog
 
+#### 29rd August, 2023
+- Added [SesamePage](./Sesame) and first pass of glitch mess
+- Added Resource Set for ThreeCommon
+- Updated FramePresenter to contain fullscreen button
+
 #### 23rd August, 2023
 - Starting from scratch again baby!
   This time in deno to get a breath of fresh air.

@@ -1,16 +1,19 @@
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
+import { SimpleCanvasProps } from "../ThreeCommon/SimpleCanvas.ts";
 import { act, actThree, schedule, three, threeCommon } from "./deps.ts";
 const { h } = act;
 
 export type OrbitSceneCanvasProps = {
   speed?: number;
   distance?: number;
-};
+  overrides?: SimpleCanvasProps["overrides"],
+}
 
 export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
   speed = .1,
   distance = 50,
   children,
+  overrides = {},
 }) => {
   const cameraRef = act.useRef<three.PerspectiveCamera | null>(null);
 
@@ -28,7 +31,7 @@ export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
 
   return h(FramePresenter, {}, [
     h(threeCommon.SimpleCanvas, {
-      overrides: { cameraRef },
+      overrides: { ...overrides, cameraRef },
     }, [
       h(actThree.perspectiveCamera, { ref: cameraRef }),
       children,

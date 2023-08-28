@@ -10,7 +10,15 @@ const { h } = act;
 const geometry = new three.BoxGeometry(10, 10, 10);
 const material = new three.MeshStandardMaterial({ color: 'red' })
 
+console.log('demo')
 const OrbitSceneCanvasDemo = () => {
+  console.log('demo')
+  act.useEffect(() => {
+    console.log('up');
+    return () => {
+      console.log('down');
+    }
+  });
   return h(OrbitSceneCanvas, {}, [
     h(actThree.mesh, { position: new three.Vector3(0, 0, 0), geometry, material }),
     h(actThree.ambientLight, { color: new three.Color('grey') }),

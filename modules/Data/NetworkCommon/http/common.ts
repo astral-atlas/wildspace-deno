@@ -3,6 +3,7 @@ export type HTTPMethod =
   | 'PUT'
   | 'POST'
   | 'DELETE'
+  | 'PATCH'
   | 'HEAD'
 
 export type HTTPStatus = number;

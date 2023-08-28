@@ -48,13 +48,19 @@ export type OfModelType<T extends Model> = {
   "object": T extends ModelsByType["object"] ? { readonly [key in keyof T["properties"]]: OfModelType<T["properties"][key]> } : never,
 }[T["type"]]
 
+export const anyModelSymbol = Symbol();
+export type AnyModel = typeof anyModelSymbol;
 
 export type ModelOf<T extends TypesByName[keyof TypesByName]> =
   [T] extends [never]   ? ModelsByType["never"] :
   T extends number  ? ModelsByType["number"] :
-  T extends string  ? ModelsByType["string"] | ModelsByType["enum"] :
+  T extends string  ? (ModelsByType["string"] | ModelsByType["enum"]) :
   T extends boolean ? ModelsByType["boolean"] :
   T extends null    ? ModelsByType["null"] :
   T extends ModeledType[]         ? { type: 'array', elements: ModelOf<T[number]> } :
-  T extends TypesByName["object"] ? { type: 'object', properties: { readonly [key in keyof T]: ModelOf<T[key]> } } :
+  T extends Record<string, infer X> ? { type: 'object', properties: { [key in keyof T]: ModelOf<X> } } :
+  T extends typeof anyModelSymbol ? { type: 'any' } :
   any
+
+
+type a = ModelOf<never>

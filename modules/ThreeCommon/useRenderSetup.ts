@@ -1,4 +1,5 @@
 import { act, css2d, schedule, three } from "./deps.ts"
+import { useOverridableRef } from "./useOverridableRef.ts";
 
 export type RenderSetup = {
   canvasRef:  act.Ref<null | HTMLCanvasElement>,
@@ -20,11 +21,6 @@ export type RenderSetupOverrides = {
     height: number,
   ) => void,
 };
-
-const useOverridableRef = <T>(override: void | act.Ref<null | T>): act.Ref<null | T> => {
-  const localRef = act.useRef<null | T>(null);
-  return override || localRef;
-}
 
 export type RenderFrame = schedule.AnimationFrame & {
   camera: three.PerspectiveCamera,
@@ -94,8 +90,9 @@ export const useRenderSetup = (
     resizeObserver.observe(canvas);
 
     const renderSubscription = scheduler.animation.subscribe('3DRender', onRender);
-
+    console.log('Renderer created')
     return () => {
+      console.log("Renderer disposed")
       renderer.dispose();
       resizeObserver.disconnect();
       

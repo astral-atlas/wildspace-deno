@@ -8,3 +8,11 @@ theme.
 [Development blog](https://cohost.org/lno9/post/2461514-glitch-effect)
 
 ::glitch-mesh
+
+## Looping Track
+
+Not "track" as in music, but like
+"minecart track" or "something following
+a fixed trajectory" idk.
+
+::looping_track
