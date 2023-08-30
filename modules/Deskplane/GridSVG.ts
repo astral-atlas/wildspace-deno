@@ -1,4 +1,5 @@
-import { Component, Ref, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { createId } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Component, Ref, h, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
 
 export type GridSVGInterval = {
   size: number,
@@ -27,10 +28,11 @@ export const GridSVG: Component<GridSVGProps> = ({
   patternSize = 64,
   intervals = [defaultInverval]
 }) => {
+  const [id] = useState('grid-' + createId());
   return h("svg", { ref, style }, [
     h("defs", {}, [
       h( "pattern", {
-          id: "grid",
+          id,
           width: patternSize,
           height: patternSize,
           patternUnits: "userSpaceOnUse",
@@ -44,6 +46,6 @@ export const GridSVG: Component<GridSVGProps> = ({
         })),
       ),
     ]),
-    h("rect", { width: "100%", height: "100%", fill: "url(#grid)" }),
+    h("rect", { width: "100%", height: "100%", fill: `url(#${id})` }),
   ]);
 };

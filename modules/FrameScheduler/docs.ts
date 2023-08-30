@@ -6,6 +6,10 @@ import { createFrameScheduler } from "./FrameScheduler.ts";
 import { useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { h } from "https://esm.sh/@lukekaalim/act@2.6.0";
 
+// @deno-types="vite-text"
+import readme from './readme.md?raw';
+import { markdownToSheet } from "../ComponentDoc/markdown.ts";
+
 export const FrameSchedulerDemo = () => {
   const [scheduler, controller] = useRef(createFrameScheduler()).current;
 
@@ -58,12 +62,5 @@ export const FrameSchedulerDemo = () => {
 };
 
 export const frameSchedulerDocs: DocSheet[] = [
-  {
-    id: "FrameScheduler",
-    elements: [
-      { type: "title", text: "Frame Scheduler" },
-      { type: "paragraph", text: "Distribute CPU time to functions" },
-      { type: "rich", richElement: h(FrameSchedulerDemo) },
-    ],
-  },
+  markdownToSheet('FrameScheduler', readme)
 ];

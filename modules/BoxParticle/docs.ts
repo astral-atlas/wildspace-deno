@@ -4,6 +4,10 @@ import { Box2, Vector2 } from "https://esm.sh/three@0.155.0";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { simulateParticle2D } from "./mod.ts";
 import { Particle2D, ParticleSettings } from "./particle.ts";
+import { markdownToDoc, markdownToSheet } from "../ComponentDoc/markdown.ts";
+
+// @deno-types="vite-text"
+import readme from './readme.md?raw';
 
 const BoxParticleDemo = () => {
   const outputRef = useRef<HTMLCanvasElement | null>(null);
@@ -72,11 +76,5 @@ const BoxParticleDemo = () => {
 };
 
 export const boxParticleDocs: DocSheet[] = [
-  {
-    id: "BoxParticle",
-    elements: [
-      { type: "title", text: "Box Particle" },
-      { type: "component", component: BoxParticleDemo },
-    ],
-  },
+  markdownToSheet('Particle', readme, { particle_demo: BoxParticleDemo })
 ];

@@ -1,3 +1,5 @@
+import { MetaModel } from "./meta.ts";
+
 export type Model = ModelsByType[keyof ModelsByType];
 
 export type ModeledType =
@@ -16,6 +18,7 @@ export type TypesByName = {
   'null':     null,
   'never':    never,
   'any':      any,
+  'meta':     any,
   'array':    ReadonlyArray<ModeledType>,
   'object':   { readonly [key: string]: ModeledType }
 }
@@ -32,6 +35,7 @@ export type ModelsByType = {
   'union':    { type: 'union', cases: { readonly [key: string]: Model } },
   'array':    { type: 'array', elements: Model },
   'object':   { type: 'object', properties: { readonly [key: string]: Model }},
+  'meta':     MetaModel,
 }
 
 export type OfModelType<T extends Model> = {
@@ -41,6 +45,7 @@ export type OfModelType<T extends Model> = {
   "null":     null,
   "any":      any,
   "never":    never,
+  "meta":    T extends MetaModel ? OfModelType<T["value"]> : never,
   "literal":T extends ModelsByType["literal"] ? T["value"] : never,
   "enum":   T extends ModelsByType["enum"] ? T["cases"][number] : never,
   "union":  T extends ModelsByType["union"] ? OfModelType<T["cases"][keyof T["cases"]]> : never,

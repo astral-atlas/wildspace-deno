@@ -9,6 +9,10 @@ import { useAnimation } from "../FrameScheduler/useAnimation.ts";
 import { Deskplane } from "./Deskplane.ts";
 import { useDraggableSurface } from "./useDraggableSurface.ts";
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
+import { markdownToSheet } from "../ComponentDoc/markdown.ts";
+
+// @deno-types="vite-text"
+import readme from './readme.md?raw';
 
 export const GridSVGDemo: Component = () => {
   const ref = useRef(null);
@@ -97,17 +101,13 @@ export const DraggableSurfaceDemo = () => {
   return h('pre', { ref, style: { userSelect: 'none' } }, `Drag me!\n${dragged.x}, ${dragged.y}`)
 }
 
+const demos = {
+  deskplane_demo: DeskPlaneDemo,
+  gridsvg_demo: GridSVGDemo,
+  dragsurface_demo: DraggableSurfaceDemo,
+  dragparticle_demo: () => null,
+}
+
 export const deskplaneDocs: DocSheet[] = [
-  { id: 'SVG', elements: [
-    { type: 'title', text: 'SVG' },
-    { type: 'rich', richElement: h(GridSVGDemo) }
-  ] },
-  { id: 'Deskplane', elements: [
-    { type: 'title', text: 'Desk Plane' },
-    { type: 'rich', richElement: h(DeskPlaneDemo) }
-  ] },
-  { id: 'DraggableSurface', elements: [
-    { type: 'title', text: 'Draggable Surface' },
-    { type: 'rich', richElement: h(DraggableSurfaceDemo) }
-  ] }
+  markdownToSheet('Deskplane', readme, demos)
 ]
