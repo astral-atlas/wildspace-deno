@@ -28,8 +28,9 @@ export const createFrameSchedulerEmitter = <T>(): FrameSchedulerEmitter<T> => {
   };
 
   const invoke = (event: T) => {
-    for (const subscriber of subscribers)
+    for (const subscriber of subscribers) {
       subscriber.callback(event);
+    }
   };
 
   return { subscribe, invoke }

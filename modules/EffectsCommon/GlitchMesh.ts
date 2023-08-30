@@ -1,9 +1,12 @@
 import { glitchNames } from "./EffectsResourceProvider.ts";
 import { act, actThree, three, gltf, threeCommon } from "./deps.ts";
+import { glyph2URLs } from "./mod.ts";
 const { h, useEffect, useState } = act;
 
 const glyphsURL = new URL("./glyphs.png", import.meta.url).href;
 const glitchMeshesURL = new URL("./glitch_meshes.glb", import.meta.url).href;
+
+console.log(glyph2URLs)
 
 const textureLoader = new three.TextureLoader();
 const gltfLoader = new gltf.GLTFLoader();
@@ -21,7 +24,6 @@ map.minFilter = three.NearestFilter;
 map.magFilter = three.NearestFilter;
 
 export type GlitchMeshProps = {
-  tile: three.Vector2;
   state?: (typeof glitchNames)[number];
   glitchTime?: number;
   normalTime?: number;
@@ -30,7 +32,6 @@ export type GlitchMeshProps = {
 export const GlitchMesh: act.Component<GlitchMeshProps> = ({
   glitchTime = 250,
   normalTime = 1000,
-  tile,
   ...objectProps
 }) => {
   const ref = threeCommon.useOverridableRef<three.Mesh>(
@@ -40,9 +41,7 @@ export const GlitchMesh: act.Component<GlitchMeshProps> = ({
   const [glitchState, setGlitchState] = useState(0);
   const name = glitchNames[glitchState];
 
-  const geometry = threeCommon.useGeometryResource(
-    [tile.x, tile.y, name].join("")
-  );
+  const geometry = threeCommon.useGeometryResource(name);
 
   useEffect(() => {
     const runGlitch = () => {

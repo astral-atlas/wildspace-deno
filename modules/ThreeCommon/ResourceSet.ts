@@ -17,7 +17,7 @@ export const emptyResourceSet: ResourceSet = {
 export const resourceSetContext = createContext<ResourceSet>(emptyResourceSet);
 
 export type ResourceSetProviderProps = {
-  load: () => Promise<ResourceSet>;
+  load: (update: (set: ResourceSet) => unknown) => Promise<ResourceSet>;
 };
 
 export const ResourceSetProvider: act.Component<ResourceSetProviderProps> = ({
@@ -28,7 +28,7 @@ export const ResourceSetProvider: act.Component<ResourceSetProviderProps> = ({
   const contextResources = useContext(resourceSetContext);
 
   useEffect(() => {
-    load()
+    load(setResources)
       .then(setResources)
       .catch(console.error);
   }, []);

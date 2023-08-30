@@ -6,10 +6,11 @@ export default {
     '**/*.md',
     '**/*.gltf',
     '**/*.glb',
+    '**/*.PNG',
   ],
   server: {
     fs: {
       allow: ['..']
     }
-  }
+  },
 };
