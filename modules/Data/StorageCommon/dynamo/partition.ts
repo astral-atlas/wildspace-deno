@@ -82,7 +82,7 @@ export type DynamoPartitionClient<T extends DynamoPartitionType> = {
   definition: DynamoPartitionDefinition<T>,
 
   put: (key: DynamoKey<T>, value: T["value"] | null) => Promise<void>;
-  delete: (key: DynamoKey<T>) => Promise<void>;
+  delete: (key: DynamoKey<T>) => Promise<T["value"]>;
   get: (key: DynamoKey<T>) => Promise<T["value"]>;
   query: (query: DynamoPartitionQuery<T>) => Promise<DynamoQueryResults<T>>;
 };
@@ -115,8 +115,9 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
     },
     async delete(key) {
       const partition = definition.partitionPrefix + (key.part || '');
-      await client.send(
+      const { Attributes: Item } = await client.send(
         new dynamo.DeleteItemCommand({
+          ReturnValues: 'ALL_OLD',
           TableName: table.tableName,
           Key: objectToAttributeMap({
             [table.partitionKeyName]: partition,
@@ -124,6 +125,9 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
           })
         })
       );
+      if (!Item)
+        throw new Error();
+      return cast(decode(Item));
     },
     async get(key) {
       const partition = definition.partitionPrefix + (key.part || '');

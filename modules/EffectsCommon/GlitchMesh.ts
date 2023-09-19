@@ -6,8 +6,6 @@ const { h, useEffect, useState } = act;
 const glyphsURL = new URL("./glyphs.png", import.meta.url).href;
 const glitchMeshesURL = new URL("./glitch_meshes.glb", import.meta.url).href;
 
-console.log(glyph2URLs)
-
 const textureLoader = new three.TextureLoader();
 const gltfLoader = new gltf.GLTFLoader();
 

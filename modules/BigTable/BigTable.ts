@@ -7,10 +7,12 @@ export type BigTableProps = {
   columns:  string[],
   rows:     string[][],
   heading?:  ElementNode,
+  containerStyle?:   { [style: string]: unknown },
+  style?:   { [style: string]: unknown }
 };
 
-export const BigTable: Component<BigTableProps> = ({ columns, rows, heading }) => {
-  return h('div', { class: styles.bigTableContainer }, h('table', { class: styles.bigTable }, [
+export const BigTable: Component<BigTableProps> = ({ columns, rows, heading, style, containerStyle }) => {
+  return h('div', { class: styles.bigTableContainer, style: containerStyle }, h('table', { class: styles.bigTable, style }, [
     h('thead', {}, [
       h('tr', { colSpan: columns.length }, heading),
       h('tr', {}, columns.map(column =>

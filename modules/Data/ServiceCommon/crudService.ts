@@ -75,8 +75,8 @@ export type CRUDService<T extends CRUDType> = {
   create(create: T["create"]):                  Promise<T["resource"]>,
   list  (filter: T["filter"]):                  Promise<T["resource"][]>,
   read  (filter: T["id"]):                      Promise<T["resource"]>,
-  update(filter: T["id"], update: T["update"]): Promise<void>,
-  delete(filter: T["id"]):                      Promise<void>,
+  update(filter: T["id"], update: T["update"]): Promise<T["resource"]>,
+  delete(filter: T["id"]):                      Promise<T["resource"]>,
 }
 
 export const createCRUDHTTPTransactionDefinitions = <T extends CRUDType>(

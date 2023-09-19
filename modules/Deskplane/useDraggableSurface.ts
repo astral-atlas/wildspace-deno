@@ -22,8 +22,8 @@ export const useDraggableSurface = (
     let isDragging = false;
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.target !== draggable)
-        return;
+      //if (event.target !== draggable)
+      //  return;
       
       isDragging = true;
       setDragging(draggable);

@@ -41,16 +41,19 @@ export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
         value,
         key,
       } as MemoryStoreItem<T>;
-      allItems = [item, ...allItems];
+      allItems = [item, ...allItems.filter(i => !isKeyEqual(i.key, key))];
       operations.push({ type: 'put', key, value })
       onMemoryUpdate.next(allItems);
       return Promise.resolve();
     },
     delete(key) {
+      const item = allItems.find(item => isKeyEqual(item.key, key));
       allItems = allItems.filter(item => isKeyEqual(item.key, key))
       operations.push({ type: 'delete', key })
       onMemoryUpdate.next(allItems);
-      return Promise.resolve();
+      if (!item)
+        throw new Error();
+      return Promise.resolve(item.value);
     },
     get(key) {
       const item = allItems.find(item => isKeyEqual(item.key, key));

@@ -10,6 +10,7 @@
     "vite-text": "./lib/vite-text.d.ts"
   },
   "compilerOptions": {
+    "types": ["vite/client"],
     "lib": [
       "deno.window",
       "lib/vite-types.d.ts",

@@ -28,7 +28,8 @@ export type DraggableParticle = {
 export const useDraggableParticle = (
   surfaceRef: Ref<null | HTMLElement>,
   particleSettings: ParticleSettings = deskplaneParticleSettings,
-  updateParticle: (particle: Particle2D, frame: AnimationFrame) => unknown
+  updateParticle: (particle: Particle2D, frame: AnimationFrame) => unknown,
+  enabled: boolean = true,
 ): DraggableParticle => {
   const particle = useRef<Particle2D>({
     position: new Vector2(),
@@ -39,8 +40,9 @@ export const useDraggableParticle = (
   useKeyboardElementRef(surfaceRef);
   const keyboard = useContext(keyboardStateControllerContext);
 
-
   const { dragging } = useDraggableSurface(surfaceRef, (diff) => {
+    if (!enabled)
+      return;
     particle.position.add(diff);
     if (particleSettings.bounds) {
       particleSettings.bounds.clampPoint(particle.position, particle.position);

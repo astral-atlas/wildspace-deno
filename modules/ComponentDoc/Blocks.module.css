@@ -10,11 +10,24 @@
   background-size: cover;
 }
 
-.fillBlockLabel {
+.fixedBlock {
+  background-position: center center;
+  background-size: cover;
+
+  display: flex;
+  padding: 8px;
+  position: relative;
+}
+
+.flexBlock {
+  flex: 1;
+}
+
+.label {
   margin: auto;
   color: white;
   text-align: center;
 }
-.fillBlockLabel.invert {
+.label.invert {
   color: black;
 }

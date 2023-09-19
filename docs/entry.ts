@@ -22,6 +22,8 @@ import { kayoDocs } from "../modules/Kayo/docs.ts";
 import { renderCool } from "../modules/AtlasRenderer/renderer.ts";
 import { dataDocs } from "../modules/Data/docs.ts";
 import { sesameDocs } from "../www/sesame/docs.ts";
+import { serviceCommonDocs } from "../modules/Data/ServiceCommon/docs.ts";
+import { dryEraseDocs } from "../modules/DryErase/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
@@ -40,6 +42,7 @@ export const sheets = [
   sesameModelsDocs,
   kayoDocs,
   dataDocs,
+  dryEraseDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {

@@ -14,7 +14,8 @@ type AnyMemoryClient =
 export const StoreVisualzer: act.Component<{
   name: string;
   store: AnyMemoryClient;
-}> = ({ name, store }) => {
+  height?: number,
+}> = ({ name, store, height }) => {
   type Item = storage.MemoryStoreItem<storage.DynamoPartitionType>;
 
   const [items, setItems] = useState<Item[]>([]);
@@ -27,7 +28,7 @@ export const StoreVisualzer: act.Component<{
     return () => sub.unsubscribe();
   }, []);
 
-  return h(big.BigTable, {
+  return h('div', { style: { maxHeight: height || '400px', height, overflow: 'auto' } }, h(big.BigTable, {
     heading: h("h3", {}, name),
     columns: [
       "PartitionKey",
@@ -38,8 +39,11 @@ export const StoreVisualzer: act.Component<{
       return [
         item.key.part || "",
         item.key.sort,
-        ...Object.values(item.value).map((v) => v?.toString() || "null"),
+        ...Object.values(item.value).map((v) =>
+          (typeof v === "object" ? JSON.stringify(v) : v?.toString() || "null")
+            .slice(0, 100)
+        ),
       ];
     }),
-  });
+  }));
 };

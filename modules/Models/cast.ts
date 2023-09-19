@@ -26,8 +26,9 @@ export const createModelCaster = <I extends Model>(
         // @ts-ignore j
         createModelCaster(modelDefinition.elements)
       ) as any;
-    case 'literal':
     case 'enum':
+      return createEnumCaster(modelDefinition.cases);
+    case 'literal':
     case 'union':
       throw new Error('Unimplemented caster')
     case 'never':
@@ -58,6 +59,14 @@ export const createArrayCaster = <T>(
   return (value) => {
     if (!Array.isArray(value)) throw new Error();
     return value.map(castElement);
+  };
+};
+export const createEnumCaster = <T extends string>(
+  enums: T[],
+): Cast<T> => {
+  return (value) => {
+    if (!enums.includes(value)) throw new Error();
+    return value;
   };
 };
 
