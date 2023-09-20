@@ -6,40 +6,47 @@ export type ResourceSet = {
   texture: Map<string, three.Texture>;
   material: Map<string, three.Material>;
   geometry: Map<string, three.BufferGeometry>;
+  object: Map<string, three.Object3D>;
 };
 
 export const emptyResourceSet: ResourceSet = {
   texture: new Map(),
   material: new Map(),
   geometry: new Map(),
+  object: new Map(),
 };
+
+export const mergeResourceSet = (setA: ResourceSet, setB: Partial<ResourceSet>): ResourceSet => {
+  return {
+    texture: new Map([...setA.texture, ...setB.texture || []]),
+    material: new Map([...setA.material, ...setB.material || []]),
+    geometry: new Map([...setA.geometry, ...setB.geometry || []]),
+    object: new Map([...setA.object, ...setB.object || []]),
+  }
+}
 
 export const resourceSetContext = createContext<ResourceSet>(emptyResourceSet);
 
 export type ResourceSetProviderProps = {
-  load: (update: (set: ResourceSet) => unknown) => Promise<ResourceSet>;
+  load: () => Promise<Partial<ResourceSet>>;
 };
 
 export const ResourceSetProvider: act.Component<ResourceSetProviderProps> = ({
   children,
   load,
 }) => {
-  const [resources, setResources] = useState(emptyResourceSet);
+  const [localResources, setLocalResources] = useState<Partial<ResourceSet>>({});
   const contextResources = useContext(resourceSetContext);
 
   useEffect(() => {
-    load(setResources)
-      .then(setResources)
+    load()
+      .then(setLocalResources)
       .catch(console.error);
   }, []);
 
   const mergedSet = useMemo(
-    () => ({
-      texture: new Map([...resources.texture, ...contextResources.texture]),
-      material: new Map([...resources.material, ...contextResources.material]),
-      geometry: new Map([...resources.geometry, ...contextResources.geometry]),
-    }),
-    [resources, contextResources]
+    () => mergeResourceSet(contextResources, localResources),
+    [localResources, contextResources]
   );
 
   return h(resourceSetContext.Provider, { value: mergedSet }, children);
@@ -59,3 +66,10 @@ export const useGeometryResource = (
   const { geometry } = useContext(resourceSetContext);
   return geometry.get(key) || null;
 };
+export const useObjectResource = (
+  key: string
+): three.Object3D | null => {
+  const { object } = useContext(resourceSetContext);
+  return object.get(key) || null;
+};
+

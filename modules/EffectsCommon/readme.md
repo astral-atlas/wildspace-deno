@@ -3,6 +3,10 @@
 Some useful threejs effects with no strict
 theme.
 
+## Water
+
+::water_demo
+
 ## GlitchMesh
 
 [Development blog](https://cohost.org/lno9/post/2461514-glitch-effect)

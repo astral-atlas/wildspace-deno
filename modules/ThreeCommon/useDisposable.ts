@@ -3,15 +3,22 @@ import { act } from "./deps.ts";
 
 export const useDisposable = <T extends { dispose: () => unknown }>(
   createResource: () => T,
+  deps: act.Deps = []
 ): T => {
   const resourceRef = useRef(createResource());
+  const disposedRef = useRef(false);
 
   useEffect(() => {
-
+    if (disposedRef.current) {
+      resourceRef.current = createResource()
+      disposedRef.current = false;
+    }
+      
     return () => {
       resourceRef.current.dispose();
+      disposedRef.current = true;
     }
-  }, []);
+  }, deps);
 
   return resourceRef.current;
 };

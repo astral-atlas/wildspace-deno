@@ -1,0 +1,1 @@
+export const portalConceptURL = new URL('portal_concept.png', import.meta.url);

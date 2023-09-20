@@ -1,20 +1,27 @@
+import { useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { rxjs } from "./deps.ts";
 import { act, css2d, schedule, three } from "./deps.ts"
 import { useOverridableRef } from "./useOverridableRef.ts";
 
 export type RenderSetup = {
-  canvasRef:  act.Ref<null | HTMLCanvasElement>,
-  cameraRef:  act.Ref<null | three.PerspectiveCamera>,
-  rootRef:    act.Ref<null | HTMLElement>,
-  sceneRef:   act.Ref<null | three.Scene>,
+  canvasRef:    act.Ref<null | HTMLCanvasElement>,
+  cameraRef:    act.Ref<null | three.PerspectiveCamera>,
+  rootRef:      act.Ref<null | HTMLElement>,
+  sceneRef:     act.Ref<null | three.Scene>,
+  rendererRef:  act.Ref<null | three.WebGLRenderer>,
+
+  rendererCreate: rxjs.Observable<null | three.WebGLRenderer>,
+  rendererResize: rxjs.Observable<three.Vector2>,
 
   renderEmitter: schedule.FrameSchedulerEmitter<RenderFrame>
 };
 
 export type RenderSetupOverrides = {
-  canvasRef?: act.Ref<null | HTMLCanvasElement>,
-  cameraRef?: act.Ref<null | three.PerspectiveCamera>,
-  sceneRef?:  act.Ref<null | three.Scene>,
-  rootRef?:   act.Ref<null | HTMLElement>,
+  canvasRef?:   act.Ref<null | HTMLCanvasElement>,
+  cameraRef?:   act.Ref<null | three.PerspectiveCamera>,
+  sceneRef?:    act.Ref<null | three.Scene>,
+  rootRef?:     act.Ref<null | HTMLElement>,
+  rendererRef?: act.Ref<null | three.WebGLRenderer>,
 
   onResize?: (
     width: number,
@@ -36,6 +43,10 @@ export const useRenderSetup = (
   const cameraRef = useOverridableRef(overrides.cameraRef);
   const sceneRef = useOverridableRef(overrides.sceneRef);
   const rootRef = useOverridableRef(overrides.rootRef);
+  const rendererRef = useOverridableRef(overrides.rendererRef);
+
+  const rendererCreate = useRef(new rxjs.Subject<null | three.WebGLRenderer>()).current;
+  const rendererResize = useRef(new rxjs.Subject<three.Vector2>()).current;
 
   const scheduler = schedule.useFrameScheduler();
 
@@ -59,6 +70,8 @@ export const useRenderSetup = (
     const renderer = new three.WebGLRenderer(options);
     const css2dRenderer = root && new css2d.CSS2DRenderer({ element: root });
     renderer.outputColorSpace = three.SRGBColorSpace;
+    rendererRef.current = renderer;
+    rendererCreate.next(renderer);
     
     const renderEvent: RenderFrame = {
       deltaMs: 0,
@@ -77,6 +90,7 @@ export const useRenderSetup = (
     const onCanvasResize = () => {
       const canvasRect = canvas.getBoundingClientRect();
       renderer.setSize(canvasRect.width, canvasRect.height, false);
+      rendererResize.next(renderer.getSize(new three.Vector2()));
       if (css2dRenderer) {
         css2dRenderer.setSize(canvasRect.width, canvasRect.height)
       }
@@ -106,6 +120,9 @@ export const useRenderSetup = (
     sceneRef,
     rootRef,
     renderEmitter,
+    rendererRef,
+    rendererCreate,
+    rendererResize,
   }), []);
 
   return setup;

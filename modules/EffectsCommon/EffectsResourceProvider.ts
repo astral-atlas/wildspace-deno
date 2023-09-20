@@ -17,16 +17,19 @@ export const glitchNames = [
 const load = async (): Promise<threeCommon.ResourceSet> => {
   const glitchMeshScene = await gltfLoader.loadAsync(glitchMeshesURL);
   const textures = new Map([
-    ...Object.entries(glyph2URLs),
+    ...Object.entries(glyph2URLs as Record<string, string>),
     ['concrete', concreteURL],
     ['forest', forestURL],
   ]
     .map(([textureName, textureURL]) => [textureName, textureLoader.load(textureURL)]))
 
-  for (const name of Object.keys(glyph2URLs)) {
-    const texture =textures.get(name);
-    if (texture)
+  for (const [name] of textures) {
+    const texture = textures.get(name);
+    if (texture) {
       texture.flipY = false;
+      //texture.wrapS = three.RepeatWrapping;
+      //texture.wrapT = three.RepeatWrapping;
+    }
   }
 
   const glitchMeshMap = new Map(

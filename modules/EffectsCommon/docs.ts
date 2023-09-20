@@ -1,5 +1,6 @@
 import {
   h,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -9,7 +10,7 @@ import { act, actThree, componentDoc, three, threeCommon } from "./deps.ts";
 
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
-import { Helper, OrbitSceneCanvas } from "../ThreeCommonDoc/mod.ts";
+import { OrbitSceneCanvas } from "../ThreeCommonDoc/mod.ts";
 import { GlitchMesh } from "./GlitchMesh.ts";
 import { LoopingTrack } from "./LoopingTrack.ts";
 import { SimpleCanvas } from "../ThreeCommon/SimpleCanvas.ts";
@@ -18,10 +19,96 @@ import {
   EffectResourcesProvider,
   glitchNames,
 } from "./EffectsResourceProvider.ts";
-import { glyph2Names } from "./mod.ts";
+import { glyph2Names, WaterShader } from "./mod.ts";
 import { useTextureResource } from "../ThreeCommon/ResourceSet.ts";
 import { useDisposable } from "../ThreeCommon/useDisposable.ts";
 import { SkyboxMaterial } from "./SkyboxShader/mod.ts";
+import { useAnimation } from "../FrameScheduler/useAnimation.ts";
+
+const subdiviedPlane = new three.PlaneGeometry(100, 100, 100, 100);
+subdiviedPlane.rotateX(Math.PI * -0.5);
+
+const WaterShaderDemo = () => {
+  const [color, setColor] = useState(new three.Color("#0b257a"));
+  const [depthColor, setDepthColor] = useState(new three.Color("#049ef4"));
+  const [depthMultiplier, setDepthMultiplier] = useState(0.2);
+  const [waveSize, setWaveSize] = useState(1);
+  const [waveFrequency, setWaveFrequency] = useState(1);
+
+  const onColorInput = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    setColor(new three.Color(value));
+  };
+  const onDepthColorInput = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    setDepthColor(new three.Color(value));
+  };
+  const onDepthMultiplierInput = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    setDepthMultiplier(parseFloat(value));
+  };
+  const onWaveSizeInput = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    setWaveSize(parseFloat(value));
+  };
+  const onWaveFrequencyInput = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    setWaveFrequency(parseFloat(value));
+  };
+  const material = threeCommon.useDisposable(() => {
+    return new WaterShader();
+  });
+  useEffect(() => {
+    material.color = color;
+    material.depthColor = depthColor;
+    material.depthMultiplier = depthMultiplier;
+    material.waveSize = waveSize;
+    material.waveFrequency = waveFrequency;
+  }, [color, depthColor, depthMultiplier, waveSize, waveFrequency]);
+
+  useAnimation("WaterShaderDemo", (frame) => {
+    material.time = frame.now / 1000;
+  });
+
+  return [
+    h("pre", {}, JSON.stringify(color.getHexString())),
+    h("pre", {}, JSON.stringify(depthColor.getHexString())),
+    h("pre", {}, JSON.stringify(depthMultiplier)),
+    h("input", {
+      type: "color",
+      onInput: onColorInput,
+      value: "#" + color.getHexString(),
+    }),
+    h("input", {
+      type: "color",
+      onInput: onDepthColorInput,
+      value: "#" + depthColor.getHexString(),
+    }),
+    h("input", {
+      type: "number",
+      onInput: onDepthMultiplierInput,
+      value: depthMultiplier,
+      step: 0.01,
+    }),
+    h("input", {
+      type: "number",
+      onInput: onWaveSizeInput,
+      value: waveSize,
+      step: 0.05,
+    }),
+    h("input", {
+      type: "number",
+      onInput: onWaveFrequencyInput,
+      value: waveFrequency,
+      step: 0.05,
+    }),
+    h(OrbitSceneCanvas, {
+      height: 10,
+    }, [
+      h(actThree.mesh, { geometry: subdiviedPlane, material }),
+    ]),
+  ];
+};
 
 const GlitchMeshDemo = () => {
   const [i, setI] = useState(0);
@@ -63,6 +150,7 @@ const box = new three.BoxGeometry(20, 20, 20);
 const material = new three.LineBasicMaterial({ color: "red" });
 
 const demos = {
+  water_demo: WaterShaderDemo,
   glyph_demo() {
     const [selectedName, setSelectedName] = useState(glyph2Names[0]);
     const texture = useTextureResource(selectedName);
@@ -96,13 +184,23 @@ const demos = {
   },
   skybox_demo() {
     const texture = useTextureResource("forest");
-    if (!texture) {
+    if (!texture)
       return null;
-    }
     const skyboxMaterial = useDisposable(() =>
       new SkyboxMaterial({ map: texture })
     );
-    return h(OrbitSceneCanvas, {},
+    const rendererRef = useRef<null | three.WebGLRenderer>(null);
+    
+    const onSizeChange = () => {
+      const { current: renderer } = rendererRef;
+      if (!renderer)
+        return;
+      skyboxMaterial.resolution = renderer.getSize(skyboxMaterial.resolution);
+      skyboxMaterial.needsUpdate = true;
+    }
+
+    return h(OrbitSceneCanvas,
+      { simpleCanvas: { overrides: { rendererRef }, onResize: onSizeChange } },
       h(actThree.mesh, {
         geometry: box,
         material: skyboxMaterial,
@@ -142,7 +240,7 @@ const demos = {
           ref: cameraRef,
           rotation: new three.Euler(0, Math.PI / 2, 0),
         }),
-        h(Helper, { helper: cameraHelper }),
+        h(threeCommon.ObjectAttacher, { object: cameraHelper }),
       ]),
       h(FramePresenter, {}, [
         h(SimpleCanvas, { overrides: { cameraRef: fpCameraRef } }, [

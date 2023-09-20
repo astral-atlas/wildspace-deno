@@ -3,8 +3,8 @@ import {
 } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { GridSVG, defaultInverval } from "./GridSVG.ts";
 import { Particle2D, ParticleSettings } from "../BoxParticle/particle.ts";
-import { Box2, Vector2 } from "https://esm.sh/three";
 import { useDraggableParticle } from "./useDraggableParticle.ts";
+import { three } from "../AtlasRenderer/deps.ts";
 
 export type DeskplaneProps = {
   particleSettings?: ParticleSettings;
@@ -14,7 +14,7 @@ export type DeskplaneProps = {
 const deskplaneParticleSettings: ParticleSettings = {
   dragCoefficent: 0.005,
   velocityMagnitudeMax: 0.5,
-  bounds: new Box2(new Vector2(-512, -512), new Vector2(512, 512)),
+  bounds: new three.Box2(new three.Vector2(-512, -512), new three.Vector2(512, 512)),
 };
 
 export const Deskplane: Component<DeskplaneProps> = ({

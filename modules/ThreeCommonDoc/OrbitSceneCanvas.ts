@@ -6,12 +6,16 @@ const { h } = act;
 export type OrbitSceneCanvasProps = {
   speed?: number;
   distance?: number;
+  height?: number,
   overrides?: SimpleCanvasProps["overrides"],
+  simpleCanvas?: SimpleCanvasProps,
 }
 
 export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
-  speed = .1,
+  speed = .05,
   distance = 50,
+  height = 0,
+  simpleCanvas = {},
   children,
   overrides = {},
 }) => {
@@ -23,7 +27,7 @@ export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
 
     camera.position.set(
       Math.sin((now / 1000) * speed * Math.PI * 2) * distance,
-      distance,
+      height || distance,
       Math.cos((now / 1000) * speed * Math.PI * 2) * distance
     );
     camera.lookAt(new three.Vector3(0, 0, 0));
@@ -31,7 +35,8 @@ export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
 
   return h(FramePresenter, {}, [
     h(threeCommon.SimpleCanvas, {
-      overrides: { ...overrides, cameraRef },
+      ...simpleCanvas,
+      overrides: { ...overrides, ...simpleCanvas.overrides, cameraRef },
     }, [
       h(actThree.perspectiveCamera, { ref: cameraRef }),
       children,

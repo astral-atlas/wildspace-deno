@@ -20,8 +20,8 @@ export const SesamePage = () => {
             return h(RandomGlyphField);
           },
           size: 50,
-          count: 3,
-          period: 10000,
+          count: 8,
+          period: 6000,
         }),
         h(actThree.perspectiveCamera, {
           ref: cameraRef,
