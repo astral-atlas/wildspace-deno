@@ -1,3 +1,5 @@
+import denoResolve from '/Users/lkaalim/Projects/lukekaalim/vite_plugin_deno_resolve/mod.ts';
+
 export default {
   build: {
     sourcemap: true

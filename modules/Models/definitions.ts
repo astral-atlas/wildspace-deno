@@ -18,6 +18,13 @@ export const set = <T extends ReadonlyArray<string>>(
 };
 
 
+export const nullable = <T extends Model>(
+  value: T
+) => {
+  return { type: "nullable", value } as const;
+};
+
+
 export const union = <T extends ModelsByType["union"]["cases"]>(cases: T) => {
   return { type: 'union', cases } as const;
 };

@@ -2,19 +2,40 @@ import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 import { WhiteboardView } from "./components.ts";
 import { act, channel, service, nanoid, storage } from "./deps.ts";
-const { h, useState, useEffect } = act;
 
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
 import { BigTable } from "../BigTable/BigTable.ts";
-import { WhiteboardTypes, systems } from "./service.ts";
+import { WhiteboardTypes, createBackend, createInsecureImplementation, createMemoryDeps } from "./service.ts";
 import { createWhiteboardServerChannel } from "./channel.ts";
 import { StoreVisualzer } from "../Data/DataDoc/mod.ts";
 import { WhiteboardEditor } from "./components/WhiteboardEditor.ts";
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
 
+const { h, useState, useEffect, createContext, useContext } = act;
+
+const hostContext = createContext<ReturnType<typeof useHost>>(null);
+
+const useHost = () => {
+  const [host, error] = useAsync(async () => {
+    const implementation = createInsecureImplementation("Me!");
+    const backendDeps = createMemoryDeps(implementation);
+    const backend = createBackend(backendDeps, implementation);
+
+    const left = await createWhiteboardServerChannel('left', 'board-id', backend);
+    const right = await createWhiteboardServerChannel('right', 'board-id', backend);
+    return { left, right, backend, backendDeps };
+  }, []);
+
+  if (error)
+    console.error(error)
+
+  return host;
+}
+
 const Provider: act.Component = ({ children }) => {
-  return children;
+  const host = useHost()
+  return h(hostContext.Provider, { value: host }, children);
 };
 const ChannelView: act.Component<{
   channel: channel.BidirectionalChannel<unknown, unknown>;
@@ -46,28 +67,7 @@ const useAsync = <T>(func: () => Promise<T>, deps: act.Deps = []): [T | null, un
   return [resolution, rejection]
 }
 const Demo: act.Component = () => {
-  const [host, error] = useAsync(async () => {
-    const cursor = service.createMemoryCommonSystemComponents<WhiteboardTypes["cursorSystem"]>(systems.cursor, {
-      calculateKey: i => ({ part: i.whiteboardId, sort: i.id }),
-      create: i => ({ ...i, id: nanoid() }),
-      update: (p, i) => ({ ...p, ...i })
-    })
-    const stroke = service.createMemoryCommonSystemComponents<WhiteboardTypes["strokeSystem"]>(systems.stroke, {
-      calculateKey: i => ({ part: i.whiteboardId, sort: i.id }),
-      create: i => ({ ...i, id: nanoid() }),
-      update: (p, i) => ({ ...p, ...i })
-    })
-    const backend = {
-      cursor: cursor.service,
-      stroke: stroke.service
-    };
-    const left = await createWhiteboardServerChannel('left', 'board-id', backend, cursor.changes, stroke.changes)
-    const right = await createWhiteboardServerChannel('right', 'board-id', backend, cursor.changes, stroke.changes)
-    return { left, right, cursor, stroke };
-  }, []);
-
-  if (error)
-    console.error(error)
+  const host = useContext(hostContext);
   if (!host)
     return 'Loading';
 
@@ -81,12 +81,16 @@ const Demo: act.Component = () => {
       ]),
     ]),
     h(ChannelView, { channel: host.left as channel.BidirectionalChannel<unknown, unknown> }),
-    h(StoreVisualzer, { name: 'Cursor', store: host.cursor.memory.storage as any }),
-    h(StoreVisualzer, { name: 'Stroke', store: host.stroke.memory.storage as any })
+    h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.cursor.memoryStore }),
+    h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.note.memoryStore }),
   ];
 };
 const WhiteboardEditorDemo = () => {
-  return h(FramePresenter, {}, h(WhiteboardEditor));
+  const host = useContext(hostContext);
+  if (!host)
+    return 'Loading';
+
+  return h(FramePresenter, {}, h(WhiteboardEditor, { channel: host.left }));
 };
 const components = {
   demo: Demo,

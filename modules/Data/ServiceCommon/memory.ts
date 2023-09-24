@@ -1,6 +1,6 @@
 import { DynamoMemoryStoreExtension } from "../StorageCommon/mod.ts";
 import {
-CommonSystemComponents,
+  CommonSystemComponents,
   CommonSystemDefinintion,
   CommonSystemType,
   createCommonSystemChannels,
@@ -8,6 +8,27 @@ CommonSystemComponents,
   createCommonSystemStoreDefinition,
 } from "./commonSystem.ts";
 import { channel, storage } from "./deps.ts";
+import { CommonSystemServiceImplementation } from "./mod.ts";
+
+export const createMemoryChannels = <T extends CommonSystemType>(
+  definition: CommonSystemDefinintion<T>,
+  implementation: CommonSystemServiceImplementation<T>,
+) => {
+  const [outgoing, incoming] = createCommonSystemChannels<T>(
+    channel.createEchoChannel(),
+    definition,
+    implementation.calculateKey
+  );
+  return {
+    changes: incoming,
+    channel: outgoing,
+  }
+};
+export const createMemoryStore = <T extends CommonSystemType>(definition: CommonSystemDefinintion<T>) => {
+  return storage.createMemoryDynamoStore(
+    createCommonSystemStoreDefinition<T>(definition)
+  );
+}
 
 export const createMemoryCommonSystemComponents = <T extends CommonSystemType>(
   definition: CommonSystemDefinintion<T>,

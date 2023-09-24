@@ -1,10 +1,10 @@
 import {
   Component, ElementNode, h, useRef,
 } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { GridSVG, defaultInverval } from "./GridSVG.ts";
-import { Particle2D, ParticleSettings } from "../BoxParticle/particle.ts";
+import { GridSVG } from "./GridSVG.ts";
+import { ParticleSettings } from "../BoxParticle/particle.ts";
 import { useDraggableParticle } from "./useDraggableParticle.ts";
-import { three } from "../AtlasRenderer/deps.ts";
+import { three } from "./deps.ts";
 
 export type DeskplaneProps = {
   particleSettings?: ParticleSettings;

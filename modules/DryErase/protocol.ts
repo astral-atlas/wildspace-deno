@@ -2,11 +2,11 @@ import { m } from "./deps.ts";
 import {
   whiteboardCanvasDefinition,
   whiteboardDefinition,
-  whiteboardStrokePointDefinition,
   whiteboardStickerDefinition,
   whiteboardVectorDefinition,
   whiteboardStrokeDefinition,
-whiteboardCursorDefinition,
+  whiteboardCursorDefinition,
+noteDefinition,
 } from "./models.ts";
 
 export const strokeProtocolMessageDefinitions = {
@@ -17,6 +17,33 @@ export const strokeProtocolMessageDefinitions = {
   "stroke-update": m.object({
     type: m.literal("stroke-update"),
     stroke: whiteboardStrokeDefinition,
+  }),
+} as const;
+
+export const noteMessageDefinitions = {
+  "note-submit": m.object({
+    type: m.literal("note-create"),
+    position: whiteboardVectorDefinition,
+    size: whiteboardVectorDefinition,
+  }),
+  "note-create": m.object({
+    type: m.literal("note-create"),
+    note: noteDefinition,
+  }),
+  "note-move": m.object({
+    type: m.literal("note-create"),
+    noteId: noteDefinition.properties.id,
+    position: whiteboardVectorDefinition,
+    size: whiteboardVectorDefinition,
+  }),
+  "note-content-update": m.object({
+    type: m.literal("note-create"),
+    noteId: noteDefinition.properties.id,
+    content: noteDefinition.properties.content,
+  }),
+  "note-delete": m.object({
+    type: m.literal("note-create"),
+    noteId: noteDefinition.properties.id,
   }),
 } as const;
 
@@ -53,6 +80,7 @@ export const whiteboardProtocolMessageDefinition = m.union({
   ...strokeProtocolMessageDefinitions,
   ...layerProtocolMessageDefinitions,
   ...pointerProtocolMessageDefinitions,
+  ...noteMessageDefinitions,
 
   "whiteboard-update": m.object({
     type: m.literal("whiteboard-update"),
@@ -69,6 +97,7 @@ export type WhiteboardProtocolMessage = m.OfModelType<
 
 
 const client = m.union({
+  ...noteMessageDefinitions,
   "pointer-move": m.object({
     type: m.literal("pointer-move"),
     position: whiteboardVectorDefinition,

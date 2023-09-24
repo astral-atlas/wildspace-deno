@@ -1,7 +1,9 @@
 import { ModelOf, ModeledType } from "../Models/model.ts";
+import { vectorDefinition } from "../TheaterModels/space.ts";
 import { m, service, sesame, storage, nanoid, channel } from "./deps.ts";
 import {
   Whiteboard,
+  noteDefinition,
   whiteboardCursorDefinition,
   whiteboardDefinition,
   whiteboardLayerDefinition,
@@ -10,242 +12,224 @@ import {
   whiteboardVectorDefinition,
 } from "./models.ts";
 
-const whiteboardServiceDefinitition = service.createCRUDDefinition({
-  path: "dryerase/whiteboard",
-  name: "whiteboard",
+const whiteboardSystemDefinition = {
+  names: ["dryerase", "whiteboard"],
   resource: whiteboardDefinition,
-  create: m.object({ name: m.string, ownerId: m.string }),
-  update: m.object({
+  partName: "ownerId",
+  sortName: "whiteboardId",
+  editable: m.object({
+    ownerId: m.string,
     name: m.string,
-    layers: m.array(whiteboardLayerDefinition),
+    layers: whiteboardDefinition.properties.layers,
   }),
-  id: m.object({ whiteboardId: m.string }),
-  filter: m.object({ ownerId: m.string }),
-} as const);
-type WhiteboardServiceDefinitition = service.TypeOfCRUDDefinition<
-  typeof whiteboardServiceDefinitition
+} as const;
+type WhiteboardSystemType = service.ToCommonSystemType<
+  typeof whiteboardSystemDefinition
 >;
 
-const whiteboardStickerServiceDefinitition =
-  service.createCommonSystemDefinition({
-    names: ["dryerase", "whiteboard", "sticker"],
-    resource: whiteboardStickerDefinition,
-    partName: "whiteboardId",
-    sortName: "stickerId",
-    editable: m.object({
-      whiteboardId: m.string,
-      layerId: m.string,
-      assetId: m.string,
-      size: whiteboardVectorDefinition,
-      position: whiteboardVectorDefinition,
-      rotation: m.number,
-    }),
-  } as const);
+const stickerSystemDefinitition = {
+  names: ["dryerase", "whiteboard", "sticker"],
+  resource: whiteboardStickerDefinition,
+  partName: "whiteboardId",
+  sortName: "stickerId",
+  editable: m.object({
+    whiteboardId: m.string,
+    layerId: m.string,
+    assetId: m.string,
+    size: whiteboardVectorDefinition,
+    position: whiteboardVectorDefinition,
+    rotation: m.number
+  }),
+} as const;
 type StickerSystemType = service.ToCommonSystemType<
-  typeof whiteboardStickerServiceDefinitition
+  typeof stickerSystemDefinitition
 >;
-const whiteboardStrokeServiceDefinitition =
-  service.createCommonSystemDefinition({
-    names: ["dryerase", "whiteboard", "stroke"],
-    resource: whiteboardStrokeDefinition,
-    partName: "whiteboardId",
-    sortName: "strokeId",
-    editable: m.object({
-      whiteboardId: whiteboardStrokeDefinition.properties.whiteboardId,
-      layerId: whiteboardStrokeDefinition.properties.layerId,
-      brush: whiteboardStrokeDefinition.properties.brush,
-      points: whiteboardStrokeDefinition.properties.points,
-    }),
-  } as const);
+
+const strokeSystemDefinitition = {
+  names: ["dryerase", "whiteboard", "stroke"],
+  resource: whiteboardStrokeDefinition,
+  partName: "whiteboardId",
+  sortName: "strokeId",
+  editable: m.object({
+    whiteboardId: whiteboardStrokeDefinition.properties.whiteboardId,
+    layerId: whiteboardStrokeDefinition.properties.layerId,
+    brush: whiteboardStrokeDefinition.properties.brush,
+    points: whiteboardStrokeDefinition.properties.points,
+  }),
+} as const;
 type StrokeSystemType = service.ToCommonSystemType<
-  typeof whiteboardStrokeServiceDefinitition
->;
-const whiteboardCursorServiceDefinitition =
-  service.createCommonSystemDefinition({
-    names: ["dryerase", "whiteboard", "cursor"],
-    resource: whiteboardCursorDefinition,
-    partName: "whiteboardId",
-    sortName: "cursorId",
-    editable: m.object({
-      whiteboardId: whiteboardCursorDefinition.properties.whiteboardId,
-      ownerId: whiteboardCursorDefinition.properties.ownerId,
-      position: whiteboardVectorDefinition,
-    }),
-  } as const);
+  typeof strokeSystemDefinitition
+>
+
+const cursorSystemDefinitition = {
+  names: ["dryerase", "whiteboard", "cursor"],
+  resource: whiteboardCursorDefinition,
+  partName: "whiteboardId",
+  sortName: "cursorId",
+  editable: m.object({
+    whiteboardId: whiteboardDefinition.properties.id,
+    ownerId: m.string,
+    position: whiteboardVectorDefinition,
+  })
+} as const;
 type CursorSystemType = service.ToCommonSystemType<
-  typeof whiteboardCursorServiceDefinitition
+  typeof cursorSystemDefinitition
+>;
+
+const noteSystemDefinition = {
+  names: ["dryerase", "whiteboard", "note"],
+  resource: noteDefinition,
+  partName: "whiteboardId",
+  sortName: "noteId",
+  editable: m.object({
+    ownerId: m.nullable(noteDefinition.properties.ownerId),
+    whiteboardId: m.nullable(noteDefinition.properties.whiteboardId),
+    content: m.nullable(noteDefinition.properties.content),
+    position: m.nullable(noteDefinition.properties.position),
+    size: m.nullable(noteDefinition.properties.size),
+  }),
+} as const;
+type NoteSystemType = service.ToCommonSystemType<
+  typeof noteSystemDefinition
 >;
 
 export type WhiteboardTypes = {
-  strokeSystem: StrokeSystemType,
-  stickerSystem: StickerSystemType,
-  cursorSystem: CursorSystemType,
+  whiteboard: WhiteboardSystemType,
+  stroke:     StrokeSystemType,
+  sticker:    StickerSystemType,
+  cursor:     CursorSystemType,
+  note:       NoteSystemType
 };
 
-export const systems = {
-  stroke: whiteboardStrokeServiceDefinitition,
-  sticker: whiteboardStickerServiceDefinitition,
-  cursor: whiteboardCursorServiceDefinitition,
+export const defs = {
+  system: {
+    whiteboard: whiteboardSystemDefinition,
+    stroke:     strokeSystemDefinitition,
+    sticker:    stickerSystemDefinitition,
+    cursor:     cursorSystemDefinitition,
+    note:       noteSystemDefinition
+  }
+} as const;
+
+export type Meta = {
+  ServiceDependencies: {
+    [system in keyof WhiteboardTypes]:
+      Pick<service.CommonSystemComponents<WhiteboardTypes[system]>, "changes" | "channel" | "storage">
+  },
+  MemoryServiceDependencies: {
+    [system in keyof WhiteboardTypes]:
+      Pick<service.CommonSystemComponents<WhiteboardTypes[system]>, "changes" | "channel" | "storage"> & {
+        memoryStore: storage.DynamoMemoryStore<service.CommonSystemOutputType<WhiteboardTypes[system]>["storage"]>
+      }
+  },
+  Services: {
+    [system in keyof WhiteboardTypes]:
+      service.CommonSystemComponents<WhiteboardTypes[system]>["service"]
+  },
+  ServiceInput: {
+    [system in keyof WhiteboardTypes]:
+      service.CommonSystemServiceImplementation<WhiteboardTypes[system]>
+  }
 }
 
-export type WhiteboardBackendService = {
-  whiteboard: service.CRUDService<WhiteboardServiceDefinitition>;
-  stickers: service.CommonSystemComponents<StickerSystemType>["service"];
-  stroke: service.CommonSystemComponents<StrokeSystemType>["service"];
-  cursor: service.CommonSystemComponents<CursorSystemType>["service"];
-  deps: WhiteboardBackendServiceDependencies,
-};
-export type WhiteboardBackendServiceDependencies = {
-  whiteboards: storage.DynamoPartitionClient<{
-    value: Whiteboard;
-    sort: "";
-    part: Whiteboard["id"];
-  }>;
-  whiteboardsByOwner: storage.DynamoPartitionClient<{
-    value: { id: Whiteboard["id"] };
-    sort: Whiteboard["id"];
-    part: sesame.SesameUserID;
-  }>;
-
-  stickers: {
-    channel: service.CommonSystemComponents<StickerSystemType>["channel"];
-    storage: service.CommonSystemComponents<StickerSystemType>["storage"];
-  };
-  stroke: {
-    channel: service.CommonSystemComponents<StrokeSystemType>["channel"];
-    storage: service.CommonSystemComponents<StrokeSystemType>["storage"];
-  };
-  cursor: {
-    channel: service.CommonSystemComponents<CursorSystemType>["channel"];
-    storage: service.CommonSystemComponents<CursorSystemType>["storage"];
-  };
+export type DryEraseBackend = {
+  deps: Meta["ServiceDependencies"],
+  services: Meta["Services"]
 };
 
-export const createWhiteboardBackendService = (
-  userId: sesame.SesameUserID,
-  store: WhiteboardBackendServiceDependencies
-): WhiteboardBackendService => {
-  const whiteboard: WhiteboardBackendService["whiteboard"] = {
-    async create({ ownerId, name }) {
-      const whiteboard = {
-        id: nanoid(),
-        name,
-        ownerId,
-        layers: [],
-      };
-      await store.whiteboards.put(
-        { part: whiteboard.id, sort: "" },
-        whiteboard
-      );
-      await store.whiteboardsByOwner.put(
-        { part: ownerId, sort: whiteboard.id },
-        { id: whiteboard.id }
-      );
-      return whiteboard;
-    },
-    async update({ whiteboardId }, { layers, name }) {
-      const prevBoard = await store.whiteboards.get({
-        part: whiteboardId,
-        sort: "",
-      });
-      const nextBoard = {
-        ...prevBoard,
-        layers,
-        name,
-      };
-      await store.whiteboards.put({ part: whiteboardId, sort: "" }, nextBoard);
-      return nextBoard;
-    },
-    async list({ ownerId }) {
-      const results = await store.whiteboardsByOwner.query({
-        part: ownerId,
-        type: "all",
-      });
-      return await Promise.all(
-        results.map((r) =>
-          store.whiteboards.get({ part: r.value.id, sort: "" })
-        )
-      );
-    },
-    async read({ whiteboardId }) {
-      return await store.whiteboards.get({ part: whiteboardId, sort: "" });
-    },
-    async delete({ whiteboardId }) {
-      return await store.whiteboards.delete({ part: whiteboardId, sort: "" });
-    },
+export const createBackend = (
+  deps: Meta["ServiceDependencies"],
+  inputs: Meta["ServiceInput"]
+): DryEraseBackend => {
+  const createService = <T extends service.CommonSystemType>(
+    def: service.CommonSystemDefinintion<T>,
+    dep: Pick<service.CommonSystemComponents<T>, "changes" | "channel" | "storage">,
+    input: service.CommonSystemServiceImplementation<T>,
+  ): service.CommonSystemComponents<T>["service"] => {
+    return  service.createCommonSystemService<T>({
+      ...dep,
+      definition: def,
+      implementation: input
+    });
   };
+  return {
+    deps,
+    services: {
+      whiteboard: createService(defs.system.whiteboard, deps.whiteboard, inputs.whiteboard),
+      sticker:    createService(defs.system.sticker,    deps.sticker, inputs.sticker),
+      stroke:     createService(defs.system.stroke,     deps.stroke, inputs.stroke),
+      note:       createService(defs.system.note,       deps.note, inputs.note),
+      cursor:     createService(defs.system.cursor,     deps.cursor, inputs.cursor),
+    }
+  }
+};
+export const createMemoryDeps = (
+  inputs: Meta["ServiceInput"]
+): Meta["MemoryServiceDependencies"] => {
+  const createMemoryDep = <T extends service.CommonSystemType>(
+    def: service.CommonSystemDefinintion<T>,
+    impl: service.CommonSystemServiceImplementation<T>,
+  ) => {
+    const storage = service.createMemoryStore(def)
+    return {
+      ...service.createMemoryChannels(def, impl),
+      storage,
+      memoryStore: storage,
+    }
+  };
+  return {
+    whiteboard: createMemoryDep(defs.system.whiteboard, inputs.whiteboard),
+    sticker: createMemoryDep(defs.system.sticker, inputs.sticker),
+    stroke: createMemoryDep(defs.system.stroke, inputs.stroke),
+    note: createMemoryDep(defs.system.note, inputs.note),
+    cursor: createMemoryDep(defs.system.cursor, inputs.cursor),
+  }
+};
 
-  const stickers = service.createCommonSystemService<StickerSystemType>({
-    storage: store.stickers.storage,
-    channel: store.stickers.channel,
-    definition: whiteboardStickerServiceDefinitition,
-    implementation: {
-      calculateKey(item) {
-        return { part: item.whiteboardId, sort: item.id };
-      },
-      create(input) {
-        return {
-          id: nanoid(),
-          ...input,
-        };
-      },
-      update(prev, input) {
-        return {
-          ...prev,
-          ...input,
-          whiteboardId: prev.whiteboardId,
-        };
-      },
-    },
-  });
-  const stroke = service.createCommonSystemService<StrokeSystemType>({
-    storage: store.stroke.storage,
-    channel: store.stroke.channel,
-    definition: whiteboardStrokeServiceDefinitition,
-    implementation: {
-      calculateKey(item) {
-        return { part: item.whiteboardId, sort: item.id };
-      },
-      create(input) {
-        return {
-          id: nanoid(),
-          ...input,
-        };
-      },
-      update(prev, input) {
-        return {
-          ...prev,
-          ...input,
-          whiteboardId: prev.whiteboardId,
-        };
-      },
-    },
-  });
-  const cursor = service.createCommonSystemService<CursorSystemType>({
-    storage: store.cursor.storage,
-    channel: store.cursor.channel,
-    definition: whiteboardCursorServiceDefinitition,
-    implementation: {
-      calculateKey(item) {
-        return { part: item.whiteboardId, sort: item.id };
-      },
-      create(input) {
-        return {
-          id: nanoid(4),
-          ...input,
-        };
-      },
-      update(prev, input) {
-        return {
-          ...prev,
-          ...input,
-          whiteboardId: prev.whiteboardId,
-        };
-      },
-    },
-  });
+const expressionThrow = (error: unknown) => { throw error };
 
-  return { whiteboard, stickers, stroke, cursor, deps: store };
+export const createInsecureImplementation = (
+  userId: sesame.SesameUserID
+): Meta["ServiceInput"] => {
+  return {
+    whiteboard: {
+      create: (i) => ({ ...i, id: nanoid() }),
+      update: (w, i) => ({ ...w, ...i }),
+      calculateKey: (w) => ({ part: w.ownerId, sort: w.id }),
+    },
+    sticker: {
+      create: (i) => ({ ...i, id: nanoid() }),
+      update: (w, i) => ({ ...w, ...i }),
+      calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
+    },
+    cursor: {
+      create: (i) => ({ ...i, id: nanoid() }),
+      update: (w, i) => ({ ...w, ...i }),
+      calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
+    },
+    stroke: {
+      create: (i) => ({ ...i, id: nanoid() }),
+      update: (w, i) => ({ ...w, ...i }),
+      calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
+    },
+    note: {
+      create: (i) => ({
+        whiteboardId: i.ownerId || expressionThrow(new Error('WhiteboardID is required')),
+        ownerId: i.ownerId || expressionThrow(new Error('OwnerID is required')),
+        content: i.content || { type: 'text', text: 'New Note' },
+        size: i.size || { x: 0, y: 0 },
+        position: i.position || { x: 0, y: 0},
+        id: nanoid()
+      }),
+      update: (w, i) => ({
+        ...w,
+        position: i.position || w.position,
+        size: i.size || w.size,
+        content: i.content || w.content,
+      }),
+      calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
+    },
+  }
 };
 
 export type WhiteboardChannelClient = {

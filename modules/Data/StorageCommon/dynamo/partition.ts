@@ -1,5 +1,5 @@
-import { castString, createModelCaster } from "../../../Models/cast.ts";
-import { ModelOf, OfModelType } from "../../../Models/model.ts";
+import { Cast, castString, createModelCaster } from "../../../Models/cast.ts";
+import { ModelOf, ModelOf2, OfModelType } from "../../../Models/model.ts";
 import { dynamo } from "../deps.ts";
 import { AttributeRecord, TypeOfAttributeValue, attributeMapToObject, objectToAttributeMap, valueToAttribute } from "./attributes.ts";
 import { DynamoTableDefinition } from "./table.ts";
@@ -41,7 +41,7 @@ export type DynamoPartitionQuery<T extends DynamoPartitionType> = (
 
 export type DynamoPartitionDefinition<T extends DynamoPartitionType> = {
   partitionPrefix:  string,
-  model:            ModelOf<T["value"]>,
+  model:            ModelOf2<T["value"]>,
 }
 
 export type DynamoQueryResults<T extends DynamoPartitionType> = {
@@ -96,7 +96,7 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
     const map = attributeMapToObject(attributes);
     return cast(map[table.valueKeyName]);
   }
-  const cast = createModelCaster(definition.model);
+  const cast = createModelCaster(definition.model) as Cast<T["value"]>;
 
   return {
     definition,

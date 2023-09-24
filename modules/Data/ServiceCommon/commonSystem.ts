@@ -1,3 +1,4 @@
+import { Cast } from "../../Models/cast.ts";
 import { ModeledType } from "../../Models/model.ts";
 import { rxjs } from "../SesameDataService/deps.ts";
 import { CRUDService } from "./crudService.ts";
@@ -15,8 +16,8 @@ export type CommonSystemDefinintion<T extends CommonSystemType> = {
   partName: T["partName"];
   sortName: T["sortName"];
   names: ReadonlyArray<string>;
-  resource: m.ModelOf<T["resource"]>;
-  editable: m.ModelOf<T["editable"]>;
+  resource: m.ModelOf2<T["resource"]>;
+  editable: m.ModelOf2<T["editable"]>;
 };
 export type ToCommonSystemType<
   T extends CommonSystemDefinintion<CommonSystemType>
@@ -30,11 +31,10 @@ export type ToCommonSystemType<
 };
 
 export const createCommonSystemDefinition = <
-  T extends CommonSystemType,
-  D extends CommonSystemDefinintion<T>
+  T extends CommonSystemType
 >(
-  def: D
-): D => {
+  def: CommonSystemDefinintion<T>
+): CommonSystemDefinintion<T> => {
   return def;
 };
 
@@ -74,15 +74,17 @@ export type CommonSystemServiceInput<T extends CommonSystemType> = {
   storage: CommonSystemComponents<T>["storage"];
   channel: CommonSystemComponents<T>["channel"];
   definition: CommonSystemDefinintion<T>;
-  implementation: {
-    create: (input: T["editable"]) => T["resource"];
-    update: (previous: T["resource"], input: T["editable"]) => T["resource"];
-    calculateKey: (input: T["resource"]) => {
-      part: T["part"];
-      sort: T["sort"];
-    };
-  };
+  implementation: CommonSystemServiceImplementation<T>;
 };
+
+export type CommonSystemServiceImplementation<T extends CommonSystemType> = {
+  create: (input: T["editable"]) => T["resource"];
+  update: (previous: T["resource"], input: T["editable"]) => T["resource"];
+  calculateKey: (input: T["resource"]) => {
+    part: T["part"];
+    sort: T["sort"];
+  };
+}
 
 export const createCommonSystemChannels = <T extends CommonSystemType>(
   transportChannel: channel.UniformChannel<ModeledType>,
@@ -95,7 +97,7 @@ export const createCommonSystemChannels = <T extends CommonSystemType>(
   const castEvent = m.createModelCaster(m.object({
     action: m.set(["CREATE", "UPDATE", "DELETE"] as const),
     item: definition.resource,
-  }));
+  })) as Cast<CommonSystemOutputType<T>["event"]>;
 
   const close = () => {
     transportChannel.close();

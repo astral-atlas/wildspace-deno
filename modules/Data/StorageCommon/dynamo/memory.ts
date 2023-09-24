@@ -12,6 +12,8 @@ export type DynamoMemoryStoreExtension<T extends DynamoPartitionType> = {
   memory(): MemoryStoreItem<T>[],
   onMemoryUpdate: Subject<MemoryStoreItem<T>[]>,
 }
+export type DynamoMemoryStore<T extends DynamoPartitionType> =
+  DynamoPartitionClient<T> & DynamoMemoryStoreExtension<T>; 
 export type MemoryStoreItem<T extends DynamoPartitionType> = {
   value: T["value"],
   key: DynamoKey<T>
@@ -19,9 +21,7 @@ export type MemoryStoreItem<T extends DynamoPartitionType> = {
 
 export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
   definition: DynamoPartitionDefinition<T>,
-): (
-  DynamoPartitionClient<T> & DynamoMemoryStoreExtension<T>
- ) => {
+): DynamoMemoryStore<T> => {
   let allItems: MemoryStoreItem<T>[] = [];
   let operations = [];
 

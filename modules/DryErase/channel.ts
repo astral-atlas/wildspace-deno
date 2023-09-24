@@ -2,7 +2,7 @@ import { BidirectionalChannel } from "../Data/ChannelCommon/channel.ts";
 import { _, rxjs, service } from "./deps.ts";
 import { WhiteboardCursor, WhiteboardStroke, WhiteboardVector } from "./models.ts";
 import { Protocol } from "./protocol.ts";
-import { WhiteboardBackendService, WhiteboardTypes } from "./service.ts";
+import { DryEraseBackend, WhiteboardTypes } from "./service.ts";
 
 export type WhiteboardChannel = BidirectionalChannel<
   Protocol["message"]["server"],
@@ -51,22 +51,15 @@ const cleanupCollection = () => {
 export const createWhiteboardServerChannel = (
   userId: string,
   whiteboardId: string,
-  // TODO: pack the change monitors into the backend service
-  service: WhiteboardBackendService,
-  changes: service.CommonSystemComponents<
-    WhiteboardTypes["cursorSystem"]
-  >["changes"],
-  strokeChanges: service.CommonSystemComponents<
-    WhiteboardTypes["strokeSystem"]
-  >["changes"],
+  backend: DryEraseBackend,
 ): WhiteboardChannel => {
   const cleanup = cleanupCollection();
   const recieve = new rxjs.ReplaySubject<Protocol["message"]["server"]>(Infinity, Infinity);
 
-  const cursorChannel = changes({ whiteboardId });
+  const cursorChannel = backend.deps.cursor.changes({ whiteboardId });
   cleanup.register(() => cursorChannel.close());
 
-  const strokeChannel = strokeChanges({ whiteboardId });
+  const strokeChannel = backend.deps.stroke.changes({ whiteboardId });
   cleanup.register(() => strokeChannel.close());
 
   const cursorSubscription = cursorChannel.recieve.subscribe((event) => {
@@ -112,23 +105,23 @@ export const createWhiteboardServerChannel = (
   let position: WhiteboardVector | null = null;
 
   const init = async () => {
-    const createdCursor = await service.cursor.create({
+    const createdCursor = await backend.services.cursor.create({
       whiteboardId,
       ownerId: userId,
       position: { x: 0, y: 0 },
     });
     cursor = createdCursor;
-    cleanup.register(() => service.cursor.delete({ whiteboardId, cursorId: createdCursor.id }))
+    cleanup.register(() => backend.services.cursor.delete({ whiteboardId, cursorId: createdCursor.id }))
     recieve.next({
       type: 'initialize',
-      cursors: await service.cursor.list({ whiteboardId })
+      cursors: await backend.services.cursor.list({ whiteboardId })
     })
   }
   init();
 
   const updateStroke = _.throttle(async (position: WhiteboardVector) => {
     if (stroke)
-      stroke = await service.stroke.update({
+      stroke = await backend.services.stroke.update({
         whiteboardId,
         strokeId: stroke.id,
       }, { ...stroke, points: [...stroke.points, { position, width: 1 }] })
@@ -139,7 +132,7 @@ export const createWhiteboardServerChannel = (
         position = event.position;
         if (!cursor)
           return;
-        await service.cursor.update(
+        await backend.services.cursor.update(
           { whiteboardId, cursorId: cursor.id },
           {
             whiteboardId,
@@ -150,7 +143,7 @@ export const createWhiteboardServerChannel = (
         updateStroke(event.position);
       },
       async 'stroke-start'() {
-        stroke = await service.stroke.create({
+        stroke = await backend.services.stroke.create({
           whiteboardId, layerId: '',
           brush: { color: 'blue', mode: 'add' },
           points: position && [{ position, width: 1 }] || [],

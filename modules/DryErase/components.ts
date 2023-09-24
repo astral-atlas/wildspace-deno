@@ -1,4 +1,5 @@
 import { WhiteboardChannel } from "./channel.ts";
+import { useWhiteboardState } from "./components/useWhiteboardState.ts";
 import { act, hash } from "./deps.ts";
 import {
   WhiteboardCursor,
@@ -14,36 +15,8 @@ export const WhiteboardView: act.Component<WhiteboardViewProps> = ({
   channel,
 }) => {
   const ref = useRef<null | SVGSVGElement>(null);
-  const [strokes, setStrokes] = useState<WhiteboardStroke[]>([]);
-  const [cursors, setCursors] = useState<WhiteboardCursor[]>([]);
 
-  useEffect(() => {
-    const subscription = channel.recieve.subscribe((event) => {
-      switch (event.type) {
-        case 'initialize':
-          return setCursors(cs => [...cs, ...event.cursors])
-        case "pointer-spawn":
-          return setCursors((cs) => [...cs, event.cursor]);
-        case "pointer-move":
-          return setCursors((cs) =>
-            cs.map((c) =>
-              c.id === event.cursorId ? { ...c, position: event.position } : c
-            )
-          );
-        case 'stroke-create':
-          return setStrokes(ss => [...ss, event.stroke])
-        case 'stroke-update':
-          return setStrokes(ss => ss.map(s => s.id === event.stroke.id ? event.stroke : s))
-        case "pointer-despawn":
-          return setCursors((cs) =>
-            cs.filter((c) => c.id !== event.cursorId)
-          );
-      }
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { strokes, cursors } = useWhiteboardState(channel);
 
   useEffect(() => {
     const { current: svg } = ref;

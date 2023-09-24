@@ -28,6 +28,8 @@ export const createModelCaster = <I extends Model>(
       ) as any;
     case 'enum':
       return createEnumCaster(modelDefinition.cases);
+    case 'nullable':
+      return createNullableCaster(createModelCaster(modelDefinition.value));
     case "union":
       return createUnionCaster(modelDefinition);
     case "literal":
@@ -87,6 +89,16 @@ export const castBoolean: Cast<boolean> = (value) => {
   if (typeof value === "boolean") return value;
   throw new Error();
 };
+
+export const createNullableCaster = <T>(
+  castValue: Cast<T>
+): Cast<T | null> => {
+  return (value) => {
+    if (value === null)
+      return null;
+    return castValue(value);
+  }
+}
 
 export const createArrayCaster = <T>(
   castElement: Cast<T>,

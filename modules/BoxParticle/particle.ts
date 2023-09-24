@@ -1,13 +1,13 @@
-import { Box2, Vector2 } from "https://esm.sh/three@0.155.0";
+import { three } from "./deps.ts";
 
 export type Particle2D = {
-  position: Vector2;
-  velocityPerMs: Vector2;
+  position: three.Vector2;
+  velocityPerMs: three.Vector2;
 };
 export type ParticleSettings = {
   dragCoefficent?: number;
   velocityMagnitudeMax?: number;
-  bounds?: null | Box2;
+  bounds?: null | three.Box2;
 };
 
 export const simulateParticle2D = (
@@ -17,7 +17,7 @@ export const simulateParticle2D = (
     dragCoefficent = 0.1,
     bounds = null,
   }: ParticleSettings,
-  accelerationPerMs: Vector2,
+  accelerationPerMs: three.Vector2,
   durationMs: number
 ) => {
   const decay = Math.pow(dragCoefficent, durationMs / 1000);

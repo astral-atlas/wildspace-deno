@@ -11,6 +11,7 @@ export type GridSVGProps = {
   patternRef?: Ref<SVGPatternElement | null>,
   ref?: Ref<SVGSVGElement | null>,
   style?: { [style: string]: unknown },
+  svgProps?: { [prop: string]: unknown },
   intervals?: GridSVGInterval[],
   patternSize?: number
 };
@@ -25,11 +26,12 @@ export const GridSVG: Component<GridSVGProps> = ({
   patternRef,
   ref,
   style,
+  svgProps = {},
   patternSize = 64,
   intervals = [defaultInverval]
 }) => {
   const [id] = useState('grid-' + createId());
-  return h("svg", { ref, style }, [
+  return h("svg", { ref, style, ...svgProps }, [
     h("defs", {}, [
       h( "pattern", {
           id,

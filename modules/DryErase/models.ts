@@ -1,3 +1,4 @@
+import { string } from "../Models/definitions.ts";
 import { m } from "./deps.ts";
 
 export const whiteboardVectorDefinition = m.object({
@@ -16,6 +17,12 @@ export const whiteboardStickerDefinition = m.object({
   rotation: m.number,
 });
 export type WhiteboardSticker = m.OfModelType<typeof whiteboardStickerDefinition>;
+type WhiteboardStickerModel = m.ModelOf2<WhiteboardSticker>;
+const a = whiteboardStickerDefinition as WhiteboardStickerModel;
+const b = (c: WhiteboardStickerModel) => {
+
+}
+b(whiteboardStickerDefinition);
 
 export const whiteboardCanvasDefinition = m.object({
   id: m.string,
@@ -33,6 +40,8 @@ export const whiteboardStrokePointDefinition = m.object({
   position: m.object({ x: m.number, y: m.number }),
   width: m.number,
 });
+export type WhiteboardStrokePoint = m.OfModelType<typeof whiteboardStrokePointDefinition>;
+
 export const whiteboardStrokeDefinition = m.object({
   id: m.string,
   layerId: m.string,
@@ -42,6 +51,7 @@ export const whiteboardStrokeDefinition = m.object({
   points: m.array(whiteboardStrokePointDefinition),
 });
 export type WhiteboardStroke = m.OfModelType<typeof whiteboardStrokeDefinition>;
+
 export const whiteboardCursorDefinition = m.object({
   id: m.string,
   ownerId: m.string,
@@ -49,6 +59,27 @@ export const whiteboardCursorDefinition = m.object({
   position: whiteboardVectorDefinition,
 });
 export type WhiteboardCursor = m.OfModelType<typeof whiteboardCursorDefinition>;
+export const noteDefinition = m.object({
+  id: m.string,
+  ownerId: m.string,
+  whiteboardId: m.string,
+
+  position: whiteboardVectorDefinition,
+  size: whiteboardVectorDefinition,
+
+  content: m.union({
+    text: m.object({ type: m.literal('text'), text: m.string })
+  }),
+});
+export type Note = m.OfModelType<typeof noteDefinition>;
+type NoteModel = m.ModelOf<Note>;
+type N = NoteModel extends { type: 'object' } ? NoteModel["properties"]["content"] : never;
+
+const modelA = (n: NoteModel) => {
+  if (n.type === 'union')
+    return;
+  n.properties.content
+}
 
 export const whiteboardLayerDefinition = m.object({
   id: m.string,

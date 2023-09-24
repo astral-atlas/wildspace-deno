@@ -1,5 +1,4 @@
 import { h, useEffect, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { Box2, Vector2 } from "https://esm.sh/three@0.155.0";
 
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { simulateParticle2D } from "./mod.ts";
@@ -8,6 +7,9 @@ import { markdownToDoc, markdownToSheet } from "../ComponentDoc/markdown.ts";
 
 // @deno-types="vite-text"
 import readme from './readme.md?raw';
+import { three } from "./deps.ts";
+
+const { Box2, Vector2 } = three;
 
 const BoxParticleDemo = () => {
   const outputRef = useRef<HTMLCanvasElement | null>(null);

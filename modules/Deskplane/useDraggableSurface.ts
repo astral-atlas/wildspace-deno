@@ -1,19 +1,29 @@
 import { Ref, useEffect, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { Vector2 } from "https://esm.sh/three@0.155.0";
-import { useSimulation } from "../FrameScheduler/useSimulation.ts";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
+import { rxjs, three } from "./deps.ts";
 
 export type DraggableSurface = {
-  dragging: Element | null
+  dragging: Element | null,
+  events: rxjs.Observable<DragEvent>,
+};
+
+export type DragEvent = {
+  start:    three.Vector2,
+  current:  three.Vector2,
+  delta:    three.Vector2,
+  state:    'start-drag' | 'dragging' | 'end-drag' | 'moving',
+
+  event: PointerEvent | MouseEvent | TouchEvent,
 };
 
 export const useDraggableSurface = (
   draggableElementRef: Ref<null | HTMLElement>,
-  onDrag: (change: Vector2, element: Element) => unknown
+  onDrag: (change: three.Vector2, element: Element) => unknown,
 ): DraggableSurface => {
+  const events = useRef(new rxjs.Subject<DragEvent>()).current;
   const [dragging, setDragging] = useState<null | Element>(null);
 
-  const change = useRef(new Vector2(0, 0)).current;
+  const change = useRef(new three.Vector2(0, 0)).current;
   useEffect(() => {
     const { current: draggable } = draggableElementRef;
     if (!draggable)
@@ -36,6 +46,9 @@ export const useDraggableSurface = (
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      events.next({
+        state: isDragging ? 'dragging' : 'moving'
+      })
       if (!isDragging)
         return;
       change.set(event.movementX, event.movementY)
@@ -61,5 +74,5 @@ export const useDraggableSurface = (
   }, [dragging])
   
 
-  return { dragging };
+  return { dragging, events };
 };
