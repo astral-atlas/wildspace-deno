@@ -1,5 +1,12 @@
 # Changelog
 
+#### 27rd September, 2023
+- Man who even knows anymore
+- Second pass at sesame page, now inside DoorJourney
+- Janitor!
+- More structured attempt at Models
+- Whiteboard, Artifact, and NetworkService (and MemoryInternet)
+
 #### 29rd August, 2023
 - Added [SesamePage](./Sesame) and first pass of glitch mess
 - Added Resource Set for ThreeCommon

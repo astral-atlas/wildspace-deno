@@ -14,10 +14,10 @@ export type HTTPRequest = {
   url: URL;
   headers: HTTPHeaders;
   method: HTTPMethod;
-  body: null | Uint8Array;
+  body: null | ReadableStream<Uint8Array>;
 };
 export type HTTPResponse = {
   status: HTTPStatus;
   headers: HTTPHeaders;
-  body: null | Uint8Array;
+  body: null | ReadableStream<Uint8Array>;
 };

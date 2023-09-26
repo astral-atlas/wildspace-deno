@@ -17,12 +17,6 @@ export const whiteboardStickerDefinition = m.object({
   rotation: m.number,
 });
 export type WhiteboardSticker = m.OfModelType<typeof whiteboardStickerDefinition>;
-type WhiteboardStickerModel = m.ModelOf2<WhiteboardSticker>;
-const a = whiteboardStickerDefinition as WhiteboardStickerModel;
-const b = (c: WhiteboardStickerModel) => {
-
-}
-b(whiteboardStickerDefinition);
 
 export const whiteboardCanvasDefinition = m.object({
   id: m.string,
@@ -72,14 +66,6 @@ export const noteDefinition = m.object({
   }),
 });
 export type Note = m.OfModelType<typeof noteDefinition>;
-type NoteModel = m.ModelOf<Note>;
-type N = NoteModel extends { type: 'object' } ? NoteModel["properties"]["content"] : never;
-
-const modelA = (n: NoteModel) => {
-  if (n.type === 'union')
-    return;
-  n.properties.content
-}
 
 export const whiteboardLayerDefinition = m.object({
   id: m.string,

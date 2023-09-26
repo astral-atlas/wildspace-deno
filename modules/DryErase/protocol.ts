@@ -6,7 +6,7 @@ import {
   whiteboardVectorDefinition,
   whiteboardStrokeDefinition,
   whiteboardCursorDefinition,
-noteDefinition,
+  noteDefinition,
 } from "./models.ts";
 
 export const strokeProtocolMessageDefinitions = {
@@ -22,7 +22,7 @@ export const strokeProtocolMessageDefinitions = {
 
 export const noteMessageDefinitions = {
   "note-submit": m.object({
-    type: m.literal("note-create"),
+    type: m.literal("note-submit"),
     position: whiteboardVectorDefinition,
     size: whiteboardVectorDefinition,
   }),
@@ -31,18 +31,18 @@ export const noteMessageDefinitions = {
     note: noteDefinition,
   }),
   "note-move": m.object({
-    type: m.literal("note-create"),
+    type: m.literal("note-move"),
     noteId: noteDefinition.properties.id,
     position: whiteboardVectorDefinition,
     size: whiteboardVectorDefinition,
   }),
   "note-content-update": m.object({
-    type: m.literal("note-create"),
+    type: m.literal("note-content-update"),
     noteId: noteDefinition.properties.id,
     content: noteDefinition.properties.content,
   }),
   "note-delete": m.object({
-    type: m.literal("note-create"),
+    type: m.literal("note-delete"),
     noteId: noteDefinition.properties.id,
   }),
 } as const;

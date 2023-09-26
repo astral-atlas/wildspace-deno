@@ -39,10 +39,16 @@ export const StoreVisualzer: act.Component<{
       return [
         item.key.part || "",
         item.key.sort,
-        ...Object.values(item.value).map((v) =>
-          (typeof v === "object" ? JSON.stringify(v) : v?.toString() || "null")
-            .slice(0, 100)
-        ),
+        ...Object.keys(store.definition.model.properties).map(key => {
+          const value = item.value[key];
+          if (typeof value === "object") {
+            return JSON.stringify(value).slice(0, 100);
+          }
+          if (!value) {
+            return null;
+          }
+          return value.toString().slice(0, 100);
+        }),
       ];
     }),
   }));

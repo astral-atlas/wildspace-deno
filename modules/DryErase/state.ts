@@ -1,5 +1,5 @@
 import { m } from "./deps.ts";
-import { whiteboardCanvasDefinition, whiteboardCursorDefinition, whiteboardStickerDefinition, whiteboardStrokeDefinition } from "./models.ts";
+import { noteDefinition, whiteboardCanvasDefinition, whiteboardCursorDefinition, whiteboardStickerDefinition, whiteboardStrokeDefinition } from "./models.ts";
 
 export const whiteboardLayerStateDefinition = m.object({
   layerId: m.string,
@@ -12,5 +12,6 @@ export type WhiteboardLayerState = m.OfModelType<typeof whiteboardLayerStateDefi
 export const whiteboardStateDefinintion = m.object({
   cursors: m.array(whiteboardCursorDefinition),
   strokes: m.array(whiteboardStrokeDefinition),
+  notes: m.array(noteDefinition),
 });
 export type WhiteboardState = m.OfModelType<typeof whiteboardStateDefinintion>;

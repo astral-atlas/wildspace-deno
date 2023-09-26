@@ -1,10 +1,19 @@
-import { HTTPTransactionType } from "./http.ts";
+import { channel } from "../ServiceCommon/deps.ts";
+import { HTTPMethod, HTTPRequest, HTTPResponse } from "./http/mod.ts";
 
-export type HTTPTransactionHandler<T extends HTTPTransactionType> = {
-  handle: (request: {
-    query: T["query"],
-    body: T["request"]
-  }) => Promise<T["response"]>
+export type Route =
+  | HTTPRoute
+  | WebsocketRoute
+
+export type HTTPRoute = {
+  type: 'http',
+  path: string,
+  method: HTTPMethod,
+  handler: (request: HTTPRequest) => (Promise<HTTPResponse> | HTTPResponse),
+};
+
+export type WebsocketRoute = {
+  type: 'websocket',
+  path: string,
+  handler: (channel: channel.UniformChannel<Uint8Array>) => void,
 }
-
-// add security at the route level

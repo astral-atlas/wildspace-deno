@@ -62,6 +62,9 @@ export const createWhiteboardServerChannel = (
   const strokeChannel = backend.deps.stroke.changes({ whiteboardId });
   cleanup.register(() => strokeChannel.close());
 
+  const noteChannel = backend.deps.note.changes({ whiteboardId });
+  cleanup.register(() => noteChannel.close());
+
   const cursorSubscription = cursorChannel.recieve.subscribe((event) => {
     switch (event.action) {
       case "CREATE":
@@ -99,6 +102,26 @@ export const createWhiteboardServerChannel = (
     }
   });
   cleanup.register(() => strokeSubscription.unsubscribe());
+
+  const noteSubscription = noteChannel.recieve.subscribe((event) => {
+    switch (event.action) {
+      case "CREATE":
+        return recieve.next({
+          type: "note-create",
+          note: event.item,
+        });
+      case "UPDATE":
+    }
+  });
+  cleanup.register(() => noteSubscription.unsubscribe());
+
+  const updates = backend.deps.updates.connect({ whiteboardId })
+  cleanup.register(() => updates.close());
+
+  const updateSubscription = updates.recieve.subscribe((update) => {
+    recieve.next(update);
+  })
+  cleanup.register(() => updateSubscription.unsubscribe());
 
   let cursor: WhiteboardCursor | null = null;
   let stroke: WhiteboardStroke | null = null;
@@ -148,6 +171,56 @@ export const createWhiteboardServerChannel = (
           brush: { color: 'blue', mode: 'add' },
           points: position && [{ position, width: 1 }] || [],
         })
+      },
+      async 'note-submit'({ position, size}) {
+        const note = await backend.services.note.create({
+          whiteboardId,
+          content: null,
+          ownerId: userId,
+          position,
+          size,
+        })
+        updates.send({
+          type: 'note-create',
+          note,
+        });
+      },
+      async 'note-move'({ position, size, noteId }) {
+        const key = {
+          whiteboardId,
+          noteId,
+        };
+        await backend.services.note.update(key, {
+          whiteboardId: null,
+          content: null,
+          ownerId: null,
+          position,
+          size,
+        })
+        updates.send({
+          type: 'note-move',
+          position,
+          size,
+          noteId,
+        });
+      },
+      async 'note-content-update'({ content, noteId }) {
+        const key = {
+          whiteboardId,
+          noteId,
+        };
+        await backend.services.note.update(key, {
+          whiteboardId: null,
+          content,
+          ownerId: null,
+          position: null,
+          size: null,
+        })
+        updates.send({
+          type: 'note-content-update',
+          content,
+          noteId,
+        });
       },
       'stroke-end'() {
         stroke = null;

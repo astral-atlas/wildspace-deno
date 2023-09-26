@@ -18,7 +18,7 @@ export type CommonSystemDefinintion<T extends CommonSystemType> = {
   names: ReadonlyArray<string>;
   resource: m.ModelOf2<T["resource"]>;
   editable: m.ModelOf2<T["editable"]>;
-};
+}
 export type ToCommonSystemType<
   T extends CommonSystemDefinintion<CommonSystemType>
 > = {
@@ -195,3 +195,9 @@ export const createCommonSystemService = <T extends CommonSystemType>({
     },
   };
 };
+
+
+
+export const assertIsSystem = <T extends CommonSystemType>(
+  def: CommonSystemDefinintion<T>
+) => {}

@@ -9,7 +9,6 @@ export type ModeledType =
   | number
   | boolean
   | null
-  | never
   | ReadonlyArray<ModeledType>
   | { readonly [key: string]: ModeledType }
 
@@ -126,23 +125,15 @@ export type ModelOfObject<T> =
 export type ModelOfArray<T extends readonly ModeledType[]> =
   { type: 'array', elements: ModelOf2<T[number]> }
 
-export type ModelOf2<T extends ModeledType> =
+// ModelOf2<ModeledType> is really expensive (infinite recursion)
+// but can more simply be described as Model anyway,
+// so we can exit typechecking quickly if thats the case
+type EarlyExit<T extends ModeledType, Expression> =
+  Exclude<ModeledType, T> extends never ? Model : Expression
+
+export type ModelOf2<T extends ModeledType> = EarlyExit<T,
   | ModelOfPrimitive<T>
   | (T extends readonly ModeledType[] ? ModelOfArray<T> : never)
   | ModelOfObject<T>
   | ModelOfNullable<T>
-
-type Primitives = ModelOfPrimitive<ModeledType>;
-type Objects = ModelOfObject<ModeledType>;
-type Nullable = ModelOfNullable<ModeledType>;
-
-type A = ModelOfPrimitive<ModeledType> extends Model ? true : false;
-type B = ModelOfObject<ModeledType> extends Model ? true : false;
-type C = ModelOfNullable<ModeledType> extends Model ? true : false;
-
-type D = ModelOf2<ModeledType> extends Model ? true : false;
-
-const d = (a: Nullable) => {
-  const b = (c: Model) => {};
-  b(a);
-}
+>

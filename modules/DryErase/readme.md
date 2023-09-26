@@ -1,10 +1,18 @@
 # DryErase
 
+DryErase is a module for a "white-board-like" experience,
+letting you draw and mark a virtual space, in sync with
+other users.
+
 ::demo
 
 ## Editor
 
 ::whiteboardEditorDemo
+
+## Backend
+
+::backendDemo
 
 ## Models
 

@@ -44,6 +44,8 @@ const ChannelView: act.Component<{
 
   useEffect(() => {
     channel.recieve.subscribe(message => {
+      if (typeof message !== 'object' || message === null)
+        return;
       setMessages(m => [JSON.stringify(Object.values(message)) || '', ...m].slice(0, 10))
     })
   }, []);
@@ -80,9 +82,6 @@ const Demo: act.Component = () => {
         h(WhiteboardView, { channel: host.right }),
       ]),
     ]),
-    h(ChannelView, { channel: host.left as channel.BidirectionalChannel<unknown, unknown> }),
-    h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.cursor.memoryStore }),
-    h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.note.memoryStore }),
   ];
 };
 const WhiteboardEditorDemo = () => {
@@ -92,9 +91,20 @@ const WhiteboardEditorDemo = () => {
 
   return h(FramePresenter, {}, h(WhiteboardEditor, { channel: host.left }));
 };
+const WhiteboardBackendDemo = () => {
+  const host = useContext(hostContext);
+  if (!host)
+    return 'Loading';
+  return [
+    h(ChannelView, { channel: host.left as channel.BidirectionalChannel<unknown, unknown> }),
+    h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.cursor.storage }),
+    h(StoreVisualzer, { name: 'Notes', store: host.backendDeps.note.storage }),
+  ];
+}
 const components = {
   demo: Demo,
-  whiteboardEditorDemo: WhiteboardEditorDemo
+  whiteboardEditorDemo: WhiteboardEditorDemo,
+  backendDemo: WhiteboardBackendDemo,
 };
 
 export const dryEraseDocs: DocSheet[] = [

@@ -25,6 +25,7 @@ import { sesameDocs } from "../www/sesame/docs.ts";
 import { doorJourneyDocs } from "../modules/DoorJourney/docs.ts";
 import { serviceCommonDocs } from "../modules/Data/ServiceCommon/docs.ts";
 import { dryEraseDocs } from "../modules/DryErase/docs.ts";
+import { artifactDocs } from "../modules/Artifact/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
@@ -45,6 +46,7 @@ export const sheets = [
   dataDocs,
   dryEraseDocs,
   doorJourneyDocs,
+  artifactDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {

@@ -11,6 +11,7 @@ import {
   whiteboardStrokeDefinition,
   whiteboardVectorDefinition,
 } from "./models.ts";
+import { Protocol, WhiteboardProtocolMessage } from "./protocol.ts";
 
 const whiteboardSystemDefinition = {
   names: ["dryerase", "whiteboard"],
@@ -103,25 +104,33 @@ export type WhiteboardTypes = {
 
 export const defs = {
   system: {
-    whiteboard: whiteboardSystemDefinition,
-    stroke:     strokeSystemDefinitition,
-    sticker:    stickerSystemDefinitition,
-    cursor:     cursorSystemDefinitition,
-    note:       noteSystemDefinition
+    whiteboard: whiteboardSystemDefinition as service.CommonSystemDefinintion<WhiteboardSystemType>,
+    stroke:     strokeSystemDefinitition  as service.CommonSystemDefinintion<StrokeSystemType>,
+    sticker:    stickerSystemDefinitition  as service.CommonSystemDefinintion<StickerSystemType>,
+    cursor:     cursorSystemDefinitition  as service.CommonSystemDefinintion<CursorSystemType>,
+    note:       noteSystemDefinition as service.CommonSystemDefinintion<NoteSystemType>,
   }
 } as const;
 
+
 export type Meta = {
+  UpdateBandType: {
+    dial: { whiteboardId: Whiteboard["id"] },
+    message: Protocol["message"]["server"]
+  },
+  SpecialDependencies: {
+    updates: channel.Band<Meta["UpdateBandType"]>,
+  },
   ServiceDependencies: {
     [system in keyof WhiteboardTypes]:
       Pick<service.CommonSystemComponents<WhiteboardTypes[system]>, "changes" | "channel" | "storage">
-  },
+  } & Meta["SpecialDependencies"],
   MemoryServiceDependencies: {
     [system in keyof WhiteboardTypes]:
       Pick<service.CommonSystemComponents<WhiteboardTypes[system]>, "changes" | "channel" | "storage"> & {
-        memoryStore: storage.DynamoMemoryStore<service.CommonSystemOutputType<WhiteboardTypes[system]>["storage"]>
+        storage: storage.DynamoMemoryStore<service.CommonSystemOutputType<WhiteboardTypes[system]>["storage"]>,
       }
-  },
+  } & Meta["SpecialDependencies"],
   Services: {
     [system in keyof WhiteboardTypes]:
       service.CommonSystemComponents<WhiteboardTypes[system]>["service"]
@@ -155,11 +164,11 @@ export const createBackend = (
   return {
     deps,
     services: {
-      whiteboard: createService(defs.system.whiteboard, deps.whiteboard, inputs.whiteboard),
-      sticker:    createService(defs.system.sticker,    deps.sticker, inputs.sticker),
-      stroke:     createService(defs.system.stroke,     deps.stroke, inputs.stroke),
-      note:       createService(defs.system.note,       deps.note, inputs.note),
-      cursor:     createService(defs.system.cursor,     deps.cursor, inputs.cursor),
+      whiteboard: createService(defs.system.whiteboard, deps.whiteboard,  inputs.whiteboard),
+      sticker:    createService(defs.system.sticker,    deps.sticker,     inputs.sticker),
+      stroke:     createService(defs.system.stroke,     deps.stroke,      inputs.stroke),
+      note:       createService(defs.system.note,       deps.note,        inputs.note),
+      cursor:     createService(defs.system.cursor,     deps.cursor,      inputs.cursor),
     }
   }
 };
@@ -170,14 +179,14 @@ export const createMemoryDeps = (
     def: service.CommonSystemDefinintion<T>,
     impl: service.CommonSystemServiceImplementation<T>,
   ) => {
-    const storage = service.createMemoryStore(def)
     return {
-      ...service.createMemoryChannels(def, impl),
-      storage,
-      memoryStore: storage,
+      ...service.createMemoryChannels<T>(def, impl),
+      storage: service.createMemoryStore(def),
     }
   };
+  
   return {
+    updates: channel.createMemoryBand<Meta["UpdateBandType"]>(({ whiteboardId }) => whiteboardId),
     whiteboard: createMemoryDep(defs.system.whiteboard, inputs.whiteboard),
     sticker: createMemoryDep(defs.system.sticker, inputs.sticker),
     stroke: createMemoryDep(defs.system.stroke, inputs.stroke),
@@ -214,7 +223,7 @@ export const createInsecureImplementation = (
     },
     note: {
       create: (i) => ({
-        whiteboardId: i.ownerId || expressionThrow(new Error('WhiteboardID is required')),
+        whiteboardId: i.whiteboardId || expressionThrow(new Error('WhiteboardID is required')),
         ownerId: i.ownerId || expressionThrow(new Error('OwnerID is required')),
         content: i.content || { type: 'text', text: 'New Note' },
         size: i.size || { x: 0, y: 0 },

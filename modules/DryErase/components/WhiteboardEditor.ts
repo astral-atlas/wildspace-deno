@@ -7,6 +7,7 @@ import { act, skia, kayo, desk, boxParticle } from "../deps.ts";
 import { WhiteboardChannel } from "../channel.ts";
 import { useWhiteboardState } from "./useWhiteboardState.ts";
 import { schedule } from "../../ThreeCommon/deps.ts";
+import { WhiteboardVector } from "../models.ts";
 const { h } = act;
 
 export type WhiteboardEditorProps = {
@@ -53,9 +54,10 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
   const patternRef = useRef<SVGPatternElement | null>(null);
   const childrenRef = useRef<HTMLElement | null>(null);
 
-  const { cursors, strokes } = useWhiteboardState(channel);
+  const { cursors, strokes, notes } = useWhiteboardState(channel);
 
   const cursorRefMap = useRef(new Map<string, HTMLElement>()).current;
+  const noteRefMap = useRef(new Map<string, HTMLElement>()).current;
 
   const {
     dragging: panning,
@@ -82,6 +84,15 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
       const y = cameraParticle.position.y + cursor.position.y;
       cursorElement.style.transform = `translate(${x}px, ${y}px)`;
     }
+    for (const [noteId, noteElement] of noteRefMap) {
+      const note = notes.find((c) => c.id === noteId);
+      if (!note) continue;
+      const x = cameraParticle.position.x + note.position.x;
+      const y = cameraParticle.position.y + note.position.y;
+      noteElement.style.transform = `translate(${x}px, ${y}px)`;
+      noteElement.style.width = note.size.x + 'px';
+      noteElement.style.height = note.size.y + 'px';
+    }
   };
 
   useEffect(() => {
@@ -103,6 +114,9 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
   useEffect(() => {
     const { current: element } = elementRef;
     if (!element) return;
+
+    let boxStart: null | WhiteboardVector = null;
+
     const onPointerMove = (event: PointerEvent) => {
       const x = event.offsetX - cameraParticle.position.x;
       const y = event.offsetY - cameraParticle.position.y;
@@ -111,17 +125,32 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
         position: { x, y },
       });
     };
-    const onPointerDown = () => {
-      if (activeMode !== "drawing") return;
-      channel.send({
-        type: "stroke-start",
-      });
+    const onPointerDown = (event: PointerEvent) => {
+      const x = event.offsetX - cameraParticle.position.x;
+      const y = event.offsetY - cameraParticle.position.y;
+      boxStart = { x, y };
+      if (activeMode === "drawing") {
+        channel.send({
+          type: "stroke-start",
+        });
+      }
     };
-    const onPointerUp = () => {
-      if (activeMode !== "drawing") return;
-      channel.send({
-        type: "stroke-end",
-      });
+    const onPointerUp = (event: PointerEvent) => {
+      const x = event.offsetX - cameraParticle.position.x;
+      const y = event.offsetY - cameraParticle.position.y;
+      const boxEnd = { x, y };
+      if (activeMode === "drawing") {
+        channel.send({
+          type: "stroke-end",
+        });
+      }
+      if (activeMode === 'noting' && boxStart) {
+        channel.send({
+          type: 'note-submit',
+          position: boxStart,
+          size: { x: boxEnd.x - boxStart.x, y: boxEnd.y - boxStart.y },
+        })
+      }
     };
     element.addEventListener("pointermove", onPointerMove);
     element.addEventListener("pointerdown", onPointerDown);
@@ -215,6 +244,23 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
       ref: elementRef,
       svgProps: { tabindex: 0 },
       style: { cursor, position: "relative", flex: 1 },
+    }),
+    notes.map(note => {
+      return h('div', {
+        key: note.id,
+        ref: (item: HTMLElement) => noteRefMap.set(note.id, item),
+        style: {
+          position: "absolute",
+          backgroundColor: "red",
+          top: 0,
+          left: 0,
+          display: 'flex',
+        }
+      }, h('textarea', { style: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%'
+      } }));
     }),
     cursors.map((cursor) => {
       return h("div", {
