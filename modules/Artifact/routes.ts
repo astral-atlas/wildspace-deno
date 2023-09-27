@@ -3,6 +3,6 @@ import { BlobStreamService } from "./blob/service.ts";
 
 export const createRoutes = (service: BlobStreamService) => {
   return [
-    ...createBlobRoutes(service)
+    ...createBlobRoutes(service),
   ]
 };

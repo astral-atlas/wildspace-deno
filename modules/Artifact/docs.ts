@@ -1,105 +1,137 @@
-import { act } from '../AtlasRenderer/mod.ts';
+import { act } from "../AtlasRenderer/mod.ts";
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
-import * as janitor from '../Janitor/mod.ts';
+import * as janitor from "../Janitor/mod.ts";
 import { createMemoryBlobStreamService } from "./blob/mod.ts";
 import { network } from "./deps.ts";
 import { createRoutes } from "./routes.ts";
 // @deno-types="vite-text"
-import readme from './readme.md?raw';
-import { createLocalURLService } from "./service.ts";
+import readme from "./readme.md?raw";
+import {
+  createArtifactMemoryBackend,
+  createArtifactService,
+  createInsecureArtifactImplementation,
+  createLocalURLService,
+} from "./service.ts";
 import { LabeledTextInput } from "../Formula/mod.ts";
+import { UploadButton } from "./components/UploadButton.ts";
+import { StoreVisualzer } from "../Data/DataDoc/mod.ts";
 
 const { createContext, h, useContext, useEffect, useState, useRef } = act;
 
-const internetContext = createContext(network.createMemoryInternet());
+const context = createContext<null | ReturnType<typeof useDocContext>>(null);
 
-export const ArtifactDemo = () => {
-  const internet = useContext(internetContext)
-  const net = useRef(network.createMemoryNetworkService(internet, 'artifact', { delay: 1000 })).current;
+const useDocContext = () => {
+  const internet = useRef(
+    network.createMemoryInternet()
+  ).current;
+  const net = useRef(
+    network.createMemoryNetworkService(internet, "artifact", { delay: 1000 })
+  ).current;
+  const implementation = useRef(
+    createInsecureArtifactImplementation()
+  ).current;
+  const backend = useRef(
+    createArtifactMemoryBackend(implementation)
+  ).current;
+  const artifact = useRef(
+    createArtifactService(backend, implementation, "http://artifact")
+  ).current;
 
   useEffect(() => {
     const clean = janitor.createCleanupTask();
     const run = async () => {
       const server = await net.createHTTPServer();
-      const blob = createMemoryBlobStreamService();
-      const router = network.createRouter([
-        ...createRoutes(blob)
-      ])
+      const blob = createMemoryBlobStreamService(artifact);
+      const router = network.createRouter([...createRoutes(blob)]);
       const subscription = server.connection.subscribe(router.handleHTTP);
       clean.register(() => {
         server.close();
         subscription.unsubscribe();
-      })
-    }
+      });
+    };
     run();
     return () => {
       clean.run();
-    }
+    };
   }, []);
 
-  const service = useRef(createLocalURLService('http://artifact')).current;
+  return { artifact, backend, net }
+}
+const Provider: act.Component = ({ children }) => {
+  const value = useDocContext();
+  return h(context.Provider, { value }, children);
+}
+
+export const ArtifactDemo = () => {
+  const c = useContext(context);
+  if (!c) 
+    return null;
+  const { net, artifact } = c;
 
   const [imageURL, setImageURL] = useState<URL | null>(null);
-  const [assetId, setAssetId] = useState('DefaultID');
-  const [state, setState] = useState('idle');
+  const [assetId, setAssetId] = useState("DefaultID");
+  const [state, setState] = useState("idle");
 
-  const onUpload = () => {
-    const el = document.createElement('input');
-    el.type = "file";
-    el.accept = "image/*";
-    el.click();
-    const onInput = async (_: Event) => {
-      el.removeEventListener('input', onInput)
-      const file = el.files && el.files[0];
-      if (!file)
-        throw new Error();
-      
-      const url = await service.createUploadURL(assetId)
-      const client = net.createHTTPClient();
-      const stream = file.stream()
-      setState('Uploading');
-      await client.request({
-        url,
-        method: 'PUT',
-        headers: {},
-        body: stream,
-      })
-      setState('Upload Complete');
-    }
-    el.addEventListener('input', onInput)
-  }
   const onDownload = async () => {
-    const url = await service.createDownloadURL(assetId)
+    const url = await artifact.url.createDownloadURL(assetId, 'me');
     const client = net.createHTTPClient();
-    setState('Download Starting')
+    setState("Download Starting");
     const response = await client.request({
       url,
-      method: 'GET',
+      method: "GET",
       headers: {},
-      body: null
+      body: null,
     });
-    if (!response.body)
-      throw new Error();
+    if (!response.body) throw new Error();
     const blob = new Blob([await network.readByteStream(response.body)]);
-    setState('Download Complete')
+    setState("Download Complete");
     if (imageURL) {
-      URL.revokeObjectURL(imageURL.href)
+      URL.revokeObjectURL(imageURL.href);
     }
-    const blobURL = URL.createObjectURL(blob)
+    const blobURL = URL.createObjectURL(blob);
     setImageURL(new URL(blobURL));
-  }
+  };
 
   return [
-    h('pre', {}, state),
-    h(LabeledTextInput, { label: 'AssetID', value: assetId, onInput: setAssetId }),
-    h('button', { onClick: onUpload }, 'Upload Image'),
-    h('button', { onClick: onDownload }, 'Download Image'),
-    imageURL && h('img', { src: imageURL.href, style: { width: '100%' } }),
+    h("pre", {}, state),
+    h(LabeledTextInput, {
+      label: "AssetID",
+      value: assetId,
+      onInput: setAssetId,
+    }),
+    h("button", { onClick: onDownload }, "Download Image"),
+    imageURL && h("img", { src: imageURL.href, style: { width: "100%" } }),
+  ];
+};
+
+const i = createInsecureArtifactImplementation();
+
+const UploadButtonDemo = () => {
+  const c = useContext(context);
+  if (!c) 
+    return null;
+  const { net, artifact, backend } = c;
+  const http = useRef(
+    net.createHTTPClient()
+  ).current;
+
+  return [
+    h(UploadButton, {
+      http,
+      artifact,
+      accept: 'image/*',
+    }),
+    h(StoreVisualzer, {
+      store: backend.memory.asset,
+      name: 'Assets',
+      style: { width: '200%' }
+    })
   ];
 };
 
 export const artifactDocs: DocSheet[] = [
-  markdownToSheet('Artifact', readme, {
+  markdownToSheet("Artifact", readme, {
     artifactDemo: ArtifactDemo,
-  }),
+    uploadButtonDemo: UploadButtonDemo,
+  }, Provider),
 ];

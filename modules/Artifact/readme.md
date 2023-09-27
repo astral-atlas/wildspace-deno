@@ -10,8 +10,15 @@ Backends:
 |File|Server|FileSystem access|
 |AWS|Server|S3 Bucket|
 
-## Demo
+## Upload
 
-This demo uses [NetworkCommon](./NetworkCommon)'s fake internet.
+Upload image assets using the artifact service.
+
+::uploadButtonDemo
+
+## Download
+
+This demo uses [NetworkCommon](./NetworkCommon)'s fake internet
+to download assets given their assetId.
 
 ::artifactDemo

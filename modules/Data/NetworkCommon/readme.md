@@ -21,12 +21,12 @@ export type NetworkService = {
 Passing in some web browser objects (like the `fetch` object),
 return a network service object.
 
-> Note, `createHTTPServer` and `createWSServer` functions will
-> throw errors, as they are not supported in this platform.
+> Note: `createHTTPServer` and `createWSServer` functions will
+> always reject, as they are not supported in this platform.
 
 ### `createDenoNetworkService()`
 
-Using the builtin `Deno` object.
+Using the builtin `Deno` object to make network connections.
 
 ### `createNodeNetworkService()`
 

@@ -10,6 +10,13 @@ export const assetIdDefinition = m.meta(m.string, { name: 'AssetID' });
 export const assetDefinition = m.meta(m.object({
   id: assetIdDefinition,
   ownerId: m.string,
+
+  contentType: m.string,
+  contentLength: m.number,
+
+  createdAt: m.number,
+  uploadedAt: m.nullable(m.number),
+  state: m.set(['pending', 'uploaded'] as const),
   
   users: m.array(assetUsageDefinition)
 }), { name: 'Asset' });

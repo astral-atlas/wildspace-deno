@@ -11,12 +11,20 @@ export type WebSocketServerConnection = {
   channel: channel.UniformChannel<Uint8Array>,
 };
 
+export type HTTPClient = {
+  request:(request: HTTPRequest) => Promise<HTTPResponse>
+};
+
+export type WSClient = {
+  request:(request: WSRequest) => Promise<WebSocketServerConnection>
+};
+
 export type Meta = {
   HTTPServer: { connection: rxjs.Observable<HTTPServerConnection>, close: () => void },
   WSServer: { connection: rxjs.Observable<WebSocketServerConnection>, close: () => void },
 
-  HTTPClient: { request:(request: HTTPRequest) => Promise<HTTPResponse> };
-  WSClient: { request:(request: WSRequest) => Promise<WebSocketServerConnection> };
+  HTTPClient: HTTPClient;
+  WSClient: WSClient;
 };
 
 /**
@@ -139,6 +147,8 @@ export const createMemoryNetworkService = (
           const host = request.url.hostname;
           const port = Number.parseInt(request.url.port) || 80;
           const server = internet.findHTTPServer(host, port)
+          if (request.url.protocol !== 'http:' && request.url.protocol !== 'https:')
+            throw new Error(`Non HTTP protocol used for HTTP request (${request.url.protocol})`)
           if (!server)
             throw new Error(`Cant find HTTP connection on ${host}:${port}`);
           const promise = new Promise<HTTPResponse>((resolve) => {

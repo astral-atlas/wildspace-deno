@@ -125,6 +125,11 @@ export type ModelOfObject<T> =
 export type ModelOfArray<T extends readonly ModeledType[]> =
   { type: 'array', elements: ModelOf2<T[number]> }
 
+export type ModelOfMeta<T> =
+  | T extends ModeledType
+    ? { type: 'meta', attributes: Record<string, string>, value: ModelOf2<T> }
+    : never;
+
 // ModelOf2<ModeledType> is really expensive (infinite recursion)
 // but can more simply be described as Model anyway,
 // so we can exit typechecking quickly if thats the case
@@ -133,6 +138,7 @@ type EarlyExit<T extends ModeledType, Expression> =
 
 export type ModelOf2<T extends ModeledType> = EarlyExit<T,
   | ModelOfPrimitive<T>
+  | ModelOfMeta<T>
   | (T extends readonly ModeledType[] ? ModelOfArray<T> : never)
   | ModelOfObject<T>
   | ModelOfNullable<T>

@@ -9,11 +9,10 @@ export const createBlobRoutes = (
     method: 'PUT',
     type: 'http',
     async handler({ body, url }) {
-      const query = Object.fromEntries(url.searchParams.entries());
-      const assetId = query.assetId;
+      const {assetId, ownerId} = Object.fromEntries(url.searchParams.entries());
       if (!body)
         throw new Error('No Uploaded asset');
-      await service.uploadStream(assetId, body);
+      await service.uploadStream(ownerId, assetId, body);
       return {
         status: 200,
         headers: {},
@@ -26,12 +25,11 @@ export const createBlobRoutes = (
     method: 'GET',
     type: 'http',
     async handler({ body, url }) {
-      const query = Object.fromEntries(url.searchParams.entries());
-      const assetId = query.assetId;
+      const {assetId, ownerId} = Object.fromEntries(url.searchParams.entries());
       if (!assetId)
         throw new Error('No Asset ID Provided');
 
-      const downloadStream = await service.downloadStream(assetId);
+      const downloadStream = await service.downloadStream(ownerId, assetId);
       
       return {
         status: 200,

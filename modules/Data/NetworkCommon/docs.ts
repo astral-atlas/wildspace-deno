@@ -99,6 +99,13 @@ const ServerDemo: act.Component = () => {
 
   const [servers, setServers] = useState<Server[]>([])
 
+  useEffect(() => {
+    return () => {
+      for (const server of servers)
+        server.close();
+    }
+  }, [servers])
+
   const submitServer = async (e: SubmitEvent) => {
     e.preventDefault();
     const createServer = (host: string, port: number, type: 'greeting' | 'echo') => {

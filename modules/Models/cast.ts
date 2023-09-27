@@ -26,6 +26,8 @@ export const createModelCaster = <I extends Model>(
         // @ts-ignore j
         createModelCaster(modelDefinition.elements),
       ) as any;
+    case 'meta':
+      return createModelCaster(modelDefinition.value);
     case 'enum':
       return createEnumCaster(modelDefinition.cases);
     case 'nullable':
