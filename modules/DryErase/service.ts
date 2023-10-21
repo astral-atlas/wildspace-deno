@@ -1,13 +1,12 @@
 import { ModelOf, ModeledType } from "../Models/model.ts";
 import { vectorDefinition } from "../TheaterModels/space.ts";
-import { m, service, sesame, storage, nanoid, channel } from "./deps.ts";
+import { m, service, sesame, storage, nanoid, channel, artifact } from "./deps.ts";
 import {
   Whiteboard,
   noteDefinition,
+  stickerDefinition,
   whiteboardCursorDefinition,
   whiteboardDefinition,
-  whiteboardLayerDefinition,
-  whiteboardStickerDefinition,
   whiteboardStrokeDefinition,
   whiteboardVectorDefinition,
 } from "./models.ts";
@@ -30,13 +29,13 @@ type WhiteboardSystemType = service.ToCommonSystemType<
 
 const stickerSystemDefinitition = {
   names: ["dryerase", "whiteboard", "sticker"],
-  resource: whiteboardStickerDefinition,
+  resource: stickerDefinition,
   partName: "whiteboardId",
   sortName: "stickerId",
   editable: m.object({
     whiteboardId: m.string,
     layerId: m.string,
-    assetId: m.string,
+    assetId: m.nullable(m.string),
     size: whiteboardVectorDefinition,
     position: whiteboardVectorDefinition,
     rotation: m.number
@@ -198,7 +197,8 @@ export const createMemoryDeps = (
 const expressionThrow = (error: unknown) => { throw error };
 
 export const createInsecureImplementation = (
-  userId: sesame.SesameUserID
+  userId: sesame.SesameUserID,
+  artifact: artifact.ArtifactService,
 ): Meta["ServiceInput"] => {
   return {
     whiteboard: {
@@ -208,7 +208,17 @@ export const createInsecureImplementation = (
     },
     sticker: {
       create: (i) => ({ ...i, id: nanoid() }),
-      update: (w, i) => ({ ...w, ...i }),
+      update: async (sticker, i) => {
+        if (i.assetId) {
+          const asset = await artifact.assets.read({
+            ownerId: userId,
+            assetId: i.assetId
+          });
+          if (asset.state !== 'uploaded')
+            throw new Error('Asset is not Uploaded!');
+        }
+        return ({ ...sticker, ...i })
+      },
       calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
     },
     cursor: {

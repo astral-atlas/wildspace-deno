@@ -1,4 +1,3 @@
-import { string } from "../Models/definitions.ts";
 import { m } from "./deps.ts";
 
 export const whiteboardVectorDefinition = m.object({
@@ -7,16 +6,18 @@ export const whiteboardVectorDefinition = m.object({
 })
 export type WhiteboardVector = m.OfModelType<typeof whiteboardVectorDefinition>
 
-export const whiteboardStickerDefinition = m.object({
+export const stickerDefinition = m.object({
   id: m.string,
   whiteboardId: m.string,
   layerId: m.string,
-  assetId: m.string,
+
+  assetId: m.nullable(m.string),
+
   size: whiteboardVectorDefinition,
   position: whiteboardVectorDefinition,
   rotation: m.number,
 });
-export type WhiteboardSticker = m.OfModelType<typeof whiteboardStickerDefinition>;
+export type Sticker = m.OfModelType<typeof stickerDefinition>;
 
 export const whiteboardCanvasDefinition = m.object({
   id: m.string,

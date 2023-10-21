@@ -1,3 +1,4 @@
+import { BlobService, BlobStreamService, createMemoryBlobStreamService } from "./blob/service.ts";
 import { m, nanoid, service, storage } from "./deps.ts";
 import { AssetID, assetDefinition, assetUsageDefinition } from "./models.ts";
 
@@ -93,6 +94,7 @@ export const createArtifactMemoryBackend = (
 export type ArtifactService = {
   assets: Meta["Components"]["asset"]["service"],
   url: URLService,
+  blob: BlobStreamService,
 };
 
 export const createArtifactService = (
@@ -107,10 +109,12 @@ export const createArtifactService = (
   })
 
   const url = createLocalURLService(host);
+  const blob = createMemoryBlobStreamService(assets);
 
   return {
     assets,
     url,
+    blob,
   }
 }
 
@@ -135,4 +139,15 @@ export const createLocalURLService = (host: string): URLService => {
     return url;
   }
   return { createDownloadURL, createUploadURL }
+}
+
+
+export const createMemoryService = (host = "http://artifact"): {
+  backend: ArtifactMemoryBackend,
+  service: ArtifactService
+} => {
+  const implementation = createInsecureArtifactImplementation()
+  const backend = createArtifactMemoryBackend(implementation);
+  const service = createArtifactService(backend, implementation, host)
+  return { backend, service };
 }

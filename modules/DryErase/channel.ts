@@ -1,12 +1,12 @@
 import { BidirectionalChannel } from "../Data/ChannelCommon/channel.ts";
-import { _, rxjs, service } from "./deps.ts";
+import { _, rxjs } from "./deps.ts";
 import { WhiteboardCursor, WhiteboardStroke, WhiteboardVector } from "./models.ts";
 import { Protocol } from "./protocol.ts";
-import { DryEraseBackend, WhiteboardTypes } from "./service.ts";
+import { DryEraseBackend } from "./service.ts";
 
 export type WhiteboardChannel = BidirectionalChannel<
-  Protocol["message"]["server"],
-  Protocol["message"]["client"]
+  Protocol["message2"]["server"],
+  Protocol["message2"]["client"]
 >;
 
 type UnionMap<Message extends { type: string }> = {
@@ -235,6 +235,18 @@ export const createWhiteboardServerChannel = (
       },
       'stroke-end'() {
         stroke = null;
+      },
+      async 'sticker-submit'(event) {
+        const { position, size, rotation } = event;
+        await backend.services.sticker.create({
+          whiteboardId,
+          layerId: '',
+          assetId: null,
+          position,
+          size,
+          rotation,
+        })
+        updates.send(event);
       }
     };
     runHandler(message, handlers);

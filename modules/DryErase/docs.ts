@@ -1,7 +1,7 @@
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 import { WhiteboardView } from "./components.ts";
-import { act, channel, service, nanoid, storage } from "./deps.ts";
+import { act, channel, service, nanoid, storage, artifact } from "./deps.ts";
 
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
@@ -18,13 +18,14 @@ const hostContext = createContext<ReturnType<typeof useHost>>(null);
 
 const useHost = () => {
   const [host, error] = useAsync(async () => {
-    const implementation = createInsecureImplementation("Me!");
+    const artifactService = artifact.createMemoryService().service;
+    const implementation = createInsecureImplementation("Me!", artifactService);
     const backendDeps = createMemoryDeps(implementation);
     const backend = createBackend(backendDeps, implementation);
 
     const left = await createWhiteboardServerChannel('left', 'board-id', backend);
     const right = await createWhiteboardServerChannel('right', 'board-id', backend);
-    return { left, right, backend, backendDeps };
+    return { left, right, backend, backendDeps, artifactService };
   }, []);
 
   if (error)
@@ -89,7 +90,10 @@ const WhiteboardEditorDemo = () => {
   if (!host)
     return 'Loading';
 
-  return h(FramePresenter, {}, h(WhiteboardEditor, { channel: host.left }));
+  return h(FramePresenter, {}, h(WhiteboardEditor, {
+    channel: host.left,
+    artifact: artifact.createServiceClient(host.artifactService, 'Me!')
+  }));
 };
 const WhiteboardBackendDemo = () => {
   const host = useContext(hostContext);
@@ -99,6 +103,7 @@ const WhiteboardBackendDemo = () => {
     h(ChannelView, { channel: host.left as channel.BidirectionalChannel<unknown, unknown> }),
     h(StoreVisualzer, { name: 'Cursor', store: host.backendDeps.cursor.storage }),
     h(StoreVisualzer, { name: 'Notes', store: host.backendDeps.note.storage }),
+    h(StoreVisualzer, { name: 'Stickers', store: host.backendDeps.sticker.storage }),
   ];
 }
 const components = {

@@ -1,16 +1,12 @@
 import { act } from "../AtlasRenderer/mod.ts";
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
 import * as janitor from "../Janitor/mod.ts";
-import { createMemoryBlobStreamService } from "./blob/mod.ts";
 import { network } from "./deps.ts";
 import { createRoutes } from "./routes.ts";
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
 import {
-  createArtifactMemoryBackend,
-  createArtifactService,
-  createInsecureArtifactImplementation,
-  createLocalURLService,
+  createMemoryService,
 } from "./service.ts";
 import { LabeledTextInput } from "../Formula/mod.ts";
 import { UploadButton } from "./components/UploadButton.ts";
@@ -27,22 +23,15 @@ const useDocContext = () => {
   const net = useRef(
     network.createMemoryNetworkService(internet, "artifact", { delay: 1000 })
   ).current;
-  const implementation = useRef(
-    createInsecureArtifactImplementation()
-  ).current;
-  const backend = useRef(
-    createArtifactMemoryBackend(implementation)
-  ).current;
-  const artifact = useRef(
-    createArtifactService(backend, implementation, "http://artifact")
+  const {backend, service} = useRef(
+    createMemoryService()
   ).current;
 
   useEffect(() => {
     const clean = janitor.createCleanupTask();
     const run = async () => {
       const server = await net.createHTTPServer();
-      const blob = createMemoryBlobStreamService(artifact);
-      const router = network.createRouter([...createRoutes(blob)]);
+      const router = network.createRouter([...createRoutes(service)]);
       const subscription = server.connection.subscribe(router.handleHTTP);
       clean.register(() => {
         server.close();
@@ -55,7 +44,7 @@ const useDocContext = () => {
     };
   }, []);
 
-  return { artifact, backend, net }
+  return { artifact: service, backend, net }
 }
 const Provider: act.Component = ({ children }) => {
   const value = useDocContext();
@@ -103,8 +92,6 @@ export const ArtifactDemo = () => {
     imageURL && h("img", { src: imageURL.href, style: { width: "100%" } }),
   ];
 };
-
-const i = createInsecureArtifactImplementation();
 
 const UploadButtonDemo = () => {
   const c = useContext(context);

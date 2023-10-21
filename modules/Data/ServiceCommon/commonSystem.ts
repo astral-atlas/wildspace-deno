@@ -77,9 +77,11 @@ export type CommonSystemServiceInput<T extends CommonSystemType> = {
   implementation: CommonSystemServiceImplementation<T>;
 };
 
+type OptionalAsync<T> = Promise<T> | T;
+
 export type CommonSystemServiceImplementation<T extends CommonSystemType> = {
-  create: (input: T["editable"]) => T["resource"];
-  update: (previous: T["resource"], input: T["editable"]) => T["resource"];
+  create: (input: T["editable"]) => OptionalAsync<T["resource"]>;
+  update: (previous: T["resource"], input: T["editable"]) => OptionalAsync<T["resource"]>;
   calculateKey: (input: T["resource"]) => {
     part: T["part"];
     sort: T["sort"];
@@ -154,7 +156,7 @@ export const createCommonSystemService = <T extends CommonSystemType>({
 }: CommonSystemServiceInput<T>): CommonSystemComponents<T>["service"] => {
   return {
     async create(creation) {
-      const item = implementation.create(creation);
+      const item = await implementation.create(creation);
       const keys = implementation.calculateKey(item);
       await storage.put(keys, item);
       channel.send({ item, action: "CREATE" });
@@ -165,7 +167,7 @@ export const createCommonSystemService = <T extends CommonSystemType>({
         part: id[definition.partName],
         sort: id[definition.sortName],
       });
-      const nextItem = implementation.update(previousItem, update);
+      const nextItem = await implementation.update(previousItem, update);
       await storage.put(
         {
           part: id[definition.partName],

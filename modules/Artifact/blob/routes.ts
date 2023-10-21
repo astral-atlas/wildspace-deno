@@ -1,8 +1,8 @@
 import { network } from "../deps.ts";
-import { BlobStreamService } from "./service.ts";
+import { ArtifactService } from "../service.ts";
 
 export const createBlobRoutes = (
-  service: BlobStreamService
+  service: ArtifactService
 ): network.http.Route[] => {
   const uploadRoute: network.http.HTTPRoute = {
     path: '/artifact/bytes',
@@ -12,7 +12,7 @@ export const createBlobRoutes = (
       const {assetId, ownerId} = Object.fromEntries(url.searchParams.entries());
       if (!body)
         throw new Error('No Uploaded asset');
-      await service.uploadStream(ownerId, assetId, body);
+      await service.blob.uploadStream(ownerId, assetId, body);
       return {
         status: 200,
         headers: {},
@@ -29,7 +29,7 @@ export const createBlobRoutes = (
       if (!assetId)
         throw new Error('No Asset ID Provided');
 
-      const downloadStream = await service.downloadStream(ownerId, assetId);
+      const downloadStream = await service.blob.downloadStream(ownerId, assetId);
       
       return {
         status: 200,

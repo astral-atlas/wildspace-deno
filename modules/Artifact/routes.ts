@@ -1,7 +1,7 @@
 import { createBlobRoutes } from "./blob/routes.ts";
-import { BlobStreamService } from "./blob/service.ts";
+import { ArtifactService } from "./service.ts";
 
-export const createRoutes = (service: BlobStreamService) => {
+export const createRoutes = (service: ArtifactService) => {
   return [
     ...createBlobRoutes(service),
   ]

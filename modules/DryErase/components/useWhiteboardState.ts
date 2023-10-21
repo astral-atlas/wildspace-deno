@@ -133,8 +133,8 @@ export const useWhiteboardState = (
     });
     return () => {
       subscription.unsubscribe();
-    };
-  }, []);
+    }
+  }, [channel])
 
   return {
     cursors: [...new Map(cursors.map((c) => [c.id, c])).values()],

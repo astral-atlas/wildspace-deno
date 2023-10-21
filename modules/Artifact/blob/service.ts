@@ -18,7 +18,7 @@ export type BlobStreamService = {
 };
 
 export const createMemoryBlobStreamService = (
-  artifact: ArtifactService,
+  assets: ArtifactService["assets"],
 ): BlobStreamService => {
   const blobs = new Map<string, Blob>();
 
@@ -30,7 +30,7 @@ export const createMemoryBlobStreamService = (
       }
       blobs.set([ownerId, assetId].join('-'), new Blob(parts))
 
-      await artifact.assets.update({ ownerId, assetId }, {
+      await assets.update({ ownerId, assetId }, {
         ownerId,
         state: 'uploaded',
         contentLength: null,

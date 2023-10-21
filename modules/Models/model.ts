@@ -73,7 +73,7 @@ export type OfModelType<T extends Model> = {
   "enum":   T extends ModelsByType["enum"] ? T["cases"][number] : never,
   "union":  T extends ModelsByType["union"] ? OfModelType<T["cases"][keyof T["cases"]]> : never,
   "array":  T extends ModelsByType["array"] ? ReadonlyArray<OfModelType<T["elements"]>> : never,
-  "object": T extends ModelsByType["object"] ? { readonly [key in keyof T["properties"]]: OfModelType<T["properties"][key]> } : never,
+  "object": T extends ModelsByType["object"] ? { [key in keyof T["properties"]]: OfModelType<T["properties"][key]> } : never,
 }[T["type"]]
 
 export const anyModelSymbol = Symbol();

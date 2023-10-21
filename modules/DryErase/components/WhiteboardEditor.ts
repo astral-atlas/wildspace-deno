@@ -3,7 +3,7 @@ import {
   useRef,
   useState,
 } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { act, skia, kayo, desk, boxParticle } from "../deps.ts";
+import { act, skia, kayo, desk, boxParticle, artifact } from "../deps.ts";
 import { WhiteboardChannel } from "../channel.ts";
 import { useWhiteboardLocalState, useWhiteboardSelector, useWhiteboardState } from "./useWhiteboardState.ts";
 import { schedule } from "../../ThreeCommon/deps.ts";
@@ -16,6 +16,7 @@ const { h, useMemo } = act;
 
 export type WhiteboardEditorProps = {
   channel: WhiteboardChannel;
+  artifact: artifact.ArtifactClient,
 };
 
 const style = {
@@ -48,6 +49,7 @@ const deskplaneParticleSettings: boxParticle.ParticleSettings = {
 
 export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
   channel,
+  artifact,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasKit = skia.useCanvasKit();
@@ -58,8 +60,6 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
   const elementRef = useRef<SVGSVGElement | null>(null);
   const patternRef = useRef<SVGPatternElement | null>(null);
   const childrenRef = useRef<HTMLElement | null>(null);
-
-  const { cursors, strokes, notes } = useWhiteboardState(channel);
 
   const cursorRefMap = useRef(new Map<string, HTMLElement>()).current;
   const noteRefMap = useRef(new Map<string, HTMLElement>()).current;

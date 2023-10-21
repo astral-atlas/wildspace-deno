@@ -23,3 +23,8 @@ export const assetDefinition = m.meta(m.object({
 
 export type Asset = m.OfModelType<typeof assetDefinition>;
 export type AssetID = m.OfModelType<typeof assetIdDefinition>;
+
+export const assetListDefinition = m.array(m.object({
+  assetId: m.string,
+  downloadURL: m.string,
+}))
