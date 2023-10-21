@@ -79,6 +79,10 @@
   text-decoration: underline;
 }
 .headingLink:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   color: red;
+}
+
+.headingLink:visited {
+  color: rgb(102, 60, 255);
 }

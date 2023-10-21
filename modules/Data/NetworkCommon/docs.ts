@@ -13,7 +13,7 @@ import { randomElement } from "../../RandomThingGenerator/mod.ts";
 import { HTTPRoute } from "./route.ts";
 import { LabeledTextInput } from "../../Formula/mod.ts";
 import { HTTPMethod, HTTPResponse } from "./http/common.ts";
-const { h, createContext, useContext, useState, useEffect } = act;
+const { h, createContext, useContext, useState, useEffect, useRef } = act;
 
 const demoContext = createContext(createMemoryInternet());
 
@@ -97,10 +97,17 @@ const ServerDemo: act.Component = () => {
 
   type Server = { host: string, port: number, close: () => void }
 
-  const [servers, setServers] = useState<Server[]>([])
+  const [servers, setServers] = useState<Server[]>([]);
 
+  const closeFuncRef = useRef(() => {});
   useEffect(() => {
     return () => {
+      closeFuncRef.current();
+    }
+  }, [])
+
+  useEffect(() => {
+    closeFuncRef.current = () => {
       for (const server of servers)
         server.close();
     }

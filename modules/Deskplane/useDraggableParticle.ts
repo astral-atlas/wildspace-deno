@@ -30,7 +30,7 @@ export type DraggableParticle = {
 export const useDraggableParticle = (
   surfaceRef: Ref<null | HTMLElement>,
   particleSettings: ParticleSettings = deskplaneParticleSettings,
-  updateParticle: (particle: Particle2D, frame: AnimationFrame) => unknown,
+  updateParticle: (particle: Particle2D, frame: AnimationFrame) => unknown = _ => {},
   enabled = true,
 ): DraggableParticle => {
   const particle = useRef<Particle2D>({

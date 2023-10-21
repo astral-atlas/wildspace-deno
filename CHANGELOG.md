@@ -1,5 +1,14 @@
 # Changelog
 
+#### 22nd October, 2033
+- Added ActCommon for some super-basic shared hooks:
+  - `useAsync`. The classic
+  - `useUpdatingMutableValue`. Handy render-time updating ref (generic version of useEventEffect)
+  - `useSelector`. New hero of the day, calculates a slice of state out of a mutable object
+  based off an event emitter and a comparison function. Makes it easy to sync some, but not all
+  parts of an object to a render cycle.
+- Started splitting out WhiteboardEditor into smaller components
+
 #### 27rd September, 2023
 - Man who even knows anymore
 - Second pass at sesame page, now inside DoorJourney

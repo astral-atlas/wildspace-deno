@@ -108,6 +108,11 @@ const client = m.union({
   "stroke-end": m.object({
     type: m.literal("stroke-end"),
   }),
+  "move-object": m.object({
+    type: m.literal('move-object'),
+    position: whiteboardVectorDefinition,
+    size: whiteboardVectorDefinition,
+  })
 });
 type ClientMessage = m.OfModelType<typeof client>;
 

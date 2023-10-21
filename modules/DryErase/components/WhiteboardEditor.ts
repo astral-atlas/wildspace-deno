@@ -5,10 +5,14 @@ import {
 } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { act, skia, kayo, desk, boxParticle } from "../deps.ts";
 import { WhiteboardChannel } from "../channel.ts";
-import { useWhiteboardState } from "./useWhiteboardState.ts";
+import { useWhiteboardLocalState, useWhiteboardSelector, useWhiteboardState } from "./useWhiteboardState.ts";
 import { schedule } from "../../ThreeCommon/deps.ts";
 import { WhiteboardVector } from "../models.ts";
-const { h } = act;
+import { CursorIndicator } from "./Cursor.ts";
+import { StrokeCanvas } from "./StrokeCanvas.ts";
+import { Controls } from "./Controls.ts";
+import { NoteEditor } from "./NoteEditor.ts";
+const { h, useMemo } = act;
 
 export type WhiteboardEditorProps = {
   channel: WhiteboardChannel;
@@ -28,6 +32,7 @@ const toolbarStyle = {
 };
 
 const modes = ["panning", "drawing", "noting", "sticking"] as const;
+
 const cursorForMode = {
   panning: "grab",
   drawing: "auto",
@@ -90,6 +95,7 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
       const x = cameraParticle.position.x + note.position.x;
       const y = cameraParticle.position.y + note.position.y;
       noteElement.style.transform = `translate(${x}px, ${y}px)`;
+      console.log(noteElement.style.transform)
       noteElement.style.width = note.size.x + 'px';
       noteElement.style.height = note.size.y + 'px';
     }
@@ -111,56 +117,6 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
     [cursors]
   );
 
-  useEffect(() => {
-    const { current: element } = elementRef;
-    if (!element) return;
-
-    let boxStart: null | WhiteboardVector = null;
-
-    const onPointerMove = (event: PointerEvent) => {
-      const x = event.offsetX - cameraParticle.position.x;
-      const y = event.offsetY - cameraParticle.position.y;
-      channel.send({
-        type: "pointer-move",
-        position: { x, y },
-      });
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      const x = event.offsetX - cameraParticle.position.x;
-      const y = event.offsetY - cameraParticle.position.y;
-      boxStart = { x, y };
-      if (activeMode === "drawing") {
-        channel.send({
-          type: "stroke-start",
-        });
-      }
-    };
-    const onPointerUp = (event: PointerEvent) => {
-      const x = event.offsetX - cameraParticle.position.x;
-      const y = event.offsetY - cameraParticle.position.y;
-      const boxEnd = { x, y };
-      if (activeMode === "drawing") {
-        channel.send({
-          type: "stroke-end",
-        });
-      }
-      if (activeMode === 'noting' && boxStart) {
-        channel.send({
-          type: 'note-submit',
-          position: boxStart,
-          size: { x: boxEnd.x - boxStart.x, y: boxEnd.y - boxStart.y },
-        })
-      }
-    };
-    element.addEventListener("pointermove", onPointerMove);
-    element.addEventListener("pointerdown", onPointerDown);
-    element.addEventListener("pointerup", onPointerUp);
-    return () => {
-      element.removeEventListener("pointermove", onPointerMove);
-      element.removeEventListener("pointerdown", onPointerDown);
-      element.removeEventListener("pointerup", onPointerUp);
-    };
-  }, [activeMode]);
 
   const cursor = cursorForMode[activeMode];
 
@@ -226,8 +182,26 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
     };
   }, [canvasKit, activeMode]);
 
+  const state = useWhiteboardLocalState(channel);
+
+  if (!state)
+    return null;
+
+  const cursorCount = useWhiteboardSelector(state, useMemo(() => (state) => {
+    return state.cursors.length;
+  }, []), 0)
+  const noteCount = useWhiteboardSelector(state, useMemo(() => (state) => {
+    return state.notes.length;
+  }, []), 0)
+
+  schedule.useAnimation('WhiteboardEditor', () => {
+    patternRef.current?.setAttribute("x", state.camera.x.toString());
+    patternRef.current?.setAttribute("y", state.camera.y.toString());
+  })
+
   return h("div", { style }, [
-    h("canvas", {
+    h(StrokeCanvas, {
+      state,
       style: {
         position: "absolute",
         height: "100%",
@@ -237,7 +211,6 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
         right: 0,
         bottom: 0,
       },
-      ref: canvasRef,
     }),
     h(desk.GridSVG, {
       patternRef,
@@ -245,40 +218,13 @@ export const WhiteboardEditor: act.Component<WhiteboardEditorProps> = ({
       svgProps: { tabindex: 0 },
       style: { cursor, position: "relative", flex: 1 },
     }),
-    notes.map(note => {
-      return h('div', {
-        key: note.id,
-        ref: (item: HTMLElement) => noteRefMap.set(note.id, item),
-        style: {
-          position: "absolute",
-          backgroundColor: "red",
-          top: 0,
-          left: 0,
-          display: 'flex',
-        }
-      }, h('textarea', { style: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%'
-      } }));
-    }),
-    cursors.map((cursor) => {
-      return h("div", {
-        key: cursor.id,
-        ref: (item: HTMLElement) => cursorRefMap.set(cursor.id, item),
-        style: {
-          pointerEvents: "none",
-          height: `16px`,
-          width: `16px`,
-          backgroundColor: "red",
-          position: "absolute",
-          top: 0,
-          left: 0,
-        },
-      });
-    }),
-    h(
-      kayo.Toolbar,
+    Array.from({ length: cursorCount })
+      .map((_, cursorIndex) => h(CursorIndicator, { cursorIndex, state })),
+
+    h(Controls, { state, editorState: { mode: activeMode } }),
+    Array.from({ length: noteCount })
+      .map((_, noteIndex) => h(NoteEditor, { noteIndex, state })),
+    h(kayo.Toolbar,
       { direction: "down", style: toolbarStyle },
       modes.map((mode) => {
         return h(

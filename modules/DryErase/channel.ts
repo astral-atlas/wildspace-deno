@@ -143,11 +143,22 @@ export const createWhiteboardServerChannel = (
   init();
 
   const updateStroke = _.throttle(async (position: WhiteboardVector) => {
-    if (stroke)
-      stroke = await backend.services.stroke.update({
-        whiteboardId,
-        strokeId: stroke.id,
-      }, { ...stroke, points: [...stroke.points, { position, width: 1 }] })
+    if (stroke) {
+      if (stroke.points.length > 12) {
+        const lastPoint = stroke.points[stroke.points.length - 1];
+        stroke = await backend.services.stroke.create({
+          whiteboardId,
+          layerId: '',
+          brush: { color: 'blue', mode: 'add' },
+          points: [lastPoint, { position, width: 1 }],
+        })
+      } else {
+        stroke = await backend.services.stroke.update({
+          whiteboardId,
+          strokeId: stroke.id,
+        }, { ...stroke, points: [...stroke.points, { position, width: 1 }] })
+      }
+    }
   }, 100);
   const send = (message: Protocol["message"]["client"]) => {
     const handlers: ChannelHandlerMap<Protocol["message"]["client"]> = {

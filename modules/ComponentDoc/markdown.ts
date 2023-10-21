@@ -5,7 +5,7 @@ import {
   ComponentMap, MarkdownDirectiveComponentProps, MarkdownASTRenderer, parseMarkdown, MarkdownNode, MarkdownNodeProps,
   // @ts-ignore It totally exists guys I promise
   MarkdownHeading
-} from "https://esm.sh/@lukekaalim/act-markdown@1.8.0";
+} from "https://esm.sh/@lukekaalim/act-markdown@1.8.1";
 import { DocElement, DocSheet } from "./DocElement.ts";
 import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
 
@@ -29,7 +29,9 @@ const LinkHeading: Component<MarkdownNodeProps> = ({ node }) => {
   const data = (node.data || {}) as Record<string, unknown>;
   const id = data.id as string;
   if (id)
-    return h('a', { href: `#${id}`, class: docSiteStyles.headingLink }, h(MarkdownHeading, { node }));
+    return h('div', {},
+      h('a', { href: `#${id}`, class: docSiteStyles.headingLink },
+        h(MarkdownHeading, { node })));
 
   return h(MarkdownHeading, { node });
 }
