@@ -3,9 +3,9 @@ import { appDefinition } from "./app.ts";
 import { m } from "./deps.ts";
 import { SesameUserID, userDefinition } from "./user.ts";
 
-export type SesameRole = OfModelType<typeof roleDefinition>;
+export type Actor = OfModelType<typeof actorDefinition>;
 
-export const roleDefinition = m.union({
+export const actorDefinition = m.union({
   'user': m.object({
     type: m.literal('user'),
     userId: userDefinition.properties.id,
@@ -22,3 +22,12 @@ export const roleDefinition = m.union({
     appId: appDefinition.properties.id
   }),
 })
+
+export type Role = OfModelType<typeof roleDefinition>;
+
+export const roleDefinition = m.set([
+  'user',
+  'admin',
+  'guest',
+  'application'
+] as const)

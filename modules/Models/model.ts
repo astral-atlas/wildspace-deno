@@ -80,7 +80,8 @@ type OfModelTypeInternal<T extends Model> = {
 
 export type OfModelType<T extends Model> =
   [Model] extends [T]
-    ? ModeledType : OfModelTypeInternal<T>
+    ? ModeledType
+    : OfModelTypeInternal<T>
 
 type A = OfModelType<Model>
 type B = ModelOf2<A>;
@@ -154,4 +155,4 @@ type ModelOf2Internal<T extends ModeledType> =
 // but can more simply be described as Model anyway,
 // so we can exit typechecking quickly if thats the case
 export type ModelOf2<T extends ModeledType> =
-  [ModeledType] extends [T] ? Model : ModelOf2Internal<T>
+  ([ModeledType] extends [T] ? Model : ModelOf2Internal<T>)

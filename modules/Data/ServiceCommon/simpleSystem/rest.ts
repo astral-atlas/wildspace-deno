@@ -1,5 +1,6 @@
 import { m, network } from "../deps.ts";
 import { Components } from "./components.ts";
+import { Service } from "./service.ts";
 import { SimpleSystemType, SimpleSystemDefinition } from "./system.ts";
 
 type ListQuery<T extends SimpleSystemType> =
@@ -12,7 +13,7 @@ export type RESTTransactionTypes<T extends SimpleSystemType> = {
   create: {
     request: T["create"],
     response: T["resource"],
-    query: null,
+    query: Record<string, never>,
   },
   read: {
     request: null,
@@ -59,11 +60,11 @@ export const createRESTTransactionDefinitions = <T extends SimpleSystemType>(
       models: {
         request: definition.models.create,
         response: definition.models.resource,
-        query: m.literal(null),
+        query: m.object({}),
       }
     },
     read: {
-      path: [definition.key + 'by-id'].join('/'),
+      path: [definition.key, 'by-id'].join('/'),
       method: "GET",
       models: {
         request: m.literal(null),
@@ -104,26 +105,68 @@ export const createRESTTransactionDefinitions = <T extends SimpleSystemType>(
 export const createRESTRoutes = <T extends SimpleSystemType>(
   components: Components<T>,
   definitions: RESTTransactionDefinitions<T>,
-): network.HTTPRoute[] => {
-  const castCreateRequest = m.createModelCaster(
-    definitions.create.models.request
-  ) as m.Cast<T["create"]>;
-
-  const createRoute = network.createJSONRoute({
-    path: definitions.create.path,
-    method: definitions.create.method,
-    handler: async (request) => {
-      const create = castCreateRequest(request.body);
-      const body = await components.service.create(create);
+): network.Route[] => {
+  const createRoute = network.createTransactionHTTPRoute(
+    definitions.create,
+    async ({ request }) => {
+      const body = await components.service.create(request);
+      return {
+        status: 201,
+        body,
+        headers: {},
+      };
+    }
+  )
+  const readRoute = network.createTransactionHTTPRoute(
+    definitions.read,
+    async ({ query }) => {
+      const body = await components.service.read(query);
       return {
         status: 200,
         body,
         headers: {},
       };
     }
-  });
+  )
+  const updateRoute = network.createTransactionHTTPRoute(
+    definitions.update,
+    async ({ request, query }) => {
+      const body = await components.service.update(query, request);
+      return {
+        status: 202,
+        body,
+        headers: {},
+      };
+    }
+  )
+  const deleteRoute = network.createTransactionHTTPRoute(
+    definitions.delete,
+    async ({ query }) => {
+      const body = await components.service.delete(query);
+      return {
+        status: 202,
+        body,
+        headers: {},
+      };
+    }
+  )
+  const listRoute = network.createTransactionHTTPRoute(
+    definitions.list,
+    async ({ query }) => {
+      const body = await components.service.list(query);
+      return {
+        status: 200,
+        body,
+        headers: {},
+      };
+    }
+  )
   const routes = [
-    createRoute
+    createRoute,
+    readRoute,
+    updateRoute,
+    deleteRoute,
+    listRoute,
   ];
   return routes;
 }
@@ -131,33 +174,35 @@ export const createRESTRoutes = <T extends SimpleSystemType>(
 export const createRESTClient = <T extends SimpleSystemType>(
   domain: network.DomainClient,
   definitions: RESTTransactionDefinitions<T>,
-) => {
-  const castCreateResponse = m.createModelCaster(
-    definitions.create.models.response
-  ) as m.Cast<T["resource"]>;
-
-  const create = async (create: T["create"]) => {
-    const httpResponse = await domain.request({
-      path: definitions.create.path,
-      method: definitions.create.method,
-      query: null,
-      headers: null,
-      body: new Blob([new TextEncoder().encode(JSON.stringify(create))]).stream(),
-    })
-    if (!httpResponse.body)
-      throw new Error(`No body!`);
-    try {
-      const jsonBody = JSON.parse(new TextDecoder().decode(await network.readByteStream(httpResponse.body)))
-      return castCreateResponse(jsonBody);
-    } catch (error) {
-      console.error(
-        new TextDecoder().decode(await network.readByteStream(httpResponse.body))
-      )
-      throw error;
-    }
+): Service<T> => {
+  const clients = {
+    create: network.createTransactionHTTPClient(definitions.create, domain),
+    read: network.createTransactionHTTPClient(definitions.read, domain),
+    update: network.createTransactionHTTPClient(definitions.update, domain),
+    delete: network.createTransactionHTTPClient(definitions.delete, domain),
+    list: network.createTransactionHTTPClient(definitions.list, domain),
   }
 
   return {
-    create,
+    async create(create) {
+      const { body } = await clients.create({ request: create, query: {} })
+      return body;
+    },
+    async read(identify) {
+      const { body } = await clients.read({ request: null, query: identify })
+      return body;
+    },
+    async update(identify,update) {
+      const { body } = await clients.update({ request: update, query: identify })
+      return body;
+    },
+    async delete(identify) {
+      const { body } = await clients.delete({ request: null, query: identify })
+      return body;
+    },
+    async list(filter) {
+      const { body } = await clients.list({ request: null, query: filter })
+      return body;
+    },
   }
 }

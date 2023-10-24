@@ -33,13 +33,13 @@ export const createRouter = (
   const httpRoutes = routes.filter((r): r is HTTPRoute => r.type === "http");
 
   const defaultNoRouteHandler = (request: HTTPRequest): HTTPResponse => {
+    const message = `Method ${request.method} & Route ${request.url.pathname} (with params ${request.url.search}) could not be found`
+    console.info(`404: ${message}`)
     return {
       status: 404,
       headers: { "content-type": "text/plain" },
       body: new Blob([
-        new TextEncoder().encode(
-          `Method ${request.method} & Route ${request.url.pathname} could not be found`
-        ),
+        new TextEncoder().encode(message),
       ]).stream(),
     };
   };

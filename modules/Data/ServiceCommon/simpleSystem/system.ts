@@ -6,9 +6,9 @@ export type SimpleSystemType = {
   sortName: string,
   resourceName: string,
 
-  resource: Record<string, m.ModeledType>;
-  create: Record<string, m.ModeledType>;
-  update: Record<string, m.ModeledType>;
+  resource: m.ModeledType;
+  create: m.ModeledType;
+  update: m.ModeledType;
 };
 export type SimpleSystemTypeResource<T extends SimpleSystemType> = T["resource"];
 export type SimpleSystemTypeResourceModel<T extends SimpleSystemType> = m.ModelOf2<T["resource"]>;

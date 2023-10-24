@@ -5,7 +5,8 @@ import { Game } from "./models.ts";
 // @deno-types="vite-text"
 import readme from './readme.md?raw';
 import { createRoutes } from "./routes.ts";
-import { gameSystemRESTDef } from "./system.ts";
+import { createRemoteJournalService } from "./service.ts";
+import { gameRESTDef } from "./system.ts";
 
 const { h, useEffect } = act;
 
@@ -33,19 +34,22 @@ const demo = () => {
         { type: 'none'},
         httpClient,
       );
-      const client = simpleSystem.createRESTClient(domainClient, gameSystemRESTDef);
+      const client = createRemoteJournalService(domainClient);
 
       // aaaand, action!
-      const newGame: Game = await client.create({ name: 'MyGame!' })
+      const newGame: Game = await client.game.create({ name: 'MyGame!' })
 
       // Lets log our results
       console.log(newGame);
-      const gameStore = world.partitions.get('Games');
+      const gameStore = world.partitions.get('games');
       if (gameStore) {
         // Dump the internal state of our database
         const databaseContents = gameStore.memory()
         console.log(databaseContents)
       }
+
+      // And do a network read back!
+      console.log(await client.game.read({ gameId: newGame.id, gamePart: 'all' }));
     }
     start()
       .catch(console.error)
