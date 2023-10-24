@@ -1,5 +1,5 @@
 import { createModelCaster } from "./cast.ts";
-import { Model, ModelOf, ModeledType, ModelsByType, OfModelType } from "./model.ts";
+import { Model, ModelOf, ModelOf2, ModeledType, ModelsByType, OfModelType } from "./model.ts";
 
 export const object = <T extends ModelsByType["object"]["properties"]>(
   properties: T
@@ -27,6 +27,9 @@ export const nullable = <T extends Model>(
 
 export const union = <T extends ModelsByType["union"]["cases"]>(cases: T) => {
   return { type: 'union', cases } as const;
+};
+export const union2 = <T>(cases: T) => {
+  return { type: 'union2', cases } as const;
 };
 export const literal = <T extends ModelsByType["literal"]["value"]>(value: T) => {
   return { type: 'literal', value } as const;

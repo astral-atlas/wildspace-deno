@@ -9,7 +9,7 @@ export const createKeyboardStateController = (): KeyboardStateController => {
   const keysDown = new Set<string>();
 
   const onKeyboardEvent = (event: KeyboardEvent) => {
-    event.preventDefault();
+    //event.preventDefault();
     switch (event.type) {
       case 'keydown':
         keysDown.add(event.code);

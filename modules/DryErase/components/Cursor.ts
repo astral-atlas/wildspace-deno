@@ -6,7 +6,7 @@ const { h, useRef, useMemo } = act;
 const { useAnimation } = schedule;
 
 export type CursorIndicatorProps = {
-  cursorIndex: number,
+  cursorId: string,
   state: WhiteboardLocalState,
 }
 
@@ -16,21 +16,29 @@ export const styles = {
     width: '10px',
     borderRadius: '10px',
     position: 'absolute',
+    pointerEvents: 'none',
     top: 0,
     left: 0,
   }
 } as const;
 
-export const CursorIndicator: act.Component<CursorIndicatorProps> = ({ cursorIndex, state }) => { 
+export const CursorIndicator: act.Component<CursorIndicatorProps> = ({ cursorId, state }) => { 
   const elementRef = useRef<HTMLElement | null>(null);
 
-  const color = useWhiteboardSelector(state, useMemo(() => (state: WhiteboardState) => {
-    const hue = hash.fastHashCode(state.cursors[cursorIndex].id) % 360
+  const cursor = useWhiteboardSelector(
+    state,
+    useMemo(() => (state) => state.cursors.get(cursorId), [cursorId]),
+    null
+  );
+  if (!cursor)
+    return null;
+
+  const color = useMemo(() => {
+    const hue = hash.fastHashCode(cursorId) % 360
     return `hsl(${hue}deg, 50%, 50%)`;
-  }, [cursorIndex]), 'black');
+  }, [cursorId])
 
   useAnimation('WhiteboardCursor', () => {
-    const cursor = state.data.cursors[cursorIndex];
     const element = elementRef.current;
     if (!element)
       return;
@@ -40,7 +48,7 @@ export const CursorIndicator: act.Component<CursorIndicatorProps> = ({ cursorInd
     }
     const transform = `translate(${position.x}px, ${position.y}px)`
     element.style.transform = transform;
-  });
+  }, [cursor]);
 
   return h('div', { style: { ...styles.cursor, backgroundColor: color }, ref: elementRef })
 };

@@ -8,6 +8,7 @@ export const gameDefinition = m.meta(m.object({
   id: gameIdDefinition,
   name: m.string,
 }), { name: 'Game' });
+export type Game = m.OfModelType<typeof gameDefinition>;
 
 export const invitationDefinition = m.object({
   id: m.string,

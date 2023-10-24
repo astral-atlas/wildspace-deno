@@ -1,7 +1,6 @@
 import immutable from "https://esm.sh/immutable@4.3.4";
 
 export * as m from '../Models/mod.ts';
-export { act } from '../AtlasRenderer/mod.ts';
 
 export * as rxjs from 'https://esm.sh/rxjs@7.8.1';
 export * as _ from "https://esm.sh/lodash-es@4.17.21";
@@ -14,6 +13,7 @@ export * as service from '../Data/ServiceCommon/mod.ts';
 export * as channel from '../Data/ChannelCommon/mod.ts';
 
 export * as artifact from '../Artifact/mod.ts';
+export * as janitor from '../Janitor/mod.ts';
 export * as skia from '../Skia/mod.ts';
 export * as kayo from '../Kayo/mod.ts';
 export * as desk from '../Deskplane/mod.ts';

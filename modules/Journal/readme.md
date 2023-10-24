@@ -11,6 +11,4 @@ Games have a title and a unique id - most
 other services (like [artifact](./artifact))
 use a GameID as their "root collection".
 
-COOL SVG
-
-::SVG
+::demo

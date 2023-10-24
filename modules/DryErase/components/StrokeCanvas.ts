@@ -1,8 +1,10 @@
-import { act, actCommon, hash, skia } from "../deps.ts";
+import { act, actCommon, hash, skia, three } from "../deps.ts";
+import { WhiteboardStroke } from "../models.ts";
+import { ServerProtocol } from "../protocol/mod.ts";
 import { WhiteboardState } from "../state.ts";
 import { WhiteboardLocalState, useWhiteboardSelector } from "./useWhiteboardState.ts";
 
-const { h, useRef, useState, useEffect } = act;
+const { h, useRef, useState, useEffect, useMemo } = act;
 const { useDisposable } = actCommon;
 
 type StrokeRendererProps = {
@@ -10,76 +12,152 @@ type StrokeRendererProps = {
   style: { [string: string]: unknown },
 };
 
-const selectStrokes = (state: WhiteboardState) => {
-  return state.strokes
-}
-
 export const StrokeCanvas: act.Component<StrokeRendererProps> = ({
   state,
   style,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const [surface, setSurface] = useState<skia.canvaskit.Surface | null>(null);
   const canvaskit = skia.useCanvasKit();
 
   if (!canvaskit)
     return null;
 
-  const strokes = useWhiteboardSelector(state, selectStrokes, []);
+  // Mutable map of all stroke data
+  const strokeMap = useRef(
+    new Map<
+      WhiteboardStroke["id"],
+      { paint: skia.canvaskit.Paint, path: skia.canvaskit.Path }
+    >()
+  ).current;
 
-  // Generate the skia paths for each stroke
-  const { strokeData } = useDisposable(() => {
-    const strokeData = strokes.map(stroke => {
-      const path = new canvaskit.Path()
-      const paint = new canvaskit.Paint();
+  // Create Skia-specific pieces of data.
+  const createDataForStroke = useMemo(() => (stroke: WhiteboardStroke) => {
+    const path = new canvaskit.Path()
+    const paint = new canvaskit.Paint();
 
-      const red = hash.fastHashCode(stroke.id) % 255
-      const green = hash.fastHashCode(stroke.id + 1) % 255
-      const blue = hash.fastHashCode(stroke.id + 2) % 255
-      
-      paint.setStyle(canvaskit.PaintStyle.Stroke);
-      paint.setColor(canvaskit.Color(red, green, blue))
-      paint.setStrokeWidth(2);
+    // Random stroke color!
+    const red = hash.fastHashCode(stroke.id) % 255
+    const green = hash.fastHashCode(stroke.id + 1) % 255
+    const blue = hash.fastHashCode(stroke.id + 2) % 255
+    
+    paint.setStyle(canvaskit.PaintStyle.Stroke);
+    paint.setColor(canvaskit.Color(red, green, blue))
+    paint.setStrokeWidth(2);
 
-      const firstPoint = stroke.points[0];
-      path.moveTo(firstPoint.position.x, firstPoint.position.y);
-      for (const point of stroke.points) {
-        path.lineTo(point.position.x, point.position.y);
+    const firstPoint = stroke.points[0];
+    path.moveTo(firstPoint.x, firstPoint.y);
+    for (const point of stroke.points) {
+      path.lineTo(point.x, point.y);
+    }
+
+    return { path, paint };
+  }, [canvaskit]);
+  
+  // Whenever an "init" (or the component is created for the first time),
+  // or when the component it unmounted, make sure to clean up all resources.
+  const clearOldStrokeData = () => {
+    for (const { path, paint } of strokeMap.values()) {
+      path.delete();
+      paint.delete();
+    }
+    strokeMap.clear();
+  }
+  const initStrokeData = () => {
+    for (const stroke of state.data.strokes.values())
+      strokeMap.set(stroke.id, createDataForStroke(stroke))
+  }
+  // Update the stroke data whenever a stroke is created, deleted, or drawn
+  const updateStroke = (message: ServerProtocol) => {
+    switch (message.type) {
+      case 'init': {
+        clearOldStrokeData();
+        initStrokeData();
+        return;
       }
-
-      return { path, paint };
-    })
-
-    const dispose = () => {
-      for (const { path, paint } of strokeData) {
-        path.delete();
-        paint.delete();
+      case 'update-object': {
+        if (message.subject.type !== 'stroke')
+          return;
+        const { strokeId } = message.subject;
+        if (message.update.type === 'draw') {
+          const prevData = strokeMap.get(strokeId)
+          if (prevData) {
+            prevData.path.delete();
+            prevData.paint.delete();
+            strokeMap.delete(strokeId)
+          }
+          const stroke = state.data.strokes.get(strokeId);
+          if (!stroke)
+            return;
+          strokeMap.set(strokeId, createDataForStroke(stroke))
+        }
+        return;
       }
-    };
-    return { dispose, strokeData }
-  }, [strokes, surface])
+      case 'create-object': {
+        if (message.object.type !== 'stroke')
+          return;
+        const { stroke } = message.object;
+        strokeMap.set(stroke.id, createDataForStroke(stroke))
+        return;
+      }
+    }
+  }
 
-  // Use the generated paths to draw them onto the canvas
+  useEffect(() => {
+    initStrokeData();
+    const sub = state.updates.
+      subscribe(({ message }) => updateStroke(message))
+    return () => {
+      sub.unsubscribe();
+      clearOldStrokeData()
+    }
+  }, [state, createDataForStroke])
+
+  const [canvasSize, setCanvasSize] = useState<null | DOMRect>(null)
+  useEffect(() => {
+    const { current: canvas } = canvasRef;
+    if (!canvas)
+      return;
+    const resize = new ResizeObserver(() => {
+      const rect = canvas.getBoundingClientRect();
+      setCanvasSize(c => {
+        if (!c)
+          return rect;
+        if (c.width !== rect.width || c.height !== rect.height)
+          return rect;
+        return c;
+      })
+    });
+    setCanvasSize(canvas.getBoundingClientRect())
+    resize.observe(canvas);
+    return () => {
+      resize.disconnect();
+    }
+  }, [])
+
+  // Create the SKIA Surface to render on
   useEffect(() => {
     const { current: htmlCanvas } = canvasRef;
-    if (!surface || !htmlCanvas)
+    if (!htmlCanvas || !canvasSize)
       return;
-  
-
+    htmlCanvas.width = canvasSize.width/2;
+    htmlCanvas.height = canvasSize.height/2;
+    console.log('REGENERATING CANVAS');
+    const surface = canvaskit.MakeWebGLCanvasSurface(htmlCanvas, undefined, { antialias: 2 });
+    if (!surface)
+      return;
+    
     const render = (canvas: skia.canvaskit.Canvas) => {
       const scaleX = (1/htmlCanvas.clientWidth) * surface.width();
       const scaleY = (1/htmlCanvas.clientHeight) * surface.height();
       
-      canvas.clear(canvaskit.WHITE);
+      canvas.clear(canvaskit.TRANSPARENT);
       canvas.save();
 
       canvas.scale(scaleX, scaleY);
       canvas.translate(state.camera.x, state.camera.y);
 
-      for (const { path, paint } of strokeData)
+      for (const { path, paint } of strokeMap.values())
         canvas.drawPath(path, paint);
-
 
       canvas.restore();
 
@@ -88,19 +166,9 @@ export const StrokeCanvas: act.Component<StrokeRendererProps> = ({
     let frameId = surface.requestAnimationFrame(render);
     return () => {
       cancelAnimationFrame(frameId);
+      surface.delete();
     }
-  }, [strokeData, surface, state])
+  }, [canvasSize])
 
-  // Create the SKIA Surface to render on
-  useEffect(() => {
-    const { current: canvas } = canvasRef;
-    if (!canvas)
-      return;
-    canvas.height = canvas.clientHeight/2;
-    canvas.width = canvas.clientWidth/2;
-    const surface = canvaskit.MakeWebGLCanvasSurface(canvas);
-    setSurface(surface);
-  }, [])
-
-  return h('canvas', { ref: canvasRef, style })
+  return h('canvas', { ref: canvasRef, style: { ...style, pointerEvents: 'none' } })
 };

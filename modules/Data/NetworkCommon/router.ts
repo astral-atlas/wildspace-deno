@@ -19,9 +19,10 @@ export const isRequestMatchingRoute = (
   request: HTTPRequest,
   route: HTTPRoute
 ) => {
+  const routePath = route.path.startsWith('/') ? route.path.toLocaleLowerCase() : '/' + route.path.toLocaleLowerCase();
   const methodEqual = request.method === route.method;
   const pathEqual =
-    request.url.pathname.toLocaleLowerCase() === route.path.toLocaleLowerCase();
+    request.url.pathname.toLocaleLowerCase() === routePath;
   return methodEqual && pathEqual;
 };
 

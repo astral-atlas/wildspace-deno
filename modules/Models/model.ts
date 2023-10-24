@@ -55,12 +55,13 @@ export type ModelsByType = {
   'any':      { type: 'any' },
   'literal':  { type: 'literal', value: (string | number | boolean | null) },
   'union':    { type: 'union', cases: { readonly [key: string]: Model } },
+  'union2':   { type: 'union2', cases: readonly Model[] },
   'array':    { type: 'array', elements: Model },
   'object':   { type: 'object', properties: { readonly [key: string]: Model }},
   'meta':     MetaModel,
 }
 
-export type OfModelType<T extends Model> = {
+type OfModelTypeInternal<T extends Model> = {
   "string":   string,
   "number":   number,
   "boolean":  boolean,
@@ -72,9 +73,17 @@ export type OfModelType<T extends Model> = {
   "literal":T extends ModelsByType["literal"] ? T["value"] : never,
   "enum":   T extends ModelsByType["enum"] ? T["cases"][number] : never,
   "union":  T extends ModelsByType["union"] ? OfModelType<T["cases"][keyof T["cases"]]> : never,
+  "union2":  T extends ModelsByType["union2"] ? OfModelType<T["cases"][number]> : never,
   "array":  T extends ModelsByType["array"] ? ReadonlyArray<OfModelType<T["elements"]>> : never,
   "object": T extends ModelsByType["object"] ? { [key in keyof T["properties"]]: OfModelType<T["properties"][key]> } : never,
-}[T["type"]]
+}[T["type"]]  
+
+export type OfModelType<T extends Model> =
+  [Model] extends [T]
+    ? ModeledType : OfModelTypeInternal<T>
+
+type A = OfModelType<Model>
+type B = ModelOf2<A>;
 
 export const anyModelSymbol = Symbol();
 export type AnyModel = typeof anyModelSymbol;
@@ -96,7 +105,7 @@ export type ModelOfPrimitive<T> =
   | ([T] extends [string] ?  ({ type: "string" } | { type: "enum", cases: readonly T[] }) : never)
   | (T extends boolean ? { type: "boolean" } : never)
   | (T extends null ?    { type: "null" }    : never)
-  | (T extends (string | boolean | number) ?    { type: "literal", value: T }    : never)
+  | (T extends (string | boolean | number | null) ?    { type: "literal", value: T }    : never)
 
 type NullableOption<T> = Exclude<T, null> extends ModeledType ? Exclude<T, null> : never;
 
@@ -130,16 +139,19 @@ export type ModelOfMeta<T> =
     ? { type: 'meta', attributes: Record<string, string>, value: ModelOf2<T> }
     : never;
 
-// ModelOf2<ModeledType> is really expensive (infinite recursion)
-// but can more simply be described as Model anyway,
-// so we can exit typechecking quickly if thats the case
-type EarlyExit<T extends ModeledType, Expression> =
-  Exclude<ModeledType, T> extends never ? Model : Expression
+export type ModelOfUnion2<T extends ModeledType> =
+  { type: 'union2', cases: ReadonlyArray<ModelOf2<T>> }
 
-export type ModelOf2<T extends ModeledType> = EarlyExit<T,
+type ModelOf2Internal<T extends ModeledType> = 
   | ModelOfPrimitive<T>
   | ModelOfMeta<T>
   | (T extends readonly ModeledType[] ? ModelOfArray<T> : never)
   | ModelOfObject<T>
   | ModelOfNullable<T>
->
+  | ModelOfUnion2<T>
+
+// ModelOf2<ModeledType> is really expensive (infinite recursion)
+// but can more simply be described as Model anyway,
+// so we can exit typechecking quickly if thats the case
+export type ModelOf2<T extends ModeledType> =
+  [ModeledType] extends [T] ? Model : ModelOf2Internal<T>

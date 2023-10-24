@@ -1,20 +1,18 @@
-import { WhiteboardChannel } from "../channel.ts";
-import { reduceWhiteboardStateFromServer, WhiteboardState } from "../state.ts";
+import { DryEraseChannel } from "../channel/mod.ts";
+import { createMutableState, updateMutableState, WhiteboardMutableState } from "../state.ts";
 import { act, actCommon, rxjs, three } from "../deps.ts";
-import { Note, WhiteboardCursor, WhiteboardStroke } from "../models.ts";
-import { Protocol } from "../protocol.ts";
+import { ServerProtocol } from "../protocol/mod.ts";
 
-const { h, useState, useEffect, useMemo } = act;
+const { useState, useEffect, useMemo } = act;
 
 export type WhiteboardLocalStateUpdate = {
-  prev: WhiteboardState;
-  next: WhiteboardState;
-  message: Protocol["message"]["server"];
+  data: WhiteboardMutableState,
+  message: ServerProtocol;
 };
 
 export type WhiteboardLocalState = {
-  channel: WhiteboardChannel;
-  data: WhiteboardState;
+  channel: DryEraseChannel;
+  data: WhiteboardMutableState;
   camera: three.Vector2;
 
   updates: rxjs.Observable<WhiteboardLocalStateUpdate>;
@@ -22,12 +20,12 @@ export type WhiteboardLocalState = {
   close: () => void;
 };
 
-const modes = ["panning", "drawing", "noting", "sticking"] as const;
+const modes = ["panning", "drawing", "sticking"] as const;
 export type WhiteboardEditorState = {
   mode: (typeof modes)[number]
 };
 
-export const createWhiteboardLocalState = (channel: WhiteboardChannel) => {
+export const createWhiteboardLocalState = (channel: DryEraseChannel) => {
   const updates = new rxjs.Subject<WhiteboardLocalStateUpdate>();
 
   const close = () => {
@@ -36,21 +34,15 @@ export const createWhiteboardLocalState = (channel: WhiteboardChannel) => {
 
   const state: WhiteboardLocalState = {
     channel,
-    data: {
-      cursors: [],
-      strokes: [],
-      notes: [],
-    },
+    data: createMutableState(),
     camera: new three.Vector2(),
     close,
     updates,
   };
 
   const subscription = channel.recieve.subscribe((message) => {
-    const prev = state.data;
-    const next = reduceWhiteboardStateFromServer(prev, message);
-    state.data = next;
-    updates.next({ prev, next, message });
+    updateMutableState(state.data, message);
+    updates.next({ data: state.data, message });
   });
 
   return state;
@@ -67,7 +59,7 @@ export const createWhiteboardLocalState = (channel: WhiteboardChannel) => {
  * @returns 
  */
 export const useWhiteboardLocalState = (
-  channel: WhiteboardChannel,
+  channel: DryEraseChannel,
 ): null | WhiteboardLocalState => {
   const [localState, setLocalState] = useState<null | WhiteboardLocalState>(
     null,
@@ -84,7 +76,7 @@ export const useWhiteboardLocalState = (
   return localState;
 };
 
-export type WhiteboardSelector<T> = (state: WhiteboardState, prev: T) => T;
+export type WhiteboardSelector<T> = (state: WhiteboardMutableState, prev: T) => T;
 
 export const useWhiteboardSelector = <T>(
   state: WhiteboardLocalState,
@@ -92,53 +84,10 @@ export const useWhiteboardSelector = <T>(
   initialValue: T,
   isEqual?: (a: T, b: T) => boolean,
 ): T => {
-  const source: actCommon.SelectorSource<WhiteboardState> = useMemo(() => ({
+  const source: actCommon.SelectorSource<WhiteboardMutableState> = useMemo(() => ({
     retrieve: () => state.data,
     changes: state.updates,
   }), [state]);
 
   return actCommon.useSelector(source, selector, initialValue, isEqual);
-};
-export const useWhiteboardState = (
-  channel: WhiteboardChannel,
-): WhiteboardState => {
-  const [strokes, setStrokes] = useState<WhiteboardStroke[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [cursors, setCursors] = useState<WhiteboardCursor[]>([]);
-
-  useEffect(() => {
-    const subscription = channel.recieve.subscribe((event) => {
-      switch (event.type) {
-        case "initialize":
-          return setCursors([...event.cursors]);
-        case "pointer-spawn":
-          return setCursors((cs) => [...cs, event.cursor]);
-        case "pointer-move":
-          return setCursors((cs) =>
-            cs.map((c) =>
-              c.id === event.cursorId ? { ...c, position: event.position } : c
-            )
-          );
-        case "stroke-create":
-          return setStrokes((ss) => [...ss, event.stroke]);
-        case "stroke-update":
-          return setStrokes((ss) =>
-            ss.map((s) => s.id === event.stroke.id ? event.stroke : s)
-          );
-        case "pointer-despawn":
-          return setCursors((cs) => cs.filter((c) => c.id !== event.cursorId));
-        case "note-create":
-          return setNotes((ns) => [...ns, event.note]);
-      }
-    });
-    return () => {
-      subscription.unsubscribe();
-    }
-  }, [channel])
-
-  return {
-    cursors: [...new Map(cursors.map((c) => [c.id, c])).values()],
-    strokes,
-    notes,
-  };
 };

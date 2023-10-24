@@ -34,6 +34,8 @@ export const createModelCaster = <I extends Model>(
       return createNullableCaster(createModelCaster(modelDefinition.value));
     case "union":
       return createUnionCaster(modelDefinition);
+    case 'union2':
+      return createUnion2Caster(modelDefinition);
     case "literal":
       return createLiteralCaster(modelDefinition)
     case "never":
@@ -76,6 +78,23 @@ export const createUnionCaster = <T>(
   };
   return unionCaster;
 };
+
+export const createUnion2Caster = <T>(
+  definition: ModelsByType["union2"],
+) => {
+  const casters = definition.cases.map(createModelCaster);
+  const unionCaster = (value: unknown): T => {
+    for (const caster of casters) {
+      try {
+        return caster(value)
+      } finally {
+        // failed to cast
+      }
+    }
+    throw new Error(`No matching caster`);
+  };
+  return unionCaster;
+}
 
 export const castString: Cast<string> = (value) => {
   if (typeof value === "string") return value;

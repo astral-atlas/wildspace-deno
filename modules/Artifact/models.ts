@@ -28,3 +28,4 @@ export const assetListDefinition = m.array(m.object({
   assetId: m.string,
   downloadURL: m.string,
 }))
+export type AssetList = m.OfModelType<typeof assetListDefinition>;

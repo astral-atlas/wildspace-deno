@@ -4,6 +4,7 @@ import { m, service, sesame, storage, nanoid, channel, artifact } from "./deps.t
 import {
   Whiteboard,
   noteDefinition,
+  stickerContentDefinition,
   stickerDefinition,
   whiteboardCursorDefinition,
   whiteboardDefinition,
@@ -11,6 +12,7 @@ import {
   whiteboardVectorDefinition,
 } from "./models.ts";
 import { Protocol, WhiteboardProtocolMessage } from "./protocol.ts";
+import { ServerProtocol } from "./protocol/mod.ts";
 
 const whiteboardSystemDefinition = {
   names: ["dryerase", "whiteboard"],
@@ -32,14 +34,24 @@ const stickerSystemDefinitition = {
   resource: stickerDefinition,
   partName: "whiteboardId",
   sortName: "stickerId",
-  editable: m.object({
-    whiteboardId: m.string,
-    layerId: m.string,
-    assetId: m.nullable(m.string),
-    size: whiteboardVectorDefinition,
-    position: whiteboardVectorDefinition,
-    rotation: m.number
-  }),
+  editable: m.union2([
+    m.object({
+      type: m.literal('create'),
+      whiteboardId: m.string,
+      layerId: m.nullable(m.string),
+      position: whiteboardVectorDefinition,
+    }),
+    m.object({
+      type: m.literal('content'),
+      content:  stickerContentDefinition,
+    }),
+    m.object({
+      type: m.literal('transform'),
+      size: m.nullable(whiteboardVectorDefinition),
+      position: m.nullable(whiteboardVectorDefinition),
+      rotation: m.nullable(m.number)
+    }),
+  ]),
 } as const;
 type StickerSystemType = service.ToCommonSystemType<
   typeof stickerSystemDefinitition
@@ -84,7 +96,6 @@ const noteSystemDefinition = {
   editable: m.object({
     ownerId: m.nullable(noteDefinition.properties.ownerId),
     whiteboardId: m.nullable(noteDefinition.properties.whiteboardId),
-    content: m.nullable(noteDefinition.properties.content),
     position: m.nullable(noteDefinition.properties.position),
     size: m.nullable(noteDefinition.properties.size),
   }),
@@ -111,14 +122,29 @@ export const defs = {
   }
 } as const;
 
+/*
+Service creation is done in three phases:
+  - (Big Bang).
+    - Connection to "hard" dependencies, like databases
+    and signalers
+  - Atomic Services
+    - Construction of Channels, Storage Devices.
+      These services follow well-established types and basic
+      interfaces, and mostly act as boilerplate to abstract away
+      common operations.
+  - Molecular Services
+
+*/
+
 
 export type Meta = {
   UpdateBandType: {
     dial: { whiteboardId: Whiteboard["id"] },
-    message: Protocol["message"]["server"]
+    message: ServerProtocol
   },
   SpecialDependencies: {
     updates: channel.Band<Meta["UpdateBandType"]>,
+    artifact: artifact.ArtifactService,
   },
   ServiceDependencies: {
     [system in keyof WhiteboardTypes]:
@@ -185,6 +211,7 @@ export const createMemoryDeps = (
   };
   
   return {
+    artifact: artifact.createMemoryService().service,
     updates: channel.createMemoryBand<Meta["UpdateBandType"]>(({ whiteboardId }) => whiteboardId),
     whiteboard: createMemoryDep(defs.system.whiteboard, inputs.whiteboard),
     sticker: createMemoryDep(defs.system.sticker, inputs.sticker),
@@ -207,17 +234,47 @@ export const createInsecureImplementation = (
       calculateKey: (w) => ({ part: w.ownerId, sort: w.id }),
     },
     sticker: {
-      create: (i) => ({ ...i, id: nanoid() }),
-      update: async (sticker, i) => {
-        if (i.assetId) {
-          const asset = await artifact.assets.read({
-            ownerId: userId,
-            assetId: i.assetId
-          });
-          if (asset.state !== 'uploaded')
-            throw new Error('Asset is not Uploaded!');
+      create: (i) => {
+        if (i.type !== 'create')
+          throw new Error();
+        console.log({ position: i.position || { x: 0, y: 0 }, })
+        return {
+          id: nanoid(),
+          whiteboardId: i.whiteboardId,
+          layerId: i.layerId || expressionThrow(new Error('layerId is required')),
+          content: { type: 'null' },
+          size: { x: 0, y: 0 },
+          position: i.position || { x: 0, y: 0 },
+          rotation: 0,
         }
-        return ({ ...sticker, ...i })
+      },
+      update: async (sticker, i) => {
+        switch (i.type) {
+          case 'create':
+            throw new Error();
+          case 'content': {
+            switch (i.content.type) {
+              case 'asset': {
+                // Validate Asset is uploaded
+                const asset = await artifact.assets.read({
+                  ownerId: userId,
+                  assetId: i.content.assetId
+                });
+                if (asset.state !== 'uploaded')
+                  throw new Error('Asset is not Uploaded!');
+                }
+            }
+            return { ...sticker, content: i.content };
+          }
+          case 'transform': {
+            return {
+              ...sticker,
+              position: i.position || sticker.position,
+              rotation: i.rotation || sticker.rotation,
+              size: i.size || sticker.size,
+            }
+          }
+        }
       },
       calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
     },
@@ -235,7 +292,6 @@ export const createInsecureImplementation = (
       create: (i) => ({
         whiteboardId: i.whiteboardId || expressionThrow(new Error('WhiteboardID is required')),
         ownerId: i.ownerId || expressionThrow(new Error('OwnerID is required')),
-        content: i.content || { type: 'text', text: 'New Note' },
         size: i.size || { x: 0, y: 0 },
         position: i.position || { x: 0, y: 0},
         id: nanoid()
@@ -244,7 +300,6 @@ export const createInsecureImplementation = (
         ...w,
         position: i.position || w.position,
         size: i.size || w.size,
-        content: i.content || w.content,
       }),
       calculateKey: (w) => ({ part: w.whiteboardId, sort: w.id }),
     },

@@ -7,7 +7,7 @@ import { act, channel, service, nanoid, storage, artifact } from "./deps.ts";
 import readme from "./readme.md?raw";
 import { BigTable } from "../BigTable/BigTable.ts";
 import { WhiteboardTypes, createBackend, createInsecureImplementation, createMemoryDeps } from "./service.ts";
-import { createWhiteboardServerChannel } from "./channel.ts";
+import { createDryEraseChannel } from "./channel/mod.ts";
 import { StoreVisualzer } from "../Data/DataDoc/mod.ts";
 import { WhiteboardEditor } from "./components/WhiteboardEditor.ts";
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
@@ -23,8 +23,8 @@ const useHost = () => {
     const backendDeps = createMemoryDeps(implementation);
     const backend = createBackend(backendDeps, implementation);
 
-    const left = await createWhiteboardServerChannel('left', 'board-id', backend);
-    const right = await createWhiteboardServerChannel('right', 'board-id', backend);
+    const left = await createDryEraseChannel('left', 'board-id', backend);
+    const right = await createDryEraseChannel('right', 'board-id', backend);
     return { left, right, backend, backendDeps, artifactService };
   }, []);
 
@@ -77,10 +77,10 @@ const Demo: act.Component = () => {
   return [
     h('div', { style: { display: 'flex' } }, [
       h('div', { style: { border: '1px solid black', display: 'flex', flex: 1 } }, [
-        h(WhiteboardView, { channel: host.left }),
+        //h(WhiteboardView, { channel: host.left }),
       ]),
       h('div', { style: { border: '1px solid black', display: 'flex', flex: 1 } }, [
-        h(WhiteboardView, { channel: host.right }),
+        //h(WhiteboardView, { channel: host.right }),
       ]),
     ]),
   ];

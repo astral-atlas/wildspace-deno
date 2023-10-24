@@ -9,9 +9,10 @@ export type BandType = {
 
 export type Band<T extends BandType> = {
   connect: (dial: T["dial"]) => UniformChannel<T["message"]>,
+  broadcast: (dial: T["dial"], message: T["message"]) => void,
 };
 
-export const createMemoryBand = <T extends BandType>(hashDial: (dial: T["dial"]) => string) => {
+export const createMemoryBand = <T extends BandType>(hashDial: (dial: T["dial"]) => string): Band<T> => {
   const bands = new Map<string, UniformChannel<T["message"]>>();
 
   const connect = (dial: T["dial"]) => {
@@ -20,5 +21,11 @@ export const createMemoryBand = <T extends BandType>(hashDial: (dial: T["dial"])
     bands.set(hash, band);
     return band;
   }
-  return { connect }
+  const broadcast = (dial: T["dial"], message: T["message"]) => {
+    const hash = hashDial(dial);
+    const band = bands.get(hash)
+    if (band)
+      band.send(message);
+  }
+  return { connect, broadcast }
 };

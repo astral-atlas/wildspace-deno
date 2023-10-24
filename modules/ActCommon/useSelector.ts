@@ -31,7 +31,6 @@ export const useSelector = <S, V>(
   const onChangeRef = useUpdatingMutableValue(useMemo(() => () => {
     const next = selector(source.retrieve(), valueRef.current);
     if (!isValueEqual(valueRef.current, next)) {
-      console.log(`Selector is updating with value`, next)
       valueRef.current = next;
       setRenderCount(r => r + 1);
     }

@@ -1,4 +1,5 @@
 import { WhiteboardChannel } from "./channel.ts";
+import { DryEraseChannel } from "./channel/mod.ts";
 import { useWhiteboardState } from "./components/useWhiteboardState.ts";
 import { act, hash } from "./deps.ts";
 import {
@@ -8,7 +9,7 @@ import {
 const { h, useState, useEffect, useRef } = act;
 
 export type WhiteboardViewProps = {
-  channel: WhiteboardChannel;
+  channel: DryEraseChannel;
 };
 
 export const WhiteboardView: act.Component<WhiteboardViewProps> = ({

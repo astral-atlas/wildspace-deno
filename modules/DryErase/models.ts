@@ -6,12 +6,19 @@ export const whiteboardVectorDefinition = m.object({
 })
 export type WhiteboardVector = m.OfModelType<typeof whiteboardVectorDefinition>
 
+export const stickerContentDefinition = m.union2([
+  m.object({ type: m.literal('null') }),
+  m.object({ type: m.literal('asset'), assetId: m.string, ownerId: m.string }),
+  m.object({ type: m.literal('note'), text: m.string }),
+])
+export type StickerContent = m.OfModelType<typeof stickerContentDefinition>;
+
 export const stickerDefinition = m.object({
   id: m.string,
   whiteboardId: m.string,
   layerId: m.string,
 
-  assetId: m.nullable(m.string),
+  content: stickerContentDefinition,
 
   size: whiteboardVectorDefinition,
   position: whiteboardVectorDefinition,
@@ -31,19 +38,13 @@ export const whiteboardBrushDefinition = m.object({
   color: m.string,
   mode: m.set(['add', 'erase'] as const),
 });
-export const whiteboardStrokePointDefinition = m.object({
-  position: m.object({ x: m.number, y: m.number }),
-  width: m.number,
-});
-export type WhiteboardStrokePoint = m.OfModelType<typeof whiteboardStrokePointDefinition>;
-
 export const whiteboardStrokeDefinition = m.object({
   id: m.string,
   layerId: m.string,
   whiteboardId: m.string,
   brush: whiteboardBrushDefinition,
   
-  points: m.array(whiteboardStrokePointDefinition),
+  points: m.array(whiteboardVectorDefinition),
 });
 export type WhiteboardStroke = m.OfModelType<typeof whiteboardStrokeDefinition>;
 
@@ -61,10 +62,6 @@ export const noteDefinition = m.object({
 
   position: whiteboardVectorDefinition,
   size: whiteboardVectorDefinition,
-
-  content: m.union({
-    text: m.object({ type: m.literal('text'), text: m.string })
-  }),
 });
 export type Note = m.OfModelType<typeof noteDefinition>;
 
