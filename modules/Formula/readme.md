@@ -15,3 +15,7 @@ getting and setting the text input's
 value and onInput events.
 
 ::LabeledInputDemo
+
+## ModelFormula
+
+::ModelFormulaDemo

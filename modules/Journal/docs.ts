@@ -1,4 +1,5 @@
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
+import { SystemComponentsPreview } from "../Data/ServiceCommon/SimpleSystemDoc/SystemComponentsPreview.ts";
 import { createJournalBackend } from "./backend.ts";
 import { act, network, simpleSystem } from "./deps.ts";
 import { Game } from "./models.ts";
@@ -6,16 +7,23 @@ import { Game } from "./models.ts";
 import readme from './readme.md?raw';
 import { createRoutes } from "./routes.ts";
 import { createRemoteJournalService } from "./service.ts";
-import { gameRESTDef } from "./system.ts";
+import { gameRESTDef, gameSystemDef } from "./system.ts";
 
-const { h, useEffect } = act;
+const { h, useEffect, useState } = act;
 
 const demo = () => {
+  const [{ world, backend }] = useState(() => {
+    const world = simpleSystem.createMemoryWorld();
+    const backend = createJournalBackend(world);
+    return {
+      world,
+      backend,
+    }
+  });
+
   useEffect(() => {
     const start = async () => {
       // Setup systems
-      const world = simpleSystem.createMemoryWorld();
-      const backend = createJournalBackend(world);
       const routes = createRoutes(backend);
       const router = network.createRouter(routes);
 
@@ -55,7 +63,13 @@ const demo = () => {
       .catch(console.error)
   }, []);
 
-  return h('div', {}, 'Da demo!')
+  return [
+    h(SystemComponentsPreview, {
+      world,
+      components: backend.game as unknown as simpleSystem.Components<simpleSystem.SimpleSystemType>,
+      systemDef: gameSystemDef
+    })
+  ]
 }
 
 export const journalDocs: DocSheet[] = [

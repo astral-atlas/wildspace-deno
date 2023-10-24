@@ -5,8 +5,8 @@ import { AttributeRecord, TypeOfAttributeValue, attributeMapToObject, objectToAt
 import { DynamoTableDefinition } from "./table.ts";
 
 export type DynamoPartitionType = {
-  value: { readonly [key: string]: TypeOfAttributeValue },
-  part?: string | undefined | typeof anyPart,
+  value: TypeOfAttributeValue,
+  part?: string | undefined,
   sort: string
 };
 
@@ -91,6 +91,7 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
   table: DynamoTableDefinition,
   definition: DynamoPartitionDefinition<T>,
   client: dynamo.DynamoDBClient,
+  calculateKey?: (item: T["value"]) => ({ part: string, sort: string }),
 ): DynamoPartitionClient<T> => {
   const decode = (attributes: AttributeRecord) => {
     const map = attributeMapToObject(attributes);
@@ -143,20 +144,19 @@ export const createDynamoPartitionClient = <T extends DynamoPartitionType>(
       return cast(decode(Item));
     },
     async query(queryInput) {
-      const results = await client.send(
+      const { Items } = await client.send(
         createQueryCommand(queryInput, definition, table)
       );
-      if (!results.Items)
+      if (!Items)
         throw new Error();
-      return results.Items
-        .map((item) => decode(item))
-        .map(item => ({
+      return Items
+        .map((item) => [attributeMapToObject(item), decode(item)] as const)
+        .map(([properties, item]) => ({
           key: {
-            part: castString(item[table.partitionKeyName])
-              .slice(definition.partitionPrefix.length),
-            sort: castString(item[table.sortKeyName])
+            part: castString(properties[table.partitionKeyName]),
+            sort: castString(properties[table.sortKeyName])
           } as unknown as DynamoKey<T>,
-          value: cast(item[table.valueKeyName])
+          value: item,
         }))
     }
   };

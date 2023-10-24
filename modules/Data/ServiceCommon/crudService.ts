@@ -7,9 +7,9 @@ export type ResourceType = {
 }
 
 export type CRUDType = {
-  resource: { [key: string]: m.ModeledType },
-  create:   { [key: string]: m.ModeledType },
-  update:   { [key: string]: m.ModeledType },
+  resource: m.ModeledType,
+  create:   m.ModeledType,
+  update:   m.ModeledType,
 
   id:     QueryValue,
   filter: QueryValue,

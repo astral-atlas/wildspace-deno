@@ -30,12 +30,15 @@ export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
   }
   const onMemoryUpdate = new rxjs.Subject<MemoryStoreItem<T>[]>();
 
+  const memory = () => {
+    return [...allItems]
+      .sort((a, b) => (a.key.sort as string).localeCompare(b.key.sort));
+  }
+
   return {
     definition,
     onMemoryUpdate,
-    memory() {
-      return allItems;
-    },
+    memory,
     put(key, value) {
       const item = {
         value,
@@ -43,14 +46,14 @@ export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
       } as MemoryStoreItem<T>;
       allItems = [item, ...allItems.filter(i => !isKeyEqual(i.key, key))];
       operations.push({ type: 'put', key, value })
-      onMemoryUpdate.next(allItems);
+      onMemoryUpdate.next(memory());
       return Promise.resolve();
     },
     delete(key) {
       const item = allItems.find(item => isKeyEqual(item.key, key));
       allItems = allItems.filter(item => isKeyEqual(item.key, key))
       operations.push({ type: 'delete', key })
-      onMemoryUpdate.next(allItems);
+      onMemoryUpdate.next(memory());
       if (!item)
         throw new Error();
       return Promise.resolve(item.value);

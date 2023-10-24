@@ -1,10 +1,16 @@
-import { h, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 // @deno-types="vite-text"
 import readme from './readme.md?raw';
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
 import { LabeledTextInput } from "./LabeledInput.ts";
+import { ModelFormula } from "./ModelFormula.ts";
+import { act } from "./deps.ts";
+import { m } from "./deps.ts";
+import { userDefinition } from "../SesameModels/mod.ts";
+import { invitationDefinition } from "../Journal/mod.ts";
+
+const { h, useState } = act;
 
 const LabeledInputDemo = () => {
   const [text, setText] = useState('My initial text');
@@ -13,8 +19,29 @@ const LabeledInputDemo = () => {
   ]);
 }
 
+const ModelFormulaDemo = () => {
+  const model = invitationDefinition;
+  const cast = m.createModelCaster(model);
+  const [value, setValue] = useState({
+    gameId: 'userId',
+    inviteeId: 'CoolUser',
+    role: 'admin'
+  })
+
+  return [
+    h(FramePresenter, {  }, [
+      h('div', {}, [
+        h(ModelFormula, { model, value, onInput: e => setValue(cast(e)) }),
+      ]),
+    ]),
+
+    h('pre', {}, JSON.stringify(value, null, 2))
+  ]
+}
+
 const demos = {
-  'LabeledInputDemo': LabeledInputDemo
+  'LabeledInputDemo': LabeledInputDemo,
+  ModelFormulaDemo,
 };
 
 export const formulaDocs: DocSheet[] = [

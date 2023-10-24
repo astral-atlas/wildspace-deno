@@ -1,6 +1,6 @@
 // @ts-nocheck This file does to mean things to the type system.
 // best just to trust it's types.
-import { Model, ModelOf, ModelsByType, OfModelType } from "./model.ts";
+import { Model, ModelOf, ModeledType, ModelsByType, OfModelType } from "./model.ts";
 
 export type Cast<T> = (value: unknown) => T;
 
@@ -130,7 +130,7 @@ export const createArrayCaster = <T>(
   };
 };
 export const createEnumCaster = <T extends string>(
-  enums: T[],
+  enums: readonly T[],
 ): Cast<T> => {
   return (value) => {
     if (!enums.includes(value)) throw new Error();
@@ -141,13 +141,19 @@ export const createEnumCaster = <T extends string>(
 export const createObjectCaster = <
   T extends { [key: string]: unknown },
 >(casters: { [key in keyof T]: Cast<T[key]> }): Cast<T> => {
+  const casterEntries = Object.entries(casters);
   return (value) => {
-    if (typeof value !== "object" || value === null) throw new Error();
-    const casterEntries = Object.entries(casters);
-    const object = value as { [key: string]: unknown };
+    const object = castObject(value);
 
     return Object.fromEntries(
       casterEntries.map(([key, caster]) => [key, caster(object[key])]),
     ) as T;
   };
 };
+
+export const castObject: Cast<Record<string, ModeledType>> = (value) => {
+  if (typeof value !== "object" || value === null)
+    throw new Error();
+  
+  return value;
+}

@@ -12,7 +12,7 @@ export type JournalService = {
 
 export const createRemoteJournalService = (
   domain: network.DomainClient,
-) => {
+): JournalService => {
   const game = simpleSystem.createRESTClient(domain, gameRESTDef);
   const invitation = simpleSystem.createRESTClient(domain, invitationRESTDef);
   
