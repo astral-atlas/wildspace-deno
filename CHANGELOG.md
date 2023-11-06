@@ -6,6 +6,8 @@
   will move the camera/workspace consistently
   - We only pay attention to the "first touch"
   so multi-touch actions are still WIP
+- Added ResizeRect for usage in DryErase
+  and Presentation
 
 #### 22nd October, 2033
 - Added ActCommon for some super-basic shared hooks:

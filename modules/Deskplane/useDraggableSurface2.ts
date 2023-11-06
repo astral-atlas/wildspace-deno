@@ -11,6 +11,8 @@ export type DragSurface2 = {
 export type DragMovement = {
   start: three.Vector2;
   current: three.Vector2;
+  delta: three.Vector2;
+
   changes: rxjs.Observable<DragMovementEvent>;
 
   move: (change: three.Vector2) => void;
@@ -23,14 +25,16 @@ const createDragSurface = (): DragSurface2 => {
   const startDrag = (start: three.Vector2) => {
     const changes = new rxjs.Subject<DragMovementEvent>();
     const current = start.clone();
+    const delta = new three.Vector2();
+
     const move = (change: three.Vector2) => {
       current.add(change);
+      delta.add(change);
       changes.next({ type: "move", change });
     };
     const set = (newCurrent: three.Vector2) => {
       const change = newCurrent.clone().sub(current);
-      current.copy(newCurrent);
-      changes.next({ type: "move", change });
+      move(change);
     };
     const end = () => {
       changes.next({ type: "end" });
@@ -41,6 +45,7 @@ const createDragSurface = (): DragSurface2 => {
       end,
       set,
       start,
+      delta,
       changes,
       current,
     };
@@ -66,10 +71,12 @@ export const useDraggableSurface2 = (
     const pointer = createPointerObservables(current);
     const touch = createTouchObservables(current);
     let activeDrag: null | DragMovement = null;
+    let rect: null | DOMRect = null;
     const subs = [
       pointer.all
         .pipe(rxjs.filter(e => e.pointerType !== 'touch'))
         .subscribe(event => {
+          console.log('pointer')
           switch (event.type) {
             case 'pointerdown':
               current.setPointerCapture(event.pointerId);
@@ -98,7 +105,7 @@ export const useDraggableSurface2 = (
             const first = event.targetTouches.item(0);
             if (!first)
               return;
-            const rect = current.getBoundingClientRect();
+            rect = current.getBoundingClientRect();
             const offset = new three.Vector2(first.clientX - rect.x, first.clientY - rect.y);
             activeDrag = surface.startDrag(offset);
             return;
@@ -108,13 +115,13 @@ export const useDraggableSurface2 = (
             if (activeDrag) {
               activeDrag.end();
               activeDrag = null;
+              rect = null;
             }
             return;
           case 'touchmove': {
             const first = event.targetTouches.item(0);
-            if (!first || !activeDrag)
+            if (!first || !activeDrag || !rect)
               return;
-            const rect = current.getBoundingClientRect();
             const offset = new three.Vector2(
               first.clientX - rect.x,
               first.clientY - rect.y

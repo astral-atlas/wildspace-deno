@@ -1,0 +1,18 @@
+.handle.top, .handle.bottom {
+  cursor: ns-resize;
+}
+.handle.left, .handle.right {
+  cursor: ew-resize;
+}
+
+.handle.left.top, .handle.bottom.right {
+  cursor: nwse-resize;
+}
+
+.handle.right.top, .handle.bottom.left {
+  cursor: nesw-resize;
+}
+
+.handle.center {
+  cursor: move;
+}

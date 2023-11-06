@@ -20,6 +20,7 @@ import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 import readme from "./readme.md?raw";
 import { three } from "./deps.ts";
 import { DraggableSurface2Demo } from "./docs/DraggableSurface2Doc.ts";
+import { ResizeRectDemo } from "./docs/ResizeRectDemo.ts";
 
 export const GridSVGDemo: Component = () => {
   const ref = useRef(null);
@@ -142,6 +143,7 @@ const demos = {
   deskplane_demo: DeskPlaneDemo,
   gridsvg_demo: GridSVGDemo,
   DraggableSurface2Demo,
+  ResizeRectDemo,
   dragsurface_demo: DraggableSurfaceDemo,
   dragparticle_demo: () => null,
 };

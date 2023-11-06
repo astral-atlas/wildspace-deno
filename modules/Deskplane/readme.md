@@ -13,6 +13,13 @@ sequence.
 
 ::DraggableSurface2Demo
 
+## ResizeRect
+
+This component creates some controls for manipulating
+a rectangle of content inside a space.
+
+::ResizeRectDemo
+
 ## Deskplane
 
 Everything put together - a draggable surface,
