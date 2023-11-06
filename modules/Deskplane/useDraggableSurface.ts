@@ -104,7 +104,6 @@ export const useDraggableSurface = (
     }
   }, []);
 
-
   useAnimation('useDraggableSurface', () => {
     if (!dragging || !currentEvent.current)
       return;

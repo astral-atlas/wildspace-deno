@@ -1,5 +1,12 @@
 # Changelog
 
+#### 7 November, 2033
+- Added touch support for DraggableSurface2
+  - Should mean phone + tablet touch events
+  will move the camera/workspace consistently
+  - We only pay attention to the "first touch"
+  so multi-touch actions are still WIP
+
 #### 22nd October, 2033
 - Added ActCommon for some super-basic shared hooks:
   - `useAsync`. The classic

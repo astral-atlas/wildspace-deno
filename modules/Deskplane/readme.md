@@ -4,6 +4,15 @@ This component library covers components
 around a "Deskplane" - a component that offers
 a window into a infinite 2d plane.
 
+## useDraggableSurface2
+
+This basic component captures some input events
+for a particular Element on a page, and can
+report the `start -> end` of a particular dragging
+sequence.
+
+::DraggableSurface2Demo
+
 ## Deskplane
 
 Everything put together - a draggable surface,
