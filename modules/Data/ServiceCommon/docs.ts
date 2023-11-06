@@ -4,7 +4,7 @@ import { markdownToSheet } from "../../ComponentDoc/markdown.ts";
 // @deno-types="vite-text"
 import readme from './readme.md?raw';
 // @deno-types="vite-text"
-import simpleSystemReadme from './simpleSystem/readme.md?raw';
+import simpleSystemReadme from '../SimpleSystem/readme.md?raw';
 
 export const serviceCommonDocs: DocSheet[] = [
   markdownToSheet('ServiceCommon', readme),

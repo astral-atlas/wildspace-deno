@@ -13,8 +13,16 @@ export const createDefaultValue = <T extends ModeledType>(model: ModelOf2<T>): T
       return model.cases[0] as T;
     case 'union':
       return createDefaultValue<ModeledType>(Object.values(model.cases)[0]) as T;
+    case 'union2':
+      return createDefaultValue<ModeledType>(model.cases[0]) as T;
     case 'array':
       return createDefaultValue<ModeledType>(model.elements) as T;
+    case 'literal':
+      return model.value as T;
+    case 'meta':
+      return createDefaultValue<ModeledType>(model.value) as T;
+    case 'nullable':
+      return null as T;
     default:
       throw new Error();
   }

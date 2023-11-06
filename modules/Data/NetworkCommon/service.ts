@@ -156,7 +156,18 @@ export const createMemoryNetworkService = (
               const transaction: HTTPServerConnection = {
                 request,
                 respond(response) {
-                  resolve(response);
+                  if (!response.body)
+                    return resolve(response);
+
+                  const stream = new DelayStream(options.delay || 0);
+                  response.body.pipeTo(stream.writable, { preventClose: true })
+                    .then(() => stream.finish())
+                  
+                  const delayedResponse = {
+                    ...response,
+                    body: stream.readable
+                  }
+                  resolve(delayedResponse);
                 }
               }
               server.connection.next(transaction)
@@ -169,5 +180,38 @@ export const createMemoryNetworkService = (
     createWSClient() {
       throw new Error('Unsupported')
     },
+  }
+}
+
+class DelayStream extends TransformStream {
+  ids = new Set<number>();
+  onWrite = new rxjs.Subject()
+
+  finish() {
+    this.onWrite.subscribe(() =>{
+      if (this.ids.size === 0) {
+        this.writable.close();
+      }
+    })
+  }
+  
+  constructor(delay: number) {
+    super({ 
+      start() {},
+      transform(chunk, controller) {
+        const id = setTimeout(() => {
+          controller.enqueue(chunk);
+          ids.delete(id);
+          onWrite.next(null);
+        }, delay)
+        ids.add(id);
+      },
+      flush() {
+        for (const id of ids)
+          clearTimeout(id);
+      },
+    }, new ByteLengthQueuingStrategy({ highWaterMark: 256 }));
+    const ids = this.ids;
+    const onWrite = this.onWrite;
   }
 }

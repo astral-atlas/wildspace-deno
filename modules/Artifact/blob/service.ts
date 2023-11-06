@@ -42,7 +42,7 @@ export const createMemoryBlobStreamService = (
     downloadStream(ownerId, assetId) {
       const blob = blobs.get([ownerId, assetId].join('-'));
       if (!blob)
-        throw new Error('No blob by that key found!');
+        throw new Error(`No blob for key ${assetId} ${ownerId} found!`);
       
       return Promise.resolve(blob.stream());
     }

@@ -3,6 +3,7 @@ import { m, sesameModels } from "./deps.ts";
 export const gameIdDefinition = m.meta(m.string, {
   name: 'GameID'
 });
+export type GameID = m.OfModelType<typeof gameIdDefinition>;
 
 export const gameDefinition = m.meta(m.object({
   id: gameIdDefinition,

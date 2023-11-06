@@ -4,3 +4,4 @@ export * from './definitions.ts'
 
 export * from './meta.ts';
 export * from './value.ts';
+export * from './binary.ts';

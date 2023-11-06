@@ -1,153 +1,100 @@
-import { BlobService, BlobStreamService, createMemoryBlobStreamService } from "./blob/service.ts";
-import { m, nanoid, service, storage } from "./deps.ts";
-import { AssetID, assetDefinition, assetUsageDefinition } from "./models.ts";
+import { network, simpleSystem, storage } from "./deps.ts";
+import { Asset } from "./models.ts";
+import { transactionDefs, Transactions, ArtifactSystem } from "./system.ts";
 
-const assetSystem = {
-  names: ['artifact', 'asset'],
-  partName: 'ownerId',
-  sortName: 'assetId',
-  resource: assetDefinition,
-  editable: m.object({
-    ownerId:        m.nullable(m.string),
-    contentType:    m.nullable(m.string),
-    contentLength:  m.nullable(m.number),
-    state:          m.nullable(assetDefinition.value.properties.state),
-    users:          m.nullable(m.array(assetUsageDefinition)),
-  }),
-} as const;
-service.assertIsSystem(assetSystem);
-
-export const systems = {
-  asset: assetSystem,
+export type Service = {
+  uploadAsset(gameId: string, data: Blob): Promise<Asset>;
+  downloadAsset(gameId: string, assetId: string): Promise<Blob>;
 };
 
-type Systems = {
-  asset: service.ToCommonSystemType<typeof assetSystem>,
-};
-type Meta = {
-  "Components": {
-    asset: service.CommonSystemComponents<Systems["asset"]>,
-  }
-};
+export const createRemoteService = (domain: network.DomainClient): Service => {
+  const getClient = network.createTransactionHTTPClient<Transactions["get"]>(
+    transactionDefs.get,
+    domain
+  );
+  const postClient = network.createTransactionHTTPClient<Transactions["post"]>(
+    transactionDefs.post,
+    domain
+  );
 
-type ArtifactBackend = {
-  assets: Pick<Meta["Components"]["asset"], 'channel' | 'storage' | 'changes'>
-};
-type ArtifactMemoryBackend = ArtifactBackend & {
-  memory: {
-    asset: storage.DynamoMemoryStore<service.CommonSystemOutputType<Systems["asset"]>["storage"]>
-  }
-}
-type ArtifactImplementation = {
-  assets: service.CommonSystemServiceImplementation<Systems["asset"]>
-};
-
-const inlineThrow = (error: unknown) => { throw error };
-
-export const createInsecureArtifactImplementation = (): ArtifactImplementation => {
   return {
-    assets: {
-      create(input) {
-        return {
-          id: nanoid(),
-          ownerId:        input.ownerId ?? inlineThrow(new Error('Required')),
-          contentType:    input.contentType ?? inlineThrow(new Error('Required')),
-          contentLength:  input.contentLength ?? inlineThrow(new Error('Required')),
-          createdAt:      Date.now(),
-          uploadedAt:     null,
-          state:          'pending',
-          users:          input.users ?? inlineThrow(new Error('Required')),
-        }
-      },
-      update(prev, input) {
-        return {
-          ...prev,
-          state:      input.state || prev.state,
-          uploadedAt: (input.state !== prev.state && input.state === 'uploaded') ? Date.now() : prev.uploadedAt,
-        };
-      },
-      calculateKey(input) {
-        return {
-          part: input.ownerId,
-          sort: input.id,
-        };
-      }
-    }
-  }
-}
-
-export const createArtifactMemoryBackend = (
-  implementation: ArtifactImplementation
-): ArtifactMemoryBackend => {
-  const assetStorage = service.createMemoryStore<Systems["asset"]>(systems.asset)
-  return {
-    assets: {
-      ...service.createMemoryChannels(systems.asset, implementation.assets),
-      storage: assetStorage,
+    async uploadAsset(gameId, data) {
+      const {
+        body: { asset, uploadURL },
+      } = await postClient({
+        request: {
+          gameId,
+          contentLength: data.size,
+          contentType: data.type,
+        },
+        query: {},
+      });
+      await domain.http.request({
+        url: new URL(uploadURL),
+        headers: {},
+        method: "POST",
+        body: data.stream(),
+      });
+      return asset;
     },
-    memory: {
-      asset: assetStorage,
-    }
-  }
-}
-
-export type ArtifactService = {
-  assets: Meta["Components"]["asset"]["service"],
-  url: URLService,
-  blob: BlobStreamService,
-};
-
-export const createArtifactService = (
-  backend: ArtifactBackend,
-  implementation: ArtifactImplementation,
-  host: string,
-): ArtifactService => {
-  const assets = service.createCommonSystemService<Systems["asset"]>({
-    ...backend.assets,
-    definition: systems.asset,
-    implementation: implementation.assets
-  })
-
-  const url = createLocalURLService(host);
-  const blob = createMemoryBlobStreamService(assets);
-
-  return {
-    assets,
-    url,
-    blob,
-  }
-}
-
-export type URLService = {
-  createDownloadURL: (asset: AssetID, ownerId: string) => Promise<URL>,
-  createUploadURL: (asset: AssetID, ownerId: string) => Promise<URL>,
-};
-
-/**
- * Create a URL service that returns URLS
- * from the current machine.
- */
-export const createLocalURLService = (host: string): URLService => {
-  const createDownloadURL = async (assetId: AssetID, ownerId: string) => {
-    const url = new URL('/artifact/bytes', host);
-    url.search = new URLSearchParams({ assetId, ownerId }).toString();
-    return url;
+    async downloadAsset(gameId, assetId) {
+      const {
+        body: { asset, downloadURL },
+      } = await getClient({
+        request: null,
+        query: { gameId, assetId },
+      });
+      const { body } = await domain.http.request({
+        url: new URL(downloadURL),
+        headers: {},
+        method: "GET",
+        body: null,
+      });
+      if (!body) throw new Error(`No body returned for asset`);
+      return new Blob(
+        [await network.readSizedByteStream(body, asset.contentLength)],
+        {
+          type: asset.contentType,
+        }
+      );
+    },
   };
-  const createUploadURL = async (assetId: AssetID, ownerId: string) => {
-    const url = new URL('/artifact/bytes', host);
-    url.search = new URLSearchParams({ assetId, ownerId }).toString();
-    return url;
-  }
-  return { createDownloadURL, createUploadURL }
-}
+};
 
-
-export const createMemoryService = (host = "http://artifact"): {
-  backend: ArtifactMemoryBackend,
-  service: ArtifactService
-} => {
-  const implementation = createInsecureArtifactImplementation()
-  const backend = createArtifactMemoryBackend(implementation);
-  const service = createArtifactService(backend, implementation, host)
-  return { backend, service };
-}
+export const createBackendService = (
+  userId: string,
+  assets: simpleSystem.Components<ArtifactSystem>,
+  assetBlobs: storage.BlobStreamService,
+): Service => {
+  return {
+    async uploadAsset(gameId, data) {
+      const asset = await assets.service.create({
+        gameId,
+        uploader: userId,
+        contentType: data.type,
+        contentLength: data.size,
+        users: [],
+      });
+      await assetBlobs.uploadStream(
+        [gameId, asset.id].join(":"),
+        data.stream()
+      );
+      await assets.service.update({ gameId, assetId: asset.id }, {
+        type: 'complete-upload',
+      });
+      return asset;
+    },
+    async downloadAsset(gameId, assetId) {
+      const asset = await assets.service.read({ gameId, assetId });
+      const stream = await assetBlobs.downloadStream(
+        [gameId, assetId].join(":")
+      );
+      return new Blob(
+        [await network.readSizedByteStream(stream, asset.contentLength)],
+        {
+          type: asset.contentType,
+        }
+      );
+    },
+  };
+};

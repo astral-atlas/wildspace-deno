@@ -65,24 +65,27 @@
 
 .headingLink {
   display: inline-block;
-  padding: 8px;
-  margin: -8px;
-  color: rgb(74, 124, 225);
+  padding: 0;
+  margin-top: 16px;
+  margin-bottom: 16px;
   transform: scale(1);
-  transition: all 0.2s;
+  transition: transform 0.2s;
   position: relative;
   text-decoration: underline;
   transform-origin: 50% 50%;
+  color: rgb(102, 60, 255);
 }
 .headingLink > * {
   display: inline-block;
   text-decoration: underline;
 }
+.headingLink > h1, .headingLink > h2, .headingLink > h3 {
+  margin: 0
+}
+.headingLink:visited {
+  color: rgb(74, 124, 225);
+}
 .headingLink:hover {
   transform: scale(1.05);
   color: red;
-}
-
-.headingLink:visited {
-  color: rgb(102, 60, 255);
 }

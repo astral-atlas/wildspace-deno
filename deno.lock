@@ -501,7 +501,9 @@
     }
   },
   "redirects": {
+    "http://esm.sh/nanoid": "https://esm.sh/nanoid@4.0.2",
     "https://deno.land/x/dns_sd/mod.ts": "https://deno.land/x/dns_sd@2.0.0/mod.ts",
+    "https://esm.sh/base64-arraybuffer": "https://esm.sh/base64-arraybuffer@1.0.2",
     "https://esm.sh/v133/@types/lodash-es@~4.17/index.d.ts": "https://esm.sh/v133/@types/lodash-es@4.17.10/index.d.ts",
     "https://esm.sh/v133/@types/lodash@4.14.200/index": "https://esm.sh/v133/@types/lodash@4.14.200/index~.d.ts"
   },

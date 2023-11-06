@@ -1,78 +1,50 @@
 import { act } from "../AtlasRenderer/mod.ts";
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
-import * as janitor from "../Janitor/mod.ts";
-import { network } from "./deps.ts";
+import { network, simpleSystem } from "./deps.ts";
 import { createRoutes } from "./routes.ts";
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
-import {
-  createMemoryService,
-} from "./service.ts";
 import { LabeledTextInput } from "../Formula/mod.ts";
 import { UploadButton } from "./components/UploadButton.ts";
 import { StoreVisualzer } from "../Data/DataDoc/mod.ts";
+import { createBackend } from './backend.ts';
+import { createDocContext } from "../ComponentDoc/DocContext.ts";
+import { createRemoteService } from "./service.ts";
 
-const { createContext, h, useContext, useEffect, useState, useRef } = act;
+const { h, useState } = act;
 
-const context = createContext<null | ReturnType<typeof useDocContext>>(null);
+const { useDocContext, Provider } = createDocContext(async () => {
+  const url = new URL('http://server.artifact');
+  const world = simpleSystem.createMemoryWorld();
+  const backend = createBackend(world);
+  const internet = network.createMemoryInternet();
+  const netService = network.createMemoryNetworkService(internet, url.hostname, {
+    delay: 500
+  });
 
-const useDocContext = () => {
-  const internet = useRef(
-    network.createMemoryInternet()
-  ).current;
-  const net = useRef(
-    network.createMemoryNetworkService(internet, "artifact", { delay: 1000 })
-  ).current;
-  const {backend, service} = useRef(
-    createMemoryService()
-  ).current;
+  const routes = createRoutes(backend, url.origin)
+  const router = network.createRouter(routes);
+  const server = await netService.createHTTPServer(80);
+  server.connection.subscribe(router.handleHTTP);
 
-  useEffect(() => {
-    const clean = janitor.createCleanupTask();
-    const run = async () => {
-      const server = await net.createHTTPServer();
-      const router = network.createRouter([...createRoutes(service)]);
-      const subscription = server.connection.subscribe(router.handleHTTP);
-      clean.register(() => {
-        server.close();
-        subscription.unsubscribe();
-      });
-    };
-    run();
-    return () => {
-      clean.run();
-    };
-  }, []);
+  const http = netService.createHTTPClient();
+  const domain = network.createDomainClient(url, { type: 'none' }, http);
+  const service = createRemoteService(domain);
 
-  return { artifact: service, backend, net }
-}
-const Provider: act.Component = ({ children }) => {
-  const value = useDocContext();
-  return h(context.Provider, { value }, children);
-}
+  return { service, server, world, backend, netService };
+});
 
 export const ArtifactDemo = () => {
-  const c = useContext(context);
-  if (!c) 
-    return null;
-  const { net, artifact } = c;
+  const { service } = useDocContext();
 
   const [imageURL, setImageURL] = useState<URL | null>(null);
-  const [assetId, setAssetId] = useState("DefaultID");
+  const [gameId, setGameId] = useState("DefaultGameID");
+  const [assetId, setAssetId] = useState("DefaultAssetID");
   const [state, setState] = useState("idle");
 
   const onDownload = async () => {
-    const url = await artifact.url.createDownloadURL(assetId, 'me');
-    const client = net.createHTTPClient();
     setState("Download Starting");
-    const response = await client.request({
-      url,
-      method: "GET",
-      headers: {},
-      body: null,
-    });
-    if (!response.body) throw new Error();
-    const blob = new Blob([await network.readByteStream(response.body)]);
+    const blob = await service.downloadAsset(gameId, assetId)
     setState("Download Complete");
     if (imageURL) {
       URL.revokeObjectURL(imageURL.href);
@@ -84,6 +56,11 @@ export const ArtifactDemo = () => {
   return [
     h("pre", {}, state),
     h(LabeledTextInput, {
+      label: "GameID",
+      value: gameId,
+      onInput: setGameId,
+    }),
+    h(LabeledTextInput, {
       label: "AssetID",
       value: assetId,
       onInput: setAssetId,
@@ -94,22 +71,26 @@ export const ArtifactDemo = () => {
 };
 
 const UploadButtonDemo = () => {
-  const c = useContext(context);
-  if (!c) 
-    return null;
-  const { net, artifact, backend } = c;
-  const http = useRef(
-    net.createHTTPClient()
-  ).current;
+  const { service, world } = useDocContext();
+  const [gameId, setGameId] = useState("DefaultGameID");
+
+  const assetStore = world.partitions.get('artifact')
+  if (!assetStore)
+    return 'oops';
 
   return [
+    h(LabeledTextInput, {
+      label: "GameID",
+      value: gameId,
+      onInput: setGameId,
+    }),
     h(UploadButton, {
-      http,
-      artifact,
+      gameId,
+      artifact: service,
       accept: 'image/*',
     }),
     h(StoreVisualzer, {
-      store: backend.memory.asset,
+      store: assetStore,
       name: 'Assets',
       style: { width: '200%' }
     })

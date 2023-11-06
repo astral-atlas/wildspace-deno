@@ -3,6 +3,7 @@ import { act, canvaskit, rxjs } from "./deps.ts";
 
 export type DynamicModuleLoader<T> = {
   load: () => Promise<T>,
+  state: 'initial' | 'loading' | 'loaded',
   loading: rxjs.Observable<T>,
   module: T | null
 }
@@ -12,11 +13,18 @@ export const createDynamicModuleLoader = <T>(load: () => Promise<T>) => {
   const loader: DynamicModuleLoader<T> = {
     async load() {
       if (!loader.module) {
-        loader.module = await load();
-        loading.next(loader.module);
+        if (loader.state === 'initial') {
+          loader.state = 'loading';
+          loader.module = await load();
+          loader.state = 'loaded';
+          loading.next(loader.module);
+        } else {
+          loader.module = await rxjs.firstValueFrom(loading);
+        }
       }
       return loader.module;
     },
+    state: 'initial',
     loading,
     module: null,
   }
@@ -24,7 +32,7 @@ export const createDynamicModuleLoader = <T>(load: () => Promise<T>) => {
 }
 
 const defaultCanvasKitLoader = createDynamicModuleLoader(() => canvaskit.default({
-  locateFile: (file) => 'https://unpkg.com/canvaskit-wasm@latest/bin/'+file,
+  locateFile: (file: string) => 'https://unpkg.com/canvaskit-wasm@latest/bin/'+file,
 }))
 
 export const canvasKitLoaderContext = act.createContext(defaultCanvasKitLoader);

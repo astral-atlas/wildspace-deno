@@ -21,16 +21,21 @@ import { markdownToSheet } from "../modules/ComponentDoc/mod.ts";
 import { kayoDocs } from "../modules/Kayo/docs.ts";
 import { renderCool } from "../modules/AtlasRenderer/renderer.ts";
 import { dataDocs } from "../modules/Data/docs.ts";
-import { sesameDocs } from "../www/sesame/docs.ts";
 import { doorJourneyDocs } from "../modules/DoorJourney/docs.ts";
 import { serviceCommonDocs } from "../modules/Data/ServiceCommon/docs.ts";
 import { dryEraseDocs } from "../modules/DryErase/docs.ts";
 import { artifactDocs } from "../modules/Artifact/docs.ts";
 import { journalDocs } from "../modules/Journal/docs.ts";
+import { presentationDocs } from "../modules/Presentation/docs.ts";
+import { sesameDocs } from "../modules/Sesame/docs.ts";
+import { modelDocs } from "../modules/Models/docs.ts";
+import { carpentryDocs } from "../modules/Carpentry/docs.ts";
+import { universeDocContext } from "../modules/Universe/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
   sesameDocs,
+  modelDocs,
   frameSchedulerDocs,
   componentDocDocs,
   boxParticleDocs,
@@ -49,12 +54,14 @@ export const sheets = [
   doorJourneyDocs,
   artifactDocs,
   journalDocs,
+  presentationDocs,
+  carpentryDocs,
 ].flat(1);
 
 export const DocsApp: Component = () => {
-  return h(DocSite, {
+  return h(universeDocContext.Provider, {}, h(DocSite, {
     sheets, initialSheet: sheets[0].id,
-  })
+  }));
 };
 
 const entry = () => {

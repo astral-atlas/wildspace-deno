@@ -51,7 +51,7 @@ export const createMemoryDynamoStore = <T extends DynamoPartitionType>(
     },
     delete(key) {
       const item = allItems.find(item => isKeyEqual(item.key, key));
-      allItems = allItems.filter(item => isKeyEqual(item.key, key))
+      allItems = allItems.filter(i => item !== i);
       operations.push({ type: 'delete', key })
       onMemoryUpdate.next(memory());
       if (!item)

@@ -1,11 +1,12 @@
 import { rxjs } from "../SesameDataService/deps.ts";
-import { act, big, storage, m } from "./deps.ts";
+import { act, big, storage, m, actCommon } from "./deps.ts";
 const { h, useState, useEffect } = act;
+const { useSelector, isArrayEqual } = actCommon;
 
 type AnyType = { part: any; sort: any; value: any };
 
 type AnyTypeNoPart = { part?: undefined; sort: any; value: any };
-type AnyMemoryClient =
+export type AnyMemoryClient =
   | (storage.DynamoPartitionClient<AnyType> &
       storage.DynamoMemoryStoreExtension<AnyType>)
   | (storage.DynamoPartitionClient<AnyTypeNoPart> &
@@ -17,17 +18,10 @@ export const StoreVisualzer: act.Component<{
   height?: number,
   style?: { [key: string]: string }
 }> = ({ name, store, height, style }) => {
-  type Item = storage.MemoryStoreItem<storage.DynamoPartitionType>;
-
-  const [items, setItems] = useState<Item[]>([]);
-  useEffect(() => {
-    setItems(store.memory());
-    const observer = store.onMemoryUpdate as rxjs.Observable<Item[]>;
-    const sub = observer.subscribe((items) => {
-      setItems(items);
-    });
-    return () => sub.unsubscribe();
-  }, []);
+  const items = useSelector({
+    retrieve: () => store.memory(),
+    changes: store.onMemoryUpdate,
+  }, s => s, [], isArrayEqual)
 
   const getModelProperties = (model: m.Model): { [key: string]: m.Model } => {
     switch (model.type) {
@@ -69,3 +63,5 @@ export const StoreVisualzer: act.Component<{
     })
   );
 };
+
+export * from './SystemComponentsPreview.ts';

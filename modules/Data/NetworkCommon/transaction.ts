@@ -96,7 +96,9 @@ export const createTransactionHTTPClient = <T extends TransactionType>(
   const decodeResponse = async (stream: ReadableStream | null) => {
     if (!stream)
       return null;
-    return JSON.parse(new TextDecoder().decode(await readByteStream(stream)))
+    const bytes = await readByteStream(stream);
+    const text = new TextDecoder().decode(bytes);
+    return JSON.parse(text);
   }
 
   return async ({ query, request, headers }) => {

@@ -15,6 +15,7 @@ export type DomainAuthorization =
 export type DomainClient = {
   domain: URL,
   authorization: DomainAuthorization,
+  http: HTTPClient,
   request: (request: HTTPDomainRequest) => Promise<HTTPResponse>
 };
 
@@ -38,6 +39,7 @@ export const createDomainClient = (
   return {
     domain,
     authorization,
+    http,
     request(request) {
       const url = new URL(request.path, domain);
       if (request.query)

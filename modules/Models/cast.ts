@@ -50,7 +50,7 @@ export const createModelCaster = <I extends Model>(
 export const createLiteralCaster = <T>(definition: ModelsByType["literal"]): Cast<T> => {
   const literalCaster = (value: unknown): T => {
     if (value !== definition.value)
-      throw new Error();
+      throw new Error(`"${value}" is not literally "${definition.value}"`);
     return definition.value;
   };
   return literalCaster;
@@ -87,7 +87,7 @@ export const createUnion2Caster = <T>(
     for (const caster of casters) {
       try {
         return caster(value)
-      } finally {
+      } catch {
         // failed to cast
       }
     }
@@ -98,17 +98,17 @@ export const createUnion2Caster = <T>(
 
 export const castString: Cast<string> = (value) => {
   if (typeof value === "string") return value;
-  throw new Error();
+  throw new Error(`${value} is not a string`);
 };
 
 export const castNumber: Cast<number> = (value) => {
   if (typeof value === "number") return value;
-  throw new Error();
+  throw new Error(`${value} is not a number`);
 };
 
 export const castBoolean: Cast<boolean> = (value) => {
   if (typeof value === "boolean") return value;
-  throw new Error();
+  throw new Error(`${value} is not a boolean`);
 };
 
 export const createNullableCaster = <T>(
@@ -144,9 +144,15 @@ export const createObjectCaster = <
   const casterEntries = Object.entries(casters);
   return (value) => {
     const object = castObject(value);
-
+    
     return Object.fromEntries(
-      casterEntries.map(([key, caster]) => [key, caster(object[key])]),
+      casterEntries.map(([key, caster]) => {
+        try {
+          return [key, caster(object[key])]
+        } catch (error) {
+          throw new Error(`Object property "${key}" is invalid:\n${error.message}`, { cause: error });
+        }
+      }),
     ) as T;
   };
 };

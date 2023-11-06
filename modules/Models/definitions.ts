@@ -40,9 +40,16 @@ export const boolean =  { type: "boolean" } as const;
 export const any =      { type: "any" } as const;
 export const never =    { type: "never" } as const;
 
+export const dynamic = <T>(
+  getModel: () => T
+) => {
+  return { type: 'dynamic', getModel } as const;
+}
+
 export const defs = {
   object,
   string,
   number,
   boolean,
+  dynamic,
 };

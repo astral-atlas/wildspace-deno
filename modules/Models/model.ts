@@ -81,7 +81,11 @@ type OfModelTypeInternal<T extends Model> = {
 export type OfModelType<T extends Model> =
   [Model] extends [T]
     ? ModeledType
-    : OfModelTypeInternal<T>
+    : [T] extends [ModelOf2<infer X>]
+      ? [Model] extends [X]
+        ? OfModelTypeInternal<T>
+        : X
+      : OfModelTypeInternal<T>
 
 type A = OfModelType<Model>
 type B = ModelOf2<A>;
@@ -138,7 +142,7 @@ export type ModelOfArray<T extends readonly ModeledType[]> =
 export type ModelOfMeta<T> =
   | T extends ModeledType
     ? { type: 'meta', attributes: Record<string, string>, value: ModelOf2<T> }
-    : never;
+    : never
 
 export type ModelOfUnion2<T extends ModeledType> =
   { type: 'union2', cases: ReadonlyArray<ModelOf2<T>> }
