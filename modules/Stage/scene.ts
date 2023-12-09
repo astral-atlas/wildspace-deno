@@ -17,6 +17,10 @@ export const sceneContentDef = m.union2([
     type: m.literal('whiteboard'),
     whiteboardId: m.string,
   }),
+  m.object({
+    type: m.literal('image'),
+    imageAssetId: m.string,
+  }),
 ]);
 export type SceneContent = m.OfModelType<typeof sceneContentDef>
 

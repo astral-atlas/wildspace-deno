@@ -76,7 +76,7 @@ export const useDraggableSurface2 = (
       pointer.all
         .pipe(rxjs.filter(e => e.pointerType !== 'touch'))
         .subscribe(event => {
-          console.log('pointer')
+          event.preventDefault();
           switch (event.type) {
             case 'pointerdown':
               current.setPointerCapture(event.pointerId);

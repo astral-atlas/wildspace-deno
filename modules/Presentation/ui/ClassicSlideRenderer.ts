@@ -24,8 +24,9 @@ export const ClassicSlideRenderer: act.Component<ClassicSlideRendererProps> = ({
   content,
   gameId,
   assets,
+  gameController,
 }) => {
-  const props = { gameId, slide, assets };
+  const props = { gameId, slide, assets, gameController };
   return h("div", { style: style.classicSlideContainer }, [
     h(BackgroundRenderer, { ...props, background: content.background }),
     h('div', { style: style.contentContainer }, [

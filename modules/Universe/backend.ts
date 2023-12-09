@@ -1,6 +1,7 @@
 import * as deps from './deps.ts';
 
 export type Backend = {
+  artifact: deps.artifact.Backend,
   sesame: deps.sesame.SesameBackend,
   journal: deps.journal.JournalBackend,
   stage: deps.stage.Backend,
@@ -14,10 +15,12 @@ export const createBackend = (world: deps.simpleSystem.World): Backend => {
   const journal = deps.journal.createJournalBackend(world);
   const stage = deps.stage.createBackend(world);
   const presentation = deps.presentation.createBackend(world);
+  const artifact = deps.artifact.createBackend(world);
 
   const carpentry = deps.carpentry.createBackend(world, stage);
 
   return {
+    artifact,
     sesame,
     journal,
     stage,

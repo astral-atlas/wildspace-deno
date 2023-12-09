@@ -1,7 +1,8 @@
-import { act, actCommon, artifact } from "../deps.ts";
+import { act, actCommon, artifact, journal } from "../deps.ts";
 import { Slide, SlideAsset, SlideContent } from "../slide.ts";
 
 import { ClassicSlideRenderer } from './ClassicSlideRenderer.ts';
+import { JengaSlideRenderer } from "./JengaSlide.ts";
 
 const { h, useState, useEffect } = act;
 const { useAsync, useDisposable } = actCommon;
@@ -10,19 +11,23 @@ export type SlideRendererProps = {
   gameId: string;
   slide: Slide;
   assets: artifact.Service;
+  gameController: journal.GameController,
 };
 
 export const SlideRenderer: act.Component<SlideRendererProps> = ({
   gameId,
   slide,
   assets,
+  gameController,
 }) => {
-  const props = { gameId, slide, assets };
+  const props = { gameId, slide, assets, gameController };
   switch (slide.content.type) {
     case "classic":
       return h(ClassicSlideRenderer, { ...props, content: slide.content });
     case "title":
       return h(TitleSlideRenderer, { ...props, content: slide.content });
+    case 'jenga':
+      return h(JengaSlideRenderer, { content: slide.content, gameController });
     default:
       return "Error!";
   }
@@ -67,8 +72,9 @@ export const TitleSlideRenderer: act.Component<TitleSlideRendererProps> = ({
   content,
   assets,
   gameId,
+  gameController,
 }) => {
-  const props = { gameId, slide, assets };
+  const props = { gameId, slide, assets, gameController };
   return h("div", { style: style.titleSlideContainer }, [
     h(BackgroundRenderer, { ...props, background: content.background }),
     h("h2", { style: style.title }, content.title),

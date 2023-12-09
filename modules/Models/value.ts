@@ -4,6 +4,10 @@ export const createDefaultValue = <T extends ModeledType>(model: ModelOf2<T>): T
   switch (model.type) {
     case 'string':
       return 'Sample String' as T;
+    case 'number':
+      return 0 as T;
+    case 'boolean':
+      return true as T;
     case 'object': {
       return Object.fromEntries(Object.keys(model.properties).map(key => {
         return [key, createDefaultValue<ModeledType>(model.properties[key])]
@@ -16,7 +20,7 @@ export const createDefaultValue = <T extends ModeledType>(model: ModelOf2<T>): T
     case 'union2':
       return createDefaultValue<ModeledType>(model.cases[0]) as T;
     case 'array':
-      return createDefaultValue<ModeledType>(model.elements) as T;
+      return [] as unknown as T;
     case 'literal':
       return model.value as T;
     case 'meta':

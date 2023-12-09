@@ -1,4 +1,5 @@
 import { artifact, m } from "./deps.ts";
+import { jengaSlideContentDef } from "./jenga.ts";
 
 export const imageSlideAssetDef = m.object({  
   type: m.literal('image'),
@@ -36,6 +37,7 @@ export const slideContentDef = m.union2([
   classicSlideContendDef,
   titleSlideContendDef,
   captionSlideContentDef,
+  jengaSlideContentDef,
 ] as const);
 export type SlideContent = m.OfModelType<typeof slideContentDef>;
 

@@ -1,16 +1,20 @@
-import { act, actCommon, three } from "./deps.ts";
-import { useDraggableSurface } from "./useDraggableSurface.ts";
+import { act, actCommon } from "./deps.ts";
 import { useDraggableSurface2 } from "./useDraggableSurface2.ts";
 
 // @deno-types="vite-css"
 import stylesheet from './ResizeRect.module.css';
 
-const { h, useRef, useState, useMemo, useEffect } = act;
+const { h, useRef, useMemo, useEffect } = act;
 const { useUpdatingMutableValue } = actCommon;
 
+export type Vector2 = {
+  x: number,
+  y: number,
+}
+
 export type Rect = {
-  size: { x: number; y: number };
-  position: { x: number; y: number };
+  size: Vector2;
+  position: Vector2;
 };
 
 export type ResizeRectControlsProps = {
@@ -44,7 +48,8 @@ const styles = {
       height: '10px',
       width: '10px',
       border: '1px solid black',
-      background: 'white'
+      background: 'white',
+      pointerEvents: 'all',
     },
     x: {
       0: { left: 'calc(0% - 5px)' },
@@ -76,6 +81,7 @@ const ResizeHandle: act.Component<ResizeRectHandleProps> = ({
     ...styles.handle.x[handle.x],
     ...styles.handle.y[handle.y],
   }
+  const mutableOnResize = useUpdatingMutableValue(onResize)
   const mutableRect = useUpdatingMutableValue(rect)
 
   const draggable = useDraggableSurface2(ref);
@@ -84,9 +90,8 @@ const ResizeHandle: act.Component<ResizeRectHandleProps> = ({
     const { current: element } = ref;
     if (!element)
       return;
-    let initialRect = mutableRect.current;
     const sub = draggable.onDragStart.subscribe((drag) => {
-      initialRect = mutableRect.current;
+      const initialRect = mutableRect.current;
 
       drag.changes.subscribe(e => {
         switch (e.type) {
@@ -108,7 +113,7 @@ const ResizeHandle: act.Component<ResizeRectHandleProps> = ({
               x: initialRect.position.x + positionChange.x,
               y: initialRect.position.y + positionChange.y,
             }
-            onResize({ ...initialRect, size, position })
+            mutableOnResize.current({ ...initialRect, size, position })
             return;
           }
         }

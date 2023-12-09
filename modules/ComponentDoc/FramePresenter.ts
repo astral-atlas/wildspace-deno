@@ -71,7 +71,6 @@ export const FramePresenter: Component<FramePresenterProps> = ({
                 resize: "both",
                 overflow: "hidden",
                 padding,
-
               },
             },
             children

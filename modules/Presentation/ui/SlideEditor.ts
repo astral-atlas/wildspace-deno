@@ -1,4 +1,5 @@
 import { act, formula, m, artifact, journal } from "../deps.ts";
+import { jengaSlideContentDef } from "../jenga.ts";
 import {
   SlideContent,
   SlideAsset,
@@ -7,6 +8,7 @@ import {
   imageSlideAssetDef,
   noneSlideAssetDef,
 } from "../slide.ts";
+import { JengaSlideRenderer } from "./JengaSlide.ts";
 import { style } from './styles.ts';
 
 const { h } = act;
@@ -38,6 +40,10 @@ export const ContentEditor: act.Component<ContentEditorProps> = ({
             onInput: title => onContentChange({ ...content, title })
           }),
         ]);
+      case 'jenga':
+        return h(JengaSlideRenderer, { editable: true, content, onEdit(updatedContent) {
+          onContentChange(updatedContent)
+        }, ...props, });
     }
     return "unimplemeted";
   };
@@ -125,13 +131,15 @@ export const ContentTypeEditor: act.Component<ContentEditorProps> = ({
 }) => {
   return h(formula.SelectInput, {
     value: content.type,
-    options: ["title", "classic"],
+    options: ["title", "classic", "jenga"],
     onInput(value) {
       switch (value) {
         case "title":
           return onContentChange(m.createDefaultValue(titleSlideContendDef));
         case "classic":
           return onContentChange(m.createDefaultValue(classicSlideContendDef));
+        case "jenga":
+          return onContentChange(m.createDefaultValue(jengaSlideContentDef));
       }
     },
   });

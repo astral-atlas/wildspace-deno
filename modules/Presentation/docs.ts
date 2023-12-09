@@ -5,7 +5,7 @@ import {
   markdownToSheet,
 } from "../ComponentDoc/mod.ts";
 import { SystemComponentsPreview } from "../Data/DataDoc/mod.ts";
-import { createBackend } from "./backend.ts";
+import { createBackend } from "../Universe/mod.ts";
 import {
   act, actCommon, artifact,
   m, network, simpleSystem,
@@ -18,16 +18,17 @@ import { Slide, slideDef } from "./slide.ts";
 import { slideSystemDef } from "./system.ts";
 import { SlideRenderer } from "./ui/SlideRenderer.ts";
 import { ContentEditor } from "./mod.ts";
+import { JengaSlideContent, jengaSlideContentDef } from "./jenga.ts";
 
 const { h, useState, createContext, useContext, useEffect } = act;
 const { useSelector, isArrayEqual } = actCommon;
 
 const { useDocContext, Provider } = createDocContext(async () => {
   const world = simpleSystem.createMemoryWorld();
-  const assets = artifact.createBackend(world);
   const backend = createBackend(world);
+  const { presentation } = backend;
 
-  const artifactService = assets.createService('SAMPLE_USR')
+  const artifactService = backend.artifact.createService("my_user")
 
   const dotsAsset = await artifactService.uploadAsset(
     "example-game",
@@ -42,7 +43,7 @@ const { useDocContext, Provider } = createDocContext(async () => {
     await (await fetch(streetURL)).blob()
   );
 
-  await backend.slide.service.create({
+  await presentation.slide.service.create({
     gameId: "example-game",
     name: "Cool Slide",
     content: {
@@ -59,7 +60,7 @@ const { useDocContext, Provider } = createDocContext(async () => {
     artifact: artifactService,
   }
 
-  return { world, backend, assets, gameController };
+  return { world, backend, gameController };
 });
 
 const PresentationSystemDemo = () => {
@@ -94,7 +95,7 @@ const PresentationSystemDemo = () => {
       systemDef: slideSystemDef,
       world,
       components:
-        backend.slide as unknown as simpleSystem.Components<simpleSystem.SimpleSystemType>,
+        backend.presentation.slide as unknown as simpleSystem.Components<simpleSystem.SimpleSystemType>,
     }),
   ]);
 };
@@ -122,6 +123,7 @@ const SlideDemo = () => {
           slide,
           assets: gameController.artifact,
           gameId: gameController.gameId,
+          gameController,
         }),
       ]);
     }),
@@ -132,7 +134,10 @@ const SlideDemo = () => {
 
 const EditableSlideDemo = () => {
   const { gameController } = useDocContext();
-  const [slide, setSlide] = useState(m.createDefaultValue<Slide>(slideDef));
+  const [slide, setSlide] = useState<Slide>({
+    ...m.createDefaultValue<Slide>(slideDef),
+    content: m.createDefaultValue<JengaSlideContent>(jengaSlideContentDef)
+  });
 
   return [
     h(FramePresenter, {}, [
@@ -140,6 +145,7 @@ const EditableSlideDemo = () => {
         slide,
         gameId: gameController.gameId,
         assets: gameController.artifact,
+        gameController,
       }),
     ]),
     h('h3', {}, 'Editor'),
