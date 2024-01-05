@@ -1,4 +1,4 @@
-import { channel, rxjs, sesame, m, journal } from "./deps.ts";
+import { sesame, journal } from "./deps.ts";
 import {
   createAuthenticatedChannel,
   createAuthenticatedChannelDef,

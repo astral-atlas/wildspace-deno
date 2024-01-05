@@ -2,6 +2,10 @@
 
 Component Library for Layouts.
 
+## Tree Layout
+
+::treeLayout
+
 ## Center Layout
 
 Put some content in the middle (and some in the background).

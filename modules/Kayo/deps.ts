@@ -1,1 +1,3 @@
-export * as act from "https://esm.sh/@lukekaalim/act@2.6.0";
+export * as desk from '../Deskplane/mod.ts';
+export { curve } from '../ActCommon/mod.ts';
+export { act } from '../AtlasRenderer/mod.ts';

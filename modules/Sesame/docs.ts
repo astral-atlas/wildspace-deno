@@ -19,6 +19,7 @@ import {
 } from "../Data/DataDoc/mod.ts";
 import { userSystemDef } from "./systems.ts";
 import { universeDocContext } from "../Universe/docs.ts";
+import { WildspaceFeatureDoc } from "../WildspaceDocCommon/mod.ts";
 
 const { h, useState } = act;
 const { useAsync } = actCommon;
@@ -183,8 +184,13 @@ const Demo: act.Component = () => {
   ];
 };
 
+const FeatureDoc = () => {
+  return h(WildspaceFeatureDoc, { name: 'Sesame', path: 'modules/Sesame/mod.ts' })
+}
+
 const components = {
   Demo,
+  FeatureDoc,
 };
 
 export const sesameDocs: DocSheet[] = [

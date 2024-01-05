@@ -1,6 +1,8 @@
 import {
   network, simpleSystem,
-  artifact
+  artifact,
+  stage,
+  carpentry
 } from "./deps.ts";
 import {
   GameSystem, InvitationSystem,
@@ -12,7 +14,9 @@ import { GameID } from './models.ts';
 export type GameController = {
   gameId: GameID,
 
-  artifact: artifact.Service
+  artifact: artifact.Service,
+  stage: stage.StageService,
+  carpentry: carpentry.CarpentryService,
 };
 
 export const createGameController = (): GameController => {

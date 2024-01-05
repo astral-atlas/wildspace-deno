@@ -8,3 +8,6 @@ export { act } from '../AtlasRenderer/mod.ts';
 
 export * as sesameModels from '../SesameModels/mod.ts';
 export * as artifact from '../Artifact/mod.ts';
+export * as stage from '../Stage/mod.ts';
+export * as presentation from '../Presentation/mod.ts';
+export * as carpentry from '../Carpentry/mod.ts';

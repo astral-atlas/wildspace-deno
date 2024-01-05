@@ -3,3 +3,4 @@ export * from './useSelector.ts';
 export * from './useAsync.ts';
 export * from './useDisposable.ts';
 export * from './isArrayEqual.ts';
+export { curve } from './deps.ts';

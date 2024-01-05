@@ -42,7 +42,7 @@ const createDOMStyles = (block: JengaBlock, screenSizeRect: desk.Rect, imageURL?
     overflow: 'auto',
 
     border: `1px solid ${block.styles.borderColor}`,
-    borderRadius: `${block.styles.borderRadius}px`
+    borderRadius: `${block.styles.borderRadius}%`
   };
 };
 

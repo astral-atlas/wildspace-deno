@@ -1,9 +1,8 @@
-import { act, actCommon, desk, journal, kayo } from "../deps.ts";
-import { JengaBlock, JengaRect, JengaSlideContent } from "../jenga.ts";
+import { act, desk, journal } from "../deps.ts";
+import { JengaBlock, JengaSlideContent } from "../jenga.ts";
 import { JengaBlockRenderer } from "./jenga/block.ts";
 import { EditableJengaBlockRenderer } from "./jenga/editing.ts";
 import { JengaEditorPanel } from "./jenga/panel.ts";
-import { jengaToScreenSpace, screenToJengaSpace } from "./jenga/screenSpace.ts";
 import { JengaToolbar } from "./jenga/toolbar.ts";
 const { h, useEffect, useRef, useState } = act;
 
@@ -45,7 +44,7 @@ export const JengaSlideRenderer: act.Component<JengaSlideRendererProps> = ({
       mo.disconnect();
     }
   }, []);
-  
+
   const onSelectedBlockEdit = (nextBlock: JengaBlock) => {
     onEdit({
       ...content,

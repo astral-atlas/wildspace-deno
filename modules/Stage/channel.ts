@@ -3,7 +3,7 @@ import { Backend } from "./backend.ts";
 import { SceneNodeID } from './scene.ts';
 import { SceneNodeSystem, sceneNodeSystemDef } from './systems.ts';
 
-const updateDef = simpleSystem.createUpdateChannelDefinition<
+export const updateDef = simpleSystem.createUpdateChannelDefinition<
   SceneNodeSystem
 >(sceneNodeSystemDef);
 
@@ -11,7 +11,7 @@ export const stageChannelDef = {
   incoming: updateDef.incoming,
   outgoing: m.literal(null),
 } as const;
-type StageChannelType = channel.OfChannelType<
+export type StageChannelType = channel.OfChannelType<
   typeof stageChannelDef
 >;
 
