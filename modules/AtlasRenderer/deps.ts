@@ -3,3 +3,4 @@ export * as three from 'https://esm.sh/three@0.155.0';
 
 export * as actThree from 'https://esm.sh/@lukekaalim/act-three@5.15.0';
 export * as act from "https://esm.sh/@lukekaalim/act@2.6.0";
+export * as curve from "https://esm.sh/@lukekaalim/act-curve@3.2.0";

@@ -7,6 +7,7 @@ export type Backend = {
   stage: deps.stage.Backend,
   presentation: deps.presentation.PresentationBackend,
   carpentry: deps.carpentry.Backend,
+  clerk: deps.clerk.Backend,
   //dryErase: deps.dryErase.,
 }
 
@@ -16,6 +17,7 @@ export const createBackend = (world: deps.simpleSystem.World): Backend => {
   const stage = deps.stage.createBackend(world);
   const presentation = deps.presentation.createBackend(world);
   const artifact = deps.artifact.createBackend(world);
+  const clerk = deps.clerk.createBackend(world);
 
   const carpentry = deps.carpentry.createBackend(world, stage);
 
@@ -25,6 +27,7 @@ export const createBackend = (world: deps.simpleSystem.World): Backend => {
     journal,
     stage,
     presentation,
-    carpentry
+    carpentry,
+    clerk,
   }
 }

@@ -1,12 +1,12 @@
 import { data, nanoid } from "./deps.ts";
 import {
   fileSystemDef, FileSystem,
-  directorySystemDef, DirectorySystem
+  gameRootsSystemDef, GameRootsSystem
 } from './system.ts';
 
 export type Backend = {
   files: data.simpleSystem.Components<FileSystem>,
-  directories: data.simpleSystem.Components<DirectorySystem>,
+  roots: data.simpleSystem.Components<GameRootsSystem>,
 };
 
 export const createBackend = (
@@ -21,7 +21,8 @@ export const createBackend = (
       }),
       update: (previous, input) => ({
         ...previous,
-        ...input,
+        name: input.name || previous.name,
+        content: input.content || previous.content,
       }),
       create: (input) => ({
         ...input,
@@ -29,25 +30,23 @@ export const createBackend = (
       }),
     },
   });
-  const directories = data.simpleSystem.createComponents<DirectorySystem>(world, {
-    definition: directorySystemDef,
+  const roots = data.simpleSystem.createComponents<GameRootsSystem>(world, {
+    definition: gameRootsSystemDef,
     service: {
-      calculateKey: (item) => ({
-        part: item.gameId,
-        sort: item.id
-      }),
-      update: (previous, input) => ({
-        ...previous,
-        ...input,
-      }),
-      create: (input) => ({
-        ...input,
-        id: nanoid(),
-      }),
-    },
+      calculateKey(input) {
+        return { part: input.gameId, sort: input.userId };
+      },
+      create(input) {
+        return input;
+      },
+      update(input) {
+        throw new Error();
+      },
+    }
   });
+  
   return {
     files,
-    directories,
+    roots,
   }
 }

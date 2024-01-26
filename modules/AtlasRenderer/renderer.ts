@@ -40,11 +40,11 @@ export const render = (element: Element, node: HTMLElement) => {
 export const renderCool = (element: Element, node: HTMLElement) => {
   const webToThree = createNullRenderer2<three.Object3D, Node>(
     () => object,
-    ["three"]
+    ["three", 'null']
   ) as Renderer2<Node>;
   const threeToWeb = createNullRenderer2<Node, three.Object3D>(
     () => web,
-    ["web"]
+    ["web", 'null']
   ) as Renderer2<three.Object3D>;
 
   const object = actThree.createObjectRenderer(
@@ -62,6 +62,8 @@ export const renderCool = (element: Element, node: HTMLElement) => {
       case actThree.scene:
       case "three":
         return webToThree;
+      case 'null':
+        return threeToWeb;
       default:
         return null;
     }

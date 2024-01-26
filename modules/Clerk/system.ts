@@ -1,5 +1,5 @@
 import { data, m } from "./deps.ts";
-import { directoryItemDef, fileItemDef, gameItemRef } from "./models.ts";
+import { fileItemDef, fileContentDef } from "./models.ts";
 
 export const fileSystemDef = {
   key: 'clerk/files',
@@ -7,11 +7,13 @@ export const fileSystemDef = {
     resource: fileItemDef,
     create: m.object({
       gameId: m.string,
-      content: gameItemRef,
-      parentDirectoryId: m.string,
+      content: fileContentDef,
+      parentId: m.nullable(m.string),
+      name: m.string,
     }),
     update: m.object({
-      parentDirectoryId: m.string,
+      name: m.nullable(m.string),
+      content: m.nullable(fileContentDef),
     }),
   },
   names: {
@@ -25,27 +27,28 @@ export type FileSystem = data.simpleSystem.TypeOfSimpleSystem<
   typeof fileSystemDef
 >;
 
-export const directorySystemDef = {
-  key: 'clerk/directories',
+export const gameRootsSystemDef = {
+  key: 'clerk/roots',
   models: {
-    resource: directoryItemDef,
+    resource: m.object({
+      gameId: m.string,
+      userId: m.string,
+      fileId: m.string,
+    }),
     create: m.object({
       gameId: m.string,
-      name: m.string,
-      parentDirectoryId: m.string,
+      userId: m.string,
+      fileId: m.string,
     }),
-    update: m.object({
-      name: m.string,
-      parentDirectoryId: m.string,
-    }),
+    update: m.literal(null),
   },
   names: {
     partition: 'gameId',
-    sort: 'directoryId',
-    resource: 'directoryItem',
+    sort: 'userId',
+    resource: 'root',
   }
 } as const;
 
-export type DirectorySystem = data.simpleSystem.TypeOfSimpleSystem<
-  typeof directorySystemDef
+export type GameRootsSystem = data.simpleSystem.TypeOfSimpleSystem<
+  typeof gameRootsSystemDef
 >;

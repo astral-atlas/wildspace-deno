@@ -7,7 +7,7 @@
   },
   "imports": {
     "vite-css": "./lib/vite-css.d.ts",
-    "vite-text": "./lib/vite-text.d.ts"
+    "vite-text": "./lib/vite-text.d.ts",
   },
   "compilerOptions": {
     "types": ["vite/client"],

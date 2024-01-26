@@ -1,5 +1,4 @@
 import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { render } from "../modules/AtlasRenderer/mod.ts";
 
 import { DocSite } from "../modules/ComponentDoc/DocSite.ts";
 import { frameSchedulerDocs } from "../modules/FrameScheduler/docs.ts";
@@ -22,7 +21,6 @@ import { kayoDocs } from "../modules/Kayo/docs.ts";
 import { renderCool } from "../modules/AtlasRenderer/renderer.ts";
 import { dataDocs } from "../modules/Data/docs.ts";
 import { doorJourneyDocs } from "../modules/DoorJourney/docs.ts";
-import { serviceCommonDocs } from "../modules/Data/ServiceCommon/docs.ts";
 import { dryEraseDocs } from "../modules/DryErase/docs.ts";
 import { artifactDocs } from "../modules/Artifact/docs.ts";
 import { journalDocs } from "../modules/Journal/docs.ts";
@@ -31,6 +29,7 @@ import { sesameDocs } from "../modules/Sesame/docs.ts";
 import { modelDocs } from "../modules/Models/docs.ts";
 import { carpentryDocs } from "../modules/Carpentry/docs.ts";
 import { universeDocContext } from "../modules/Universe/docs.ts";
+import { clerkDocs } from "../modules/Clerk/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
@@ -42,6 +41,7 @@ export const sheets = [
   deskplaneDocs,
   keyboardDocs,
   bigTableDocs,
+  clerkDocs,
   threeCommonDocDocs,
   effectsCommonDocs,
   sesameDataServiceDocs,

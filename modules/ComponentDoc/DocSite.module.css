@@ -32,6 +32,7 @@
   border: 1px solid black;
   border-bottom: none;
   color: black;
+  white-space: nowrap;
 }
 .sheetList a.selected {
   background-color: black;

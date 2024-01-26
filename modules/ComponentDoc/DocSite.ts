@@ -1,31 +1,29 @@
-import {
-  h,
-  Component,
-  useEffect,
-  useRef,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
-
-import {
-  useRootNavigation,
-  navigationContext,
-  Navigation,
-} from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
-
 import { DocSheet } from "./DocElement.ts";
 import { DocPage } from "./DocPage.ts";
+import { act, actNavigation } from "./deps.ts";
 // @deno-types="vite-css"
 import docSiteStyles from "./DocSite.module.css";
+
+const {
+  h,
+  useEffect,
+  useRef,
+} = act;
+const {
+  useRootNavigation,
+  navigationContext,
+} = actNavigation
 
 export type DocSiteProps = {
   sheets: DocSheet[];
   initialSheet: string;
   baseURL?: string,
 
-  overrideNavigation?: Navigation;
+  overrideNavigation?: actNavigation.Navigation;
   disableInterceptAnchors?: boolean
 };
 
-export const DocSite: Component<DocSiteProps> = ({
+export const DocSite: act.Component<DocSiteProps> = ({
   baseURL,
   sheets,
   initialSheet,

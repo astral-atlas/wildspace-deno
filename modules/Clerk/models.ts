@@ -1,37 +1,23 @@
 import { m } from "./deps.ts";
 
-export const gameItemRef = m.union2([
+export const fileContentDef = m.union2([
   m.object({
     type: m.literal('asset'),
-    assetId: m.string,
+    assetId: m.nullable(m.string),
+  }),
+  m.object({
+    type: m.literal('directory'),
+    children: m.array(m.string),
   }),
 ] as const);
-export type GameItemRef = m.OfModelType<typeof gameItemRef>;
+export type FileContent = m.OfModelType<typeof fileContentDef>;
 
 export const fileItemDef = m.object({
   gameId: m.string,
   id: m.string,
-  content: gameItemRef,
+  parentId: m.nullable(m.string),
+  name: m.string,
+  content: fileContentDef,
 });
 export type FileItem = m.OfModelType<typeof fileItemDef>;
-
-export const itemRef = m.union2([
-  m.object({
-    type: m.literal('file'),
-    fileId: m.string,
-  }),
-  m.object({
-    type: m.literal('directory'),
-    directoryId: m.string,
-  }),
-] as const);
-
-export const directoryItemDef = m.object({
-  gameId: m.string,
-  id: m.string,
-
-  name: m.string,
-  children: m.array(itemRef),
-});
-export type DirectoryItem = m.OfModelType<typeof directoryItemDef>;
-
+export type FileItemID = string;

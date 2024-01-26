@@ -11,6 +11,10 @@ export type OverlayManager = {
 
 export const overlayRootContext = act.createContext<Element | null>(null);
 
+export const useOverlayRoot = () => {
+  return useContext(overlayRootContext) as Element;
+}
+
 export const useOverlayedElement = (ref: act.Ref<Element | null>) => {
   const root = useContext(overlayRootContext);
 
@@ -36,9 +40,15 @@ export const OverlayRoot: act.Component = ({ children }) => {
       setRoot(null);
     }
   }, [])
+  
+  useEffect(() => {
+    console.log('Mounted')
+    return () => console.log('Unmounted')
+  }, [])
 
-  return h('div', { ref, class: styles.overlay }, [
-    h(overlayRootContext.Provider, { value: root }, children)
+  return h('div', { class: styles.overlay }, [
+    h(overlayRootContext.Provider, { value: root }, children),
+    h('div', { ref, style: { position: 'absolute', top: '0px', left: '0px' }, ignoreChildren: true }),
   ]);
 };
 
