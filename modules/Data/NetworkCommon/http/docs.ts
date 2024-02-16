@@ -110,5 +110,5 @@ const demos = {
 };
 
 export const networkCommonHttpDocs: DocSheet[] = [
-  markdownToSheet("NetworkCommon/http", readme, demos),
+  markdownToSheet("HTTPCommon", readme, demos, null, 'NetworkCommon'),
 ];

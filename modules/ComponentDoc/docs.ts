@@ -3,8 +3,9 @@ import { DocSheet } from "./DocElement.ts";
 import { markdownToDoc, markdownToSheet } from "./markdown.ts";
 // @deno-types="vite-text" 
 import readme from './readme.md?raw';
-import { DocSite } from "./DocSite.ts";
+import { DocSite, DocSite2 } from "./mod.ts";
 import { FramePresenter } from "./FramePresenter.ts";
+import { quickSheet } from "./markdown.ts";
 
 const DocSiteDemo = () => {
   const embeddedComponents = {
@@ -36,8 +37,42 @@ const DocSiteDemo = () => {
   ];
 }
 
+const useFakeNavigation = (initialLocation = new URL('https://example.com')) => {
+  const [location, setLocation] = useState(new URL(initialLocation))
+  const navigate = (location: URL) => {
+    setLocation(location)
+  };
+
+  return { navigate, location };
+}
+
+const DocSite2Demo = () => {
+  const navigation = useFakeNavigation();
+  const sheets = [
+    quickSheet('Home', '# Doc Home\nHome Stuff!\n\n## A Sub Heading'),
+    quickSheet('First Child', '# Cain', 'Home'),
+    quickSheet('Second Child', '# Able', 'Home'),
+    quickSheet('Deep', '# Deep', 'Second Child'),
+    quickSheet('Child', '# Child', 'Second Child'),
+    quickSheet('Second Home', '# Home away from Home'),
+    quickSheet('Unselectable Path', '# Mystery', 'No Home'),
+  ];
+
+  const sidebarHero = [
+    h('h3', {}, '😎 Cool Demo App')
+  ]
+
+  return [
+    h('div', {}, h('pre', {}, navigation.location.href)),
+    h(FramePresenter, {}, [
+      h(DocSite2, { navigation, basePath: '/', sheets, sidebarHero })
+    ])
+  ];
+}
+
 const demos = {
-  'docsite': DocSiteDemo
+  'docsite': DocSiteDemo,
+  DocSite2Demo,
 }
 
 export const componentDocDocs: DocSheet[] = [

@@ -1,6 +1,6 @@
 import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
 
-import { DocSite } from "../modules/ComponentDoc/DocSite.ts";
+import { DocSite2 } from "../modules/ComponentDoc/mod.ts";
 import { frameSchedulerDocs } from "../modules/FrameScheduler/docs.ts";
 import { componentDocDocs } from "../modules/ComponentDoc/docs.ts";
 import { boxParticleDocs } from "../modules/BoxParticle/docs.ts";
@@ -30,9 +30,14 @@ import { modelDocs } from "../modules/Models/docs.ts";
 import { carpentryDocs } from "../modules/Carpentry/docs.ts";
 import { universeDocContext } from "../modules/Universe/docs.ts";
 import { clerkDocs } from "../modules/Clerk/docs.ts";
+import { useRootNavigation } from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
+import { pancakeDocs } from "../modules/Pancake/docs.ts";
+import { universeDocs } from "../modules/Universe/docs.ts";
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
+  pancakeDocs,
+  universeDocs,
   sesameDocs,
   modelDocs,
   frameSchedulerDocs,
@@ -59,8 +64,14 @@ export const sheets = [
 ].flat(1);
 
 export const DocsApp: Component = () => {
-  return h(universeDocContext.Provider, {}, h(DocSite, {
-    sheets, initialSheet: sheets[0].id,
+  const navigation = useRootNavigation()
+  return h(universeDocContext.Provider, {}, h(DocSite2, {
+    sheets, navigation, basePath: '/',
+    sidebarHero: h('div', {}, [
+      h('h1', {}, 'Wildspace'),
+      h('div', {}, 'A Game by Luke Kaalim'),
+      h('hr'),
+    ])
   }));
 };
 

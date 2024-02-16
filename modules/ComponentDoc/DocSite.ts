@@ -62,6 +62,7 @@ export const DocSite: act.Component<DocSiteProps> = ({
       behavior: "smooth",
     });
   }, [hash, pathname]);
+
   useEffect(() => {
     const { current: site } = ref;
     if (!site) return;

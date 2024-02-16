@@ -29,6 +29,7 @@ export const FramePresenter: Component<FramePresenterProps> = ({
 }) => {
   const ref = useRef<null | HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
+
   useEffect(() => {
     const onFullscreenChange = () => {
       setFullscreen(!!document.fullscreenElement);
@@ -39,6 +40,8 @@ export const FramePresenter: Component<FramePresenterProps> = ({
       document.removeEventListener('fullscreenchange', onFullscreenChange);
     }
   }, [])
+
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   return h("div",
     {
@@ -61,6 +64,7 @@ export const FramePresenter: Component<FramePresenterProps> = ({
         [
           h("div", {
               class: styles.framePresenterContent,
+              ref: contentRef,
               style: {
                 position: "relative",
                 width: '100%',

@@ -6,3 +6,4 @@ export * from './FramePresenter.ts';
 export * from './markdown.ts';
 export * from './Blocks.ts';
 export * from './DocContext.ts';
+export * from './DocSite2.ts';

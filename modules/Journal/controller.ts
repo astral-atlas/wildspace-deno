@@ -4,11 +4,6 @@ import {
   stage,
   carpentry
 } from "./deps.ts";
-import {
-  GameSystem, InvitationSystem,
-  gameSystemDef, invitationSystemDef,
-  gameRESTDef, invitationRESTDef,
-} from "./system.ts";
 import { GameID } from './models.ts';
 
 export type GameController = {

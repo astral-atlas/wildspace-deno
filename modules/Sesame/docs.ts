@@ -194,5 +194,5 @@ const components = {
 };
 
 export const sesameDocs: DocSheet[] = [
-  markdownToSheet("Sesame", readme, components, Provider),
+  markdownToSheet("Sesame", readme, components, Provider, 'Universe'),
 ];

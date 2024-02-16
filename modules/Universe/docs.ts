@@ -1,4 +1,4 @@
-import { createDocContext } from "../ComponentDoc/mod.ts";
+import { DocSheet, createDocContext, urlSheet } from "../ComponentDoc/mod.ts";
 import { network, simpleSystem } from "./deps.ts";
 import { createBackend } from "./mod.ts";
 
@@ -35,3 +35,7 @@ export const universeDocContext = createDocContext(async () => {
     demo,
   };
 });
+
+export const universeDocs: DocSheet[] = [
+  urlSheet('Universe', new URL('./readme.md', import.meta.url))
+]

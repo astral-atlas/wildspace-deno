@@ -86,5 +86,5 @@ const demos: ComponentMap<MarkdownDirectiveComponentProps> = {
 };
 
 export const sesameDataServiceDocs: DocSheet[] = [
-  markdownToSheet("SesameDataService", readme, demos, DemoContextProvider),
+  markdownToSheet("SesameDataService", readme, demos, DemoContextProvider, 'Sesame'),
 ];

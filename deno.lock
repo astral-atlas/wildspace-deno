@@ -503,6 +503,7 @@
   "redirects": {
     "http://esm.sh/nanoid": "https://esm.sh/nanoid@4.0.2",
     "https://deno.land/x/dns_sd/mod.ts": "https://deno.land/x/dns_sd@2.0.0/mod.ts",
+    "https://deno.land/x/vite_plugin_deno_resolve/mod.ts": "https://deno.land/x/vite_plugin_deno_resolve@0.5.0/mod.ts",
     "https://esm.sh/@lukekaalim/act-curve": "https://esm.sh/@lukekaalim/act-curve@3.2.0",
     "https://esm.sh/base64-arraybuffer": "https://esm.sh/base64-arraybuffer@1.0.2",
     "https://esm.sh/color": "https://esm.sh/color@4.2.3",

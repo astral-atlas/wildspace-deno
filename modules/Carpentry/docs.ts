@@ -74,5 +74,5 @@ const components = {
 };
 
 export const carpentryDocs: DocSheet[] = [
-  markdownToSheet("Carpentry", readme, components, Provider),
+  markdownToSheet("Carpentry", readme, components, Provider, 'Universe'),
 ];

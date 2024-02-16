@@ -12,3 +12,7 @@ other services (like [artifact](./artifact))
 use a GameID as their "root collection".
 
 ::demo
+
+## Screen
+
+::screen

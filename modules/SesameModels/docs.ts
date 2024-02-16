@@ -30,5 +30,5 @@ export const sesameModelsDocs = [
         return act.h('div', {}, "Error: Can't find type");
       return act.h(ModelVisualizer, { model })
     }
-  })
+  }, null, 'Sesame')
 ]

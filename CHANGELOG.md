@@ -1,5 +1,23 @@
 # Changelog
 
+#### 5 Feburary, 2024
+
+Happy new year! Very belated. I've been working, just not committing.
+
+Out of shame.
+
+Who even knows what changed, but here is some bits:
+
+  - Journal System upgrades
+  - Universe
+  - DocSite2
+    - Now with child articles!
+  - [Clerk](./Clerk)
+
+Work in progress:
+  - End-to-End experience
+  - Finishing Clerk editors (scribe?)
+
 #### 7 November, 2023
 - Added touch support for DraggableSurface2
   - Should mean phone + tablet touch events

@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@300;400;700&display=swap');
+
+.root {
+  font-family: 'Roboto', sans-serif;
+
+  display: flex;
+  flex-direction: column;
+
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.pageContainter {
+  height: 100%;
+  
+  overflow-y: scroll;
+  flex: 1;
+  padding-right: 40px;
+  padding-left: 40px;
+}
+
+.page {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 64px;
+  padding-bottom: 64px;
+}
+
+.page blockquote {
+  background-color: #ffe4d0;
+  margin: 0;
+  padding: 8px 8px 8px 32px;
+  border-radius: 8px;
+}
