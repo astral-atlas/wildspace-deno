@@ -40,3 +40,13 @@
   padding: 8px 8px 8px 32px;
   border-radius: 8px;
 }
+
+.page h1, .page h2, .page h3, .page h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.page > article > img, .page > article > p > img {
+  box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.434);
+  border-radius: 4px;
+}

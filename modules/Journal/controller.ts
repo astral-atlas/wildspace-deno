@@ -1,3 +1,4 @@
+import { sesameModels } from "./deps.ts";
 import {
   network, simpleSystem,
   artifact,
@@ -8,6 +9,7 @@ import { GameID } from './models.ts';
 
 export type GameController = {
   gameId: GameID,
+  userId: sesameModels.SesameUserID,
 
   artifact: artifact.Service,
   stage: stage.StageService,

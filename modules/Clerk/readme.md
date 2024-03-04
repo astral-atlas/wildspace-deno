@@ -32,6 +32,22 @@ using Kayo's Instinct Tree component.
 
 ::fileBrowserDemo
 
+## Wizard
+
+A **Wizard** is a file content editing interface, which typically
+interacts with many systems provided by [Universe]().
+
+### AssetWizard
+
+::AssetWizardDemo
+
+
+## Sanctum
+
+Combing the FileBrowser with the Wizard provides us the **Sanctum** component:
+
+::SanctumDemo
+
 ## Services
 
 There are two direct backends that Clerk interacts with, but typically

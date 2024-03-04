@@ -7,93 +7,37 @@ import readme from "./readme.md?raw";
 import { FileBrowser, FileBrowserEvent } from "./ui/mod.ts";
 import { fileSystemDef, gameRootsSystemDef } from './system.ts';
 import { OverlayRoot } from "../Kayo/mod.ts";
+import * as ui from './ui/mod.ts';
+import { journal } from "./deps.ts";
+import { FileItemID, FileItemT } from "./models.ts";
+import { useFileSystem } from "./ui/mod.ts";
+import { FileContent } from "./models.ts";
 
 const { h, useState } = act;
+const { useAsync } = actCommon;
 
 const fileBrowserDemo = () => {
   const universe = universeDocContext.useDocContext();
   const { demo: { game, user }, backend: { clerk } } = universe;
 
-  const [now, setNow] = useState(Date.now())
+  const sys = useFileSystem(universe.backend, { gameId: game.id, userId: user.id } as any);
 
-  const files = actCommon.useAsync(() =>
-    universe.backend.clerk.files.service.list({
-      gameId: game.id
-    }),
-    [now]
-  );
-  const userRoot = actCommon.useAsync(() =>
-    universe.backend.clerk.roots.service.read({
-      gameId: game.id,
-      userId: user.id,
-    }),
-    [now]
-  );
-
-  if (!files)
-    return null;
-  
-  const rootFile = userRoot && userRoot.fileId;
-  const onEvent = async (event: FileBrowserEvent) => {
+  const onEvent = (event: FileBrowserEvent) => {
+    if (!sys)
+      return;
     switch (event.type) {
-      case 'rename': {
-        return universe.backend.clerk.files.service.update({
-          gameId: universe.demo.game.id,
-          fileId: event.id,
-        }, {
-          content: null,
-          name: event.newName,
-        }).then(() => setNow(Date.now()))
-      }
-      case 'delete': {
-        const file = files.find(f => f.id === event.id);
-        if (!file)
-          return;
-        const parent = files.find(f => f.id === file.parentId);
-        if (!parent || parent.content.type !== 'directory')
-          return;
-        await clerk.files.service.update({
-          gameId: universe.demo.game.id,
-          fileId: parent.id,
-        }, {
-          content: {
-            ...parent.content,
-            children: parent.content.children.filter(c => c !== file.id)
-          },
-          name: null,
-        });
-        await clerk.files.service.delete({
-          gameId: universe.demo.game.id,
-          fileId: file.id,
-        });
-        return setNow(Date.now());
-      }
-      case 'create': {
-        const folder = files.find(f => f.id === event.parentId);
-        if (!folder || folder.content.type !== 'directory')
-          return null;
-        const content = folder.content;
-
-        const newFile = await clerk.files.service.create({
-          gameId: game.id,
-          name: event.name,
-          parentId: folder.id,
-          content: event.content,
-        });
-        await clerk.files.service.update({
-          gameId: game.id,
-          fileId: event.parentId,
-        }, {
-          content: { type: 'directory', children: [...content.children, newFile.id] },
-          name: null,
-        })
-        return setNow(Date.now())
-      }
+      case 'rename':
+        return sys.actions.rename(event.id, event.newName);
+      case 'delete': 
+        return sys.actions.remove(event.id)
+      case 'create':
+        return sys.actions.create(event.parentId, event.name, event.content);
     }
   };
+  const selection = actCommon.useSelection<FileItemID>();
 
   return [
-    !userRoot && h('button', { async onClick() {
+    !sys.userRoot && h('button', { async onClick() {
       const file = await clerk.files.service.create({
         gameId: game.id,
         content: { type: 'directory', children: [] },
@@ -105,11 +49,13 @@ const fileBrowserDemo = () => {
         userId: user.id,
         fileId: file.id,
       });
-      setNow(Date.now());
+      sys.actions.refresh();
     } }, 'Create Roots'),
-    h(FramePresenter, {}, [
+    !!sys.userRoot && !!sys.files && h(FramePresenter, {}, [
       h(OverlayRoot, {}, [
-        rootFile && h(FileBrowser, { files, rootFile, onEvent }),
+        sys.userRoot.fileId && h(FileBrowser, {
+          files: sys.files, rootFile: sys.userRoot.fileId, onEvent, selection
+        }),
       ])
     ]),
   ];
@@ -136,7 +82,63 @@ const rootService = () => {
   });
 }
 
+const AssetWizardDemo = () => {
+  const universe = universeDocContext.useDocContext();
+  const [now, setNow] = useState(Date.now())
+
+  const file = useAsync(() => universe.backend.clerk.files.service.read({
+    gameId: universe.demo.game.id,
+    fileId: universe.demo.emptyAssetFile.id
+  }), [now])
+
+  if (!file)
+    return 'loading';
+
+  const content = file.content;
+
+  const gameC = {
+    gameId: universe.demo.game.id,
+    artifact: universe.backend.artifact.createService('my-service'),
+  }
+
+  if (content.type === 'directory')
+    return null;
+
+  const onFileContentUpdate = (content: FileContent) => {
+    universe.backend.clerk.files.service.update({
+      gameId: file.gameId,
+      fileId: file.id
+    }, { name: null, content })
+    setNow(Date.now());
+  }
+
+  return h(ui.AssetWizard, {
+    file: { ...file, content },
+    universe: universe.backend,
+    gameC,
+    onFileContentUpdate
+  });
+}
+
+const SanctumDemo = () => {
+  const universe = universeDocContext.useDocContext();
+
+  const gameC = {
+    gameId: universe.demo.game.id,
+    userId: universe.demo.user.id,
+    artifact: universe.backend.artifact.createService('my-service'),
+  } as any;
+
+  return h(FramePresenter, {}, [
+    h(OverlayRoot, {}, [
+      h(ui.Sanctum, { gameC, universe: universe.backend }),
+    ])
+  ])
+}
+
 const directives = {
+  SanctumDemo,
+  AssetWizardDemo,
   fileBrowserDemo,
   filesService,
   rootService,

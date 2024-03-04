@@ -32,12 +32,10 @@ export const useAnchorNavigation = (
         (node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement
       );
       const href = anchor && anchor.getAttribute('href')
-      console.log(href);
       if (!href)
         return;
 
       const anchorURL = new URL(href, navigation.location);
-      console.log(anchorURL);
       if (anchorURL.host !== host)
         return;
 
