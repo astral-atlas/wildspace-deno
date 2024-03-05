@@ -18,7 +18,10 @@ export const OmniWizard: act.Component<OmniWizardProps> = ({ file, onFileContent
 
   switch (file.content.type) {
     case 'asset':
-      return h(AssetWizard, { file: { ...file, content: file.content }, onFileContentUpdate, universe, gameC });
+      return h(AssetWizard, {
+        file: { ...file, content: file.content },
+        onFileContentUpdate, universe, gameC
+      });
     default:
       return 'No Wizard for this file type!';
   }

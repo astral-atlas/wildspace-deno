@@ -1,0 +1,12 @@
+.actionBar {
+  display: flex;
+  flex-direction: row;
+}
+
+.root {
+  border: 2px solid red;
+}
+
+.root:focus {
+  border: 4px solid blue;
+}

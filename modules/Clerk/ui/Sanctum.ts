@@ -46,7 +46,9 @@ export const Sanctum: act.Component<SanctumProps> = ({ gameC, universe }) => {
   }
 
   return h('div', { className: styles.sanctum }, [
-    h(FileBrowser, { files, rootFile: userRoot.fileId, selection, onEvent }),
+    h('div', { className: styles.browser }, [
+      h(FileBrowser, { files, rootFile: userRoot.fileId, selection, onEvent }),
+    ]),
     h('div', { className: styles.wizard }, [
       !!selectedFile && h(OmniWizard, { key: selectedFile.id, file: selectedFile, onFileContentUpdate, universe, gameC })
     ]),

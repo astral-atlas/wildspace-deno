@@ -510,6 +510,8 @@
     "https://esm.sh/v133/@types/lodash-es@~4.17/index.d.ts": "https://esm.sh/v133/@types/lodash-es@4.17.10/index.d.ts",
     "https://esm.sh/v133/@types/lodash@4.14.200/index": "https://esm.sh/v133/@types/lodash@4.14.200/index~.d.ts",
     "https://esm.sh/v135/@types/color@latest/index.d.ts": "https://esm.sh/v135/@types/color@3.0.6/index.d.ts",
+    "https://esm.sh/v135/@types/three@~0.155/examples/jsm/loaders/GLTFLoader~.d.ts": "https://esm.sh/v135/@types/three@0.155.1/examples/jsm/loaders/GLTFLoader~.d.ts",
+    "https://esm.sh/v135/@types/three@~0.155/examples/jsm/renderers/CSS2DRenderer~.d.ts": "https://esm.sh/v135/@types/three@0.155.1/examples/jsm/renderers/CSS2DRenderer~.d.ts",
     "https://esm.sh/v135/@types/three@~0.155/index.d.ts": "https://esm.sh/v135/@types/three@0.155.1/index.d.ts"
   },
   "remote": {

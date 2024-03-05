@@ -8,5 +8,13 @@
 }
 
 .wizard {
-  
+  flex: 1 1 100%;
+}
+
+.browser {
+  width: 300px;
+  flex: 1 0 300px;
+  border-right: 1px solid black;
+
+  overflow: auto;
 }

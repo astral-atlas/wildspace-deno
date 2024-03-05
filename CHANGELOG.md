@@ -1,5 +1,9 @@
 # Changelog
 
+#### 6th March, 2024
+
+  - Added GLTF Wizard
+
 #### 5th March, 2024
 
 I don't want to talk about it.

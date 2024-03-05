@@ -8,6 +8,7 @@ const { h } = act;
 export type SimpleCanvasProps = {
   className?: string,
   canvasProps?: { [prop: string]: unknown },
+  rootProps?: Record<string, unknown>,
   sceneProps?: actThree.SceneProps,
   overrides?: RenderSetupOverrides,
 
@@ -19,6 +20,7 @@ export const SimpleCanvas: act.Component<SimpleCanvasProps> = ({
   className = '',
   onResize,
   canvasProps = {},
+  rootProps = {},
   sceneProps = {},
   overrides = {}
 }) => {
@@ -29,7 +31,7 @@ export const SimpleCanvas: act.Component<SimpleCanvasProps> = ({
   }, [render])
 
   return [
-    h('div', { ref: render.rootRef, style: { position: 'absolute' } }),
+    h('div', { ...rootProps, ref: render.rootRef, style: { position: 'absolute' } }),
     h('canvas', {
       ...canvasProps,
       ref: render.canvasRef,

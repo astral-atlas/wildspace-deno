@@ -79,6 +79,8 @@ export const useDraggableSurface2 = (
           event.preventDefault();
           switch (event.type) {
             case 'pointerdown':
+              if (current instanceof HTMLElement)
+                current.focus();
               current.setPointerCapture(event.pointerId);
               activeDrag = surface.startDrag(
                 new three.Vector2(event.offsetX, event.offsetY)
@@ -105,6 +107,8 @@ export const useDraggableSurface2 = (
             const first = event.targetTouches.item(0);
             if (!first)
               return;
+            if (current instanceof HTMLElement)
+              current.focus();
             rect = current.getBoundingClientRect();
             const offset = new three.Vector2(first.clientX - rect.x, first.clientY - rect.y);
             activeDrag = surface.startDrag(offset);
