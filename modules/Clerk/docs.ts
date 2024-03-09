@@ -129,7 +129,7 @@ const SanctumDemo = () => {
     artifact: universe.backend.artifact.createService('my-service'),
   } as any;
 
-  return h(FramePresenter, {}, [
+  return h(FramePresenter, { negativeMargin: 256 }, [
     h(OverlayRoot, {}, [
       h(ui.Sanctum, { gameC, universe: universe.backend }),
     ])

@@ -1,6 +1,13 @@
 # Wizard
 
-Wizard is the systems and set of UI for Game Masters
-to control the backstage resources, items, and data
-for running a game.
+Wizard is a UI library that exposs tools used
+to read and update different kinds
+of resources inside Wildspace.
 
+## Assets
+
+[Asset Wizards](/Wizard/Asset%20Editors) are wizards specifically
+tooled to handle [assets](/Artifact).
+
+
+## Crystal Ball

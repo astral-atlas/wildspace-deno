@@ -1,0 +1,25 @@
+.crystalBall {
+  width: 300px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-left: 1px solid black;
+  background-color: rgb(213, 223, 230);
+  
+  padding: 4px;
+  height: 100%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.crystalBallPanel {
+  margin: 4px;
+  overflow: auto;
+
+  border-radius: 8px;
+  background: white;
+
+  height: 600px;
+}

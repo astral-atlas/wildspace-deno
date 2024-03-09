@@ -1,5 +1,22 @@
 # Changelog
 
+#### 10th March, 2024
+
+  - Move Wizards into their own module
+  - Add "global doc function" to ComponentDoc
+  - Add basic SceneTree to GTLF Wizard
+  - Rename wizards to:
+    - Model Wizard
+    - Image Wizard
+    - Audio Wizard
+    - Document Wizard
+
+Next up:
+  - Action Bar
+  - Non-Asset Wizards
+    - Game Wizard
+  - Actually defining constructors for a GameController
+
 #### 6th March, 2024
 
   - Added GLTF Wizard

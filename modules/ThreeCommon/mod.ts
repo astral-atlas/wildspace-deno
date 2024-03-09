@@ -5,5 +5,6 @@ export * from './useDisposable.ts';
 export * from './useOverridableRef.ts'
 export * from './ResourceSet.ts';
 export * from './ObjectAttacher.ts';
+export * from './SceneTree.ts';
 
 export { gltf, three } from './deps.ts';

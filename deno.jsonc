@@ -1,8 +1,8 @@
 {
   "tasks": {
-    "dev:docs": "deno run -A npm:vite@^4.3.9 docs --host --port 5001",
-    "dev:web": "deno run -A npm:vite@^4.3.9 web --host --port 5000",
-    "dev": "deno run -A npm:concurrently \"deno task dev:docs\" \"deno task dev:web\"",
+    "dev:docs": "deno run -A npm:vite docs --host --port 5001",
+    "dev:web": "deno run -A npm:vite web --host --port 5000",
+    "dev": "deno run -A npm:concurrently \"deno task dev:docs\" \"deno task dev:web\" -i",
     "build:docs": "deno run -A npm:vite build docs --base /wildspace-deno"
   },
   "imports": {
@@ -12,10 +12,6 @@
   },
   "compilerOptions": {
     "types": ["vite/client"],
-    "lib": [
-      "deno.window",
-      "lib/vite-types.d.ts",
-      "DOM"
-    ]
+    "lib": ["deno.window", "DOM"]
   }
 }

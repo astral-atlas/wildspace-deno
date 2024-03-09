@@ -1,6 +1,6 @@
 import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
 
-import { DocSite2 } from "../modules/ComponentDoc/mod.ts";
+import { DocSite2, globalSheets } from "../modules/ComponentDoc/mod.ts";
 import { frameSchedulerDocs } from "../modules/FrameScheduler/docs.ts";
 import { componentDocDocs } from "../modules/ComponentDoc/docs.ts";
 import { boxParticleDocs } from "../modules/BoxParticle/docs.ts";
@@ -33,6 +33,7 @@ import { clerkDocs } from "../modules/Clerk/docs.ts";
 import { useRootNavigation } from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
 import { pancakeDocs } from "../modules/Pancake/docs.ts";
 import { universeDocs } from "../modules/Universe/docs.ts";
+import '../modules/Wizard/docs.ts';
 
 export const sheets = [
   [markdownToSheet('Changelog', changelog)],
@@ -61,6 +62,7 @@ export const sheets = [
   journalDocs,
   presentationDocs,
   carpentryDocs,
+  ...globalSheets,
 ].flat(1);
 
 export const DocsApp: Component = () => {

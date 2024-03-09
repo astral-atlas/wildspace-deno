@@ -1,0 +1,7 @@
+.node {
+  margin: auto;
+}
+
+.node.selected {
+  font-weight: bold;
+}

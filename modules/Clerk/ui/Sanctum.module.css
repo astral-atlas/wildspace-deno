@@ -8,11 +8,16 @@
 }
 
 .wizard {
-  flex: 1 1 100%;
+  flex: 1;
+  min-width: 0px;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .browser {
   width: 300px;
+  max-width: 300px;
   flex: 1 0 300px;
   border-right: 1px solid black;
 
