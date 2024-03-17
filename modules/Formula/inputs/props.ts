@@ -6,7 +6,11 @@ export type InputProps<TValue> = {
   value: TValue,
   onInput?: (value: TValue, event?: InputEvent) => unknown,
 
+  id?: string,
+
   disabled?: boolean,
+  classList?: (string | undefined)[],
+  className?: string,
 };
 
 export const useInputEventHandler = <TElement extends HTMLElement, TValue>(

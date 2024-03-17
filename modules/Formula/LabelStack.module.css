@@ -1,0 +1,13 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+}
+
+.name {
+  display: flex;
+  flex-direction: row;
+  margin-left: auto;
+  margin-right: auto;
+}

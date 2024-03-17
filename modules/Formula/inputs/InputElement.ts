@@ -21,7 +21,10 @@ export const TextInput: act.Component<InputElementProps<string> & {
   onInput = (_) => {},
 
   disabled,
+  id,
   placeholder,
+  classList,
+  className,
   area,
 }) => {
   const onInputEvent = useInputEventHandler(
@@ -37,6 +40,9 @@ export const TextInput: act.Component<InputElementProps<string> & {
 
   if (area) {
     return h("textarea", {
+      id,
+      classList,
+      className,
       disabled,
       value,
       onInput: onTextAreaEvent,
@@ -45,6 +51,9 @@ export const TextInput: act.Component<InputElementProps<string> & {
 
   return h("input", {
     type: 'text',
+    ...(id ? { id } : {}),
+    classList,
+    className,
     disabled,
     value,
     onInput: onInputEvent,
@@ -56,7 +65,10 @@ export const NumberInput: act.Component<InputElementProps<number>> = ({
   value,
   onInput = (_) => {},
 
+  classList,
+  className,
   disabled,
+  id,
   placeholder,
 }) => {
   const onInputEvent = useInputEventHandler(
@@ -66,6 +78,9 @@ export const NumberInput: act.Component<InputElementProps<number>> = ({
   );
 
   return h("input", {
+    ...(id ? { id } : {}),
+    classList,
+    className,
     type: 'number',
     disabled,
     value,

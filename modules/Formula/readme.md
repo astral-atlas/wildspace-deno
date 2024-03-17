@@ -4,6 +4,10 @@ Formula is a component library for building basic
 forms, with some customisation to allow them
 to fit into some themes.
 
+## LabelBlock
+
+::LayoutDemo
+
 ## LabeledInput
 
 Simple component that combines a

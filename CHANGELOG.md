@@ -1,5 +1,9 @@
 # Changelog
 
+#### 18th March, 2024
+
+  - Small advancements to Formula to power the next set of Wizard changes.
+
 #### 10th March, 2024
 
   - Move Wizards into their own module

@@ -1,3 +1,3 @@
-export * from './AudioPreview.ts';
-export * from './GLTFPreview.ts';
-export * from './ImagePreview.ts';
+export * from './AudioWizard.ts';
+export * from './ModelWizard.ts';
+export * from './ImageWizard.ts';

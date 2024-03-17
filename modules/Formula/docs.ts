@@ -9,6 +9,9 @@ import { act } from "./deps.ts";
 import { m } from "./deps.ts";
 import { userDefinition } from "../SesameModels/mod.ts";
 import { invitationDefinition } from "../Journal/mod.ts";
+import * as mod from "./mod.ts";
+import { actCommon } from "./deps.ts";
+import { three } from "../AtlasRenderer/deps.ts";
 
 const { h, useState } = act;
 
@@ -39,7 +42,36 @@ const ModelFormulaDemo = () => {
   ]
 }
 
+const LayoutDemo = () => {
+  const id = actCommon.useId();
+
+  return h(FramePresenter, {}, [
+    h(mod.Column, {}, [
+      h(mod.TextEditor, {
+        label: {
+          name: 'My Label',
+          type: 'string',
+          optional: true,
+          description: 'This is a description for a label',
+        },
+        value: 'my cool string value',
+      }),
+      h(mod.Vector3Editor, { label: {
+        name: 'My Vector',
+      }, value: new three.Vector3() }),
+      h(mod.NumberEditor, {
+        label: {
+          name: 'My Label',
+          description: 'This is a description for a label',
+        },
+        value: 12345678,
+      }),
+    ])
+  ]);
+}
+
 const demos = {
+  LayoutDemo,
   'LabeledInputDemo': LabeledInputDemo,
   ModelFormulaDemo,
 };

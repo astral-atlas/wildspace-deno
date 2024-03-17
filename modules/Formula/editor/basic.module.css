@@ -1,0 +1,11 @@
+.text {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid black;
+}
+
+.number {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid black;
+}

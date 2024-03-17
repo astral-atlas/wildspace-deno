@@ -1,4 +1,4 @@
-import { Label } from "./Label.ts";
+import { LabelBlock } from "./LabelBlock.ts";
 import { act, hash, m } from "./deps.ts";
 
 const { h, useState } = act;
@@ -122,8 +122,7 @@ export const ModelFormula: act.Component<ModelFormulaProps> = ({
             ])
           }
 
-          return h("li", { style: style.objectProperty }, h(
-              Label,
+          return h("li", { style: style.objectProperty }, h('label',
               { text: `${name}:`, inline: true },
               h(ModelFormula, {
                 model: propertyModel,

@@ -1,0 +1,25 @@
+.vectorInput {
+  display: flex;
+  flex-direction: row;
+
+  gap: 8px;
+  padding: 2px;
+
+  margin-left:auto;
+  margin-right: auto;
+}
+
+.vectorInput input, .vectorInput input {
+  min-width: 0;
+  padding: 8px;
+  border: none;
+
+  border-top: 1px solid black;
+}   
+
+.stack {
+  border: 1px solid black;
+  border-radius: 8px;
+  max-width: 80px;
+  overflow: hidden;
+}
