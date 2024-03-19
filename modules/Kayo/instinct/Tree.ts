@@ -1,8 +1,7 @@
-import { refCount } from "https://esm.sh/rxjs@7.8.1";
 import { act, curve } from "../deps.ts";
 import { createTransitionHook } from "./array.ts";
 import { KayoRect, KayoVector2 } from "./rect.ts";
-import { useMemo } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useMemo } from "@lukekaalim/act";
 const { h, useRef } = act;
 
 export type TreeNodeID = number | string;

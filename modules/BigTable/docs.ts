@@ -1,4 +1,4 @@
-import { h } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { h } from "@lukekaalim/act";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 

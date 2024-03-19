@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useContext, useEffect, useRef } from "@lukekaalim/act";
 import { m } from "../SesameModels/deps.ts";
 import { act, actThree, effects, three, threeCommon } from "./deps.ts";
 import { schedule } from "../ThreeCommon/deps.ts";

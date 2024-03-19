@@ -1,4 +1,4 @@
-import { useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useState } from "@lukekaalim/act";
 import { LabeledTextInput } from "../Formula/LabeledInput.ts";
 import { act } from "./deps.ts"
 const { h } = act;

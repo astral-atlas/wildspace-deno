@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useContext, useEffect, useState } from "@lukekaalim/act";
 import { act, canvaskit, rxjs } from "./deps.ts";
 
 export type DynamicModuleLoader<T> = {

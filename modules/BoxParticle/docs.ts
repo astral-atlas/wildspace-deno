@@ -1,4 +1,4 @@
-import { h, useEffect, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { h, useEffect, useRef } from "@lukekaalim/act";
 
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { simulateParticle2D } from "./mod.ts";

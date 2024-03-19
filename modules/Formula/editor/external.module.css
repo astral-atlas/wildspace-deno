@@ -1,0 +1,22 @@
+.external {
+  border: 1px solid black;
+  margin: 2px;
+
+  border-radius: 8px;
+
+  overflow: auto;
+  max-height: 400px;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: white;
+}
+
+.inner {
+  padding: 4px;
+
+  flex: 1;
+}

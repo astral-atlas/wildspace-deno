@@ -2,3 +2,5 @@
 dist
 
 .terraform
+node_modules
+*.pem

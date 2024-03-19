@@ -1,16 +1,14 @@
-import { Observable, Subject } from "https://esm.sh/rxjs@7.8.1";
-import { DynamoPartitionKey } from "./mod.ts";
+import { rxjs } from '../deps.ts';
 import {
 DynamoKey,
   DynamoPartitionClient,
   DynamoPartitionDefinition,
   DynamoPartitionType,
 } from "./partition.ts";
-import { rxjs } from "../../SesameDataService/deps.ts";
 
 export type DynamoMemoryStoreExtension<T extends DynamoPartitionType> = {
   memory(): MemoryStoreItem<T>[],
-  onMemoryUpdate: Subject<MemoryStoreItem<T>[]>,
+  onMemoryUpdate: rxjs.Subject<MemoryStoreItem<T>[]>,
 }
 export type DynamoMemoryStore<T extends DynamoPartitionType> =
   DynamoPartitionClient<T> & DynamoMemoryStoreExtension<T>; 

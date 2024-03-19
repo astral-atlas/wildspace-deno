@@ -1,4 +1,4 @@
-import { createContext } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { createContext } from "@lukekaalim/act";
 
 export type KeyboardStateController = {
   keysDown: Set<string>;

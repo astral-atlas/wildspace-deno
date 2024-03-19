@@ -1,4 +1,4 @@
-import { Ref, useContext, useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Ref, useContext, useEffect } from "@lukekaalim/act";
 import { keyboardStateControllerContext } from "./keyboardStateController.ts";
 
 export const useKeyboardElementRef = (ref: Ref<null | HTMLElement>) => {

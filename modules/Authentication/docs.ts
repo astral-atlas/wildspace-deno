@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
 import { CreateUserForm } from "./CreateUserForm.ts";
 // @deno-types="vite-text"

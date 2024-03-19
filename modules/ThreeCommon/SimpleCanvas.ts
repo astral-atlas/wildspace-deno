@@ -2,7 +2,7 @@ import { useRenderSetup, RenderSetupOverrides } from "./mod.ts";
 
 import { renderSetupContext } from "./RenderSetupContext.ts";
 import { act, actThree, three } from './deps.ts';
-import { useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useEffect } from "@lukekaalim/act";
 const { h } = act;
 
 export type SimpleCanvasProps = {

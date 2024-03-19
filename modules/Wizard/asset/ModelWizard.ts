@@ -131,18 +131,23 @@ export const ModelWizardSidebar: act.Component<ModelWizardSidebarProps> = ({ sce
 
   return h(CrystalBall, {}, [
     scene && [
-      h(CrystalBallPanel, {},
+      h(formula.ExternalEditor, { label: { name: 'Scene Tree', type: 'Scene' } },
         h(threeCommon.SceneTree, { root: scene, selection })
       ),
     ],
     selection.selectedItems.map(selected => {
       return [
-        h('pre', {}, selected.name),
-        h('pre', {}, selected.type),
-        h(formula.NumberInput, { value: selected.position.x, disabled: true }),
-        h(formula.NumberInput, { value: selected.position.y, disabled: true }),
-        h(formula.NumberInput, { value: selected.position.z, disabled: true }),
-      ];
+        h(formula.TextEditor, {
+          label: { name: 'Name', type: selected.type },
+          disabled: true,
+          value: selected.name,
+        }),
+        h(formula.Vector3Editor, {
+          label: { name: 'Position' },
+          value: selected.position,
+          disabled: true,
+        }),
+      ]
     })
   ])
 }

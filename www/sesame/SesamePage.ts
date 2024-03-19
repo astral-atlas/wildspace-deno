@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useEffect, useRef, useState } from "@lukekaalim/act";
 import { atlasRenderer, threeCommon, effectsCommon, three } from "./deps.ts";
 import { useAnimation } from "../../modules/FrameScheduler/useAnimation.ts";
 import { MeshBasicMaterial } from "https://esm.sh/three@0.155.0";

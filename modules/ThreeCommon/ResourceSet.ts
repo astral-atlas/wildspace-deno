@@ -1,4 +1,4 @@
-import { useMemo } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useMemo } from "@lukekaalim/act";
 import { act, three } from "./deps.ts";
 const { createContext, h, useEffect, useState, useContext } = act;
 

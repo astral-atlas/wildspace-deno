@@ -1,5 +1,4 @@
-export { nanoid } from 'https://esm.sh/nanoid@4.0.2';
-export { default as Color } from "https://esm.sh/color@4.2.3";
+export { color, nanoid } from '../DepsCommon/mod.ts';
 
 export * as m from '../Models/mod.ts';
 export { act } from '../AtlasRenderer/mod.ts';

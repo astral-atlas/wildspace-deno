@@ -1,0 +1,12 @@
+{
+  "workspaces": [
+    "docs",
+    "modules/**/*"
+  ],
+  "scripts": {
+    "dev": "vite docs"
+  },
+  "devDependencies": {
+    "vite": "^5.1.6"
+  }
+}

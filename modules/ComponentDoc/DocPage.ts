@@ -1,13 +1,15 @@
-import { h, Component } from "https://esm.sh/v126/@lukekaalim/act@2.6.0";
+import { act } from "./deps.ts";
 import { DocElement } from "./DocElement.ts";
 import { FrameSchedulerProvider } from "../FrameScheduler/FrameSchedulerContext.ts";
 import { defaultFrameSchedulerOptions } from "../FrameScheduler/FrameScheduler.ts";
+
+const { h } = act;
 
 export type DocPageProps = {
   elements: DocElement[],
 }
 
-export const DocPage: Component<DocPageProps> = ({ elements }) => {
+export const DocPage: act.Component<DocPageProps> = ({ elements }) => {
   return h('article', {}, h(FrameSchedulerProvider, { options: defaultFrameSchedulerOptions }, elements.map(element => {
     switch (element.type) {
       case 'title':

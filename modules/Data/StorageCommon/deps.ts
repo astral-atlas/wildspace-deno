@@ -1,2 +1,3 @@
-export * as dynamo from "https://esm.sh/@aws-sdk/client-dynamodb@3.388.0";
-export * as iots from "https://esm.sh/io-ts@2.2.20";
+export * as dynamo from "@aws-sdk/client-dynamodb";
+export * as iots from "io-ts";
+export { rxjs } from '../../DepsCommon/mod.ts';

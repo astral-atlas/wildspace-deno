@@ -1,7 +1,7 @@
 import { act } from "./deps.ts"
 // @deno-types="vite-css"
 import styles from './LabeledInput.module.css';
-import { useMemo } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useMemo } from "@lukekaalim/act";
 const { h, useState } = act;
 
 export type LabeledInputProps<TInputValueType, TInputType> = {

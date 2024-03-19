@@ -4,7 +4,7 @@ import {
   createContext,
   useMemo,
   useContext,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 import {
   FrameScheduler,
   FrameSchedulerOptions,

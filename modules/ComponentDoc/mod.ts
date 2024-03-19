@@ -11,4 +11,11 @@ export * from './global.ts';
 
 import { actMarkdown, act } from './deps.ts';
 
+export const { h, useEffect, useRef, useContext, useState, useMemo } = act
+
+export type MarkdownDirectiveComponentProps = actMarkdown.MarkdownDirectiveComponentProps;
+export type ComponentMap<T extends act.Props> = actMarkdown.ComponentMap<T>
+
 export type DirectiveComponent = act.Component<actMarkdown.MarkdownDirectiveComponentProps>;
+
+export type DirectiveMap = Record<string, DirectiveComponent>;

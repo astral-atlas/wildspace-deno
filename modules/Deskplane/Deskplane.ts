@@ -1,6 +1,6 @@
 import {
   Component, ElementNode, h, useRef,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 import { GridSVG } from "./GridSVG.ts";
 import { ParticleSettings } from "../BoxParticle/particle.ts";
 import { useDraggableParticle } from "./useDraggableParticle.ts";

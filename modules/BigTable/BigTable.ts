@@ -1,4 +1,4 @@
-import { Component, ElementNode, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Component, ElementNode, h } from "@lukekaalim/act";
 
 // @deno-types="vite-css" 
 import styles from './BigTable.module.css';

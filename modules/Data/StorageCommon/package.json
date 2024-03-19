@@ -1,0 +1,7 @@
+{
+  "name": "storage-common",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.388.0",
+    "io-ts": "^2.2.20"
+  }
+}

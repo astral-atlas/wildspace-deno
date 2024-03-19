@@ -1,7 +1,6 @@
-import { useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { act } from "./deps.ts";
 
-const { useState } = act;
+const { useState, useEffect } = act;
 
 export const useAsync = <T>(createPromise: () => Promise<T>, deps: act.Deps = []): T | null => {
   const [resolution, setResolution] = useState<T | null>(null);

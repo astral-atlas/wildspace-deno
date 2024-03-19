@@ -50,3 +50,12 @@
   box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.434);
   border-radius: 4px;
 }
+
+td, th {
+ border: 1px solid black;
+ padding: 4px;
+}
+
+table {
+  border-collapse: collapse;
+}

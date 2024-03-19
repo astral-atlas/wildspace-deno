@@ -1,6 +1,7 @@
-import { Component, h } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Component, h } from "@lukekaalim/act";
+import { useRootNavigation } from "@lukekaalim/act-navigation";
 
-import { DocSite2, globalSheets } from "../modules/ComponentDoc/mod.ts";
+import { DocSheet, DocSite2, globalSheets } from "../modules/ComponentDoc/mod.ts";
 import { frameSchedulerDocs } from "../modules/FrameScheduler/docs.ts";
 import { componentDocDocs } from "../modules/ComponentDoc/docs.ts";
 import { boxParticleDocs } from "../modules/BoxParticle/docs.ts";
@@ -30,42 +31,13 @@ import { modelDocs } from "../modules/Models/docs.ts";
 import { carpentryDocs } from "../modules/Carpentry/docs.ts";
 import { universeDocContext } from "../modules/Universe/docs.ts";
 import { clerkDocs } from "../modules/Clerk/docs.ts";
-import { useRootNavigation } from "https://esm.sh/@lukekaalim/act-navigation@1.2.1";
 import { pancakeDocs } from "../modules/Pancake/docs.ts";
 import { universeDocs } from "../modules/Universe/docs.ts";
 import '../modules/Wizard/docs.ts';
+import 'deps-common/docs.ts';
 
-export const sheets = [
-  [markdownToSheet('Changelog', changelog)],
-  pancakeDocs,
-  universeDocs,
-  sesameDocs,
-  modelDocs,
-  frameSchedulerDocs,
-  componentDocDocs,
-  boxParticleDocs,
-  deskplaneDocs,
-  keyboardDocs,
-  bigTableDocs,
-  clerkDocs,
-  threeCommonDocDocs,
-  effectsCommonDocs,
-  sesameDataServiceDocs,
-  authenticationDocs,
-  formulaDocs,
-  sesameModelsDocs,
-  kayoDocs,
-  dataDocs,
-  dryEraseDocs,
-  doorJourneyDocs,
-  artifactDocs,
-  journalDocs,
-  presentationDocs,
-  carpentryDocs,
-  ...globalSheets,
-].flat(1);
 
-export const DocsApp: Component = () => {
+export const DocsApp: Component<{ sheets: DocSheet[] }> = ({ sheets }) => {
   const navigation = useRootNavigation()
   return h(universeDocContext.Provider, {}, h(DocSite2, {
     sheets, navigation, basePath: '/',
@@ -77,8 +49,43 @@ export const DocsApp: Component = () => {
   }));
 };
 
-const entry = () => {
-  renderCool(h(DocsApp), document.body)
+const entry = async () => {
+  //const glob = import.meta.glob('../modules/**/docs.ts');
+  
+  //await Promise.all(Object.values(glob).map(load => load()))
+  
+  const sheets = [
+    [markdownToSheet('Changelog', changelog)],
+    pancakeDocs,
+    universeDocs,
+    sesameDocs,
+    modelDocs,
+    frameSchedulerDocs,
+    componentDocDocs,
+    boxParticleDocs,
+    deskplaneDocs,
+    keyboardDocs,
+    bigTableDocs,
+    clerkDocs,
+    threeCommonDocDocs,
+    effectsCommonDocs,
+    sesameDataServiceDocs,
+    authenticationDocs,
+    formulaDocs,
+    sesameModelsDocs,
+    kayoDocs,
+    dataDocs,
+    dryEraseDocs,
+    doorJourneyDocs,
+    artifactDocs,
+    journalDocs,
+    presentationDocs,
+    carpentryDocs,
+    ...globalSheets,
+  ].flat(1);
+
+
+  renderCool(h(DocsApp, { sheets }), document.body)
 };
 
 entry();

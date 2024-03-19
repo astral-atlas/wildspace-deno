@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useContext, useEffect } from "@lukekaalim/act";
 import { SimulationTick } from "./FrameScheduler.ts";
 import { FrameSchedulerCallback } from "./FrameSchedulerEmitter.ts";
 import { frameSchedulerContext, useFrameScheduler } from "./FrameSchedulerContext.ts";

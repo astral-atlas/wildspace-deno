@@ -1,6 +1,9 @@
-// @deno-types="https://esm.sh/v132/@types/three@0.155.1/index.d.ts"
-export * as three from 'https://esm.sh/three@0.155.0';
+export * as three from 'three';
 
-export * as actThree from 'https://esm.sh/@lukekaalim/act-three@5.15.0';
-export * as act from "https://esm.sh/@lukekaalim/act@2.6.0";
-export * as curve from "https://esm.sh/@lukekaalim/act-curve@3.2.0";
+export * as actThree from '@lukekaalim/act-three';
+export * as act from "@lukekaalim/act";
+export * as curve from "@lukekaalim/act-curve";
+
+export * from '@lukekaalim/act-renderer-core';
+export * from '@lukekaalim/act-reconciler';
+export * from '@lukekaalim/act-web';

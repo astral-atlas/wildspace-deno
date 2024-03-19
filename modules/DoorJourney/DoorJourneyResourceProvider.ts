@@ -1,4 +1,4 @@
-import { useContext } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useContext } from "@lukekaalim/act";
 import { useAsync } from "../AtlasRenderer/useAsync.ts";
 import { act, effects, three, threeCommon } from "./deps.ts";
 import { roomsURL } from "./scenes/scenes.ts";

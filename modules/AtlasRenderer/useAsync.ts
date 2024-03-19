@@ -1,11 +1,10 @@
-import { useEffect } from 'https://esm.sh/@lukekaalim/act@2.6.0';
 import { act } from './deps.ts';
 
 export const useAsync = <T>(task: () => Promise<T>, deps: act.Deps = []): [null | T, unknown] => {
   const [resolution, setResolution] = act.useState<T | null>(null);
   const [rejection, setRejection] = act.useState<unknown | null>(null);
 
-  useEffect(() => {
+  act.useEffect(() => {
     task()
       .then(setResolution, setRejection)
   }, deps);

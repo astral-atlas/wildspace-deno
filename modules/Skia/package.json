@@ -1,0 +1,6 @@
+{
+  "name": "skia",
+  "dependencies": {
+    "canvaskit-wasm": "^0.39.1"
+  }
+}

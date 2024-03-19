@@ -1,4 +1,4 @@
-import { act, artifact, desk, formula, journal, kayo, Color } from "../../deps.ts";
+import { act, artifact, desk, formula, journal, kayo, color } from "../../deps.ts";
 import { JengaBlock, JengaRect, JengaSlideContent } from "../../jenga.ts";
 
 const { h, useEffect, useRef, useState } = act;
@@ -137,7 +137,7 @@ type ColorStyleEditorProps = {
 const ColorStyleEditor: act.Component<ColorStyleEditorProps> = ({
   block, onBlockEdit, styleName
 }) => {
-  const styleColor = new Color(block.styles[styleName])
+  const styleColor = new color(block.styles[styleName])
 
   const onColorInput = (e: InputEvent) => {
     const inputElement = (e.target as HTMLInputElement);
@@ -147,7 +147,7 @@ const ColorStyleEditor: act.Component<ColorStyleEditorProps> = ({
       ...block,
       styles: {
         ...block.styles,
-        [styleName]: new Color(inputElement.value).alpha(prevAlpha).hexa(),
+        [styleName]: new color(inputElement.value).alpha(prevAlpha).hexa(),
       },
     });
   }

@@ -1,4 +1,4 @@
-import seedrandom from "https://esm.sh/seedrandom@3.0.5"
+import { random } from '../DepsCommon/mod.ts';
 
 export const repeat = <T>(func: (index: number) => T, count: number): T[] =>
   Array.from({ length: count }).map((_, i) => func(i));
@@ -14,7 +14,7 @@ export const randomSlice = <T>(a: T[], minCount = 0): T[] => {
 }
 
 export const randomIntRange = (max: number, min = 0, seed?: string): number => {
-  return Math.round(min + (seedrandom(seed)() * (max - min)));
+  return Math.round(min + (random(seed)() * (max - min)));
 }
 
 export const randomElement = <T>(array: ReadonlyArray<T>): T => {

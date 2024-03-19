@@ -1,5 +1,18 @@
 # Changelog
 
+#### 20th March, 2024
+
+  - We say farewell to HTTPS based imports, and move back to `package.json` and `npm`.
+    Honestly, it was a fun experiment, but one all the transivite dependencies started
+    seriously impacting dev performance, it because a hard call to keep it around.
+    - Removd all "https://" imports, stopped using esm.sh
+    - Added package.json and package-lock.json
+    - Added npm workspace
+    - Added tsconfig
+  - Devsite is now HTTP/2
+
+  Read more in the [devlog](https://cohost.org/lno9/post/5165661-deno-htt-ps-imports).
+
 #### 18th March, 2024
 
   - Small advancements to Formula to power the next set of Wizard changes.

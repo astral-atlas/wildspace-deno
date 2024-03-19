@@ -3,19 +3,17 @@ import {
   createEffectService,
   createBoundaryService,
   createSchedule2,
-} from "https://esm.sh/@lukekaalim/act-reconciler@3.7.5";
-import {
+
   createWebRenderer,
   setNodeChildren2,
-} from "https://esm.sh/@lukekaalim/act-web@2.5.5";
-import { Element } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import {
+  
   Renderer2,
   createNullRenderer2,
-} from "https://esm.sh/@lukekaalim/act-renderer-core@3.5.5";
-import { three, actThree } from "./deps.ts";
+} from "./deps.ts";
 
-export const render = (element: Element, node: HTMLElement) => {
+import { act, three, actThree } from "./deps.ts";
+
+export const render = (element: act.Element, node: HTMLElement) => {
   const web = createWebRenderer();
 
   const onScheduleRequest = (callback: (deadline: number) => void) => {
@@ -37,7 +35,7 @@ export const render = (element: Element, node: HTMLElement) => {
   reconciler.tree.mount(element);
 };
 
-export const renderCool = (element: Element, node: HTMLElement) => {
+export const renderCool = (element: act.Element, node: HTMLElement) => {
   const webToThree = createNullRenderer2<three.Object3D, Node>(
     () => object,
     ["three", 'null']
@@ -63,7 +61,7 @@ export const renderCool = (element: Element, node: HTMLElement) => {
       case "three":
         return webToThree;
       case 'null':
-        return threeToWeb;
+        return threeToWeb as Renderer2<null>;
       default:
         return null;
     }

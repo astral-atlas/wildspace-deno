@@ -1,0 +1,7 @@
+{
+  "name": "component-doc",
+  "dependencies": {
+    "@lukekaalim/act-markdown": "^1.8.1",
+    "@lukekaalim/act-navigation": "^1.2.1"
+  }
+}

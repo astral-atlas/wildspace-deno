@@ -1,4 +1,4 @@
-import { h, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { h, useState } from "@lukekaalim/act";
 import { DocSheet } from "./DocElement.ts";
 import { markdownToDoc, markdownToSheet } from "./markdown.ts";
 // @deno-types="vite-text" 

@@ -2,17 +2,21 @@
 import docSiteStyles from "./DocSite.module.css";
 
 import {
-  ComponentMap, MarkdownDirectiveComponentProps, MarkdownASTRenderer, parseMarkdown, MarkdownNode, MarkdownNodeProps,
+  actMarkdown
+} from "./deps.ts";
+import { DocElement, DocSheet } from "./DocElement.ts";
+import { Component, h, useMemo } from "@lukekaalim/act";
+import { useAsync } from "../ActCommon/mod.ts";
+
+const {
+  MarkdownASTRenderer, parseMarkdown,
   // @ts-ignore It totally exists guys I promise
   MarkdownHeading
-} from "https://esm.sh/@lukekaalim/act-markdown@1.8.1";
-import { DocElement, DocSheet } from "./DocElement.ts";
-import { Component, h, useMemo } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { useAsync } from "../ActCommon/mod.ts";
+} = actMarkdown;
 
 export const markdownToDoc = (
   markdownText: string,
-  directiveComponents: ComponentMap<MarkdownDirectiveComponentProps>
+  directiveComponents: actMarkdown.ComponentMap<actMarkdown.MarkdownDirectiveComponentProps>
 ): DocElement => {
   const ast = parseMarkdown(markdownText);
 
@@ -22,7 +26,7 @@ export const markdownToDoc = (
   return { type: 'rich', richElement: h(DocComponent) };
 }
 
-const LinkHeading: Component<MarkdownNodeProps> = ({ node }) => {
+const LinkHeading: Component<actMarkdown.MarkdownNodeProps> = ({ node }) => {
   const data = (node.data || {}) as Record<string, unknown>;
   const id = data.id as string;
   if (id)
@@ -40,7 +44,7 @@ const externalComponents = {
 export const markdownToSheet = (
   id: string,
   markdownText: string,
-  directiveComponents: ComponentMap<MarkdownDirectiveComponentProps> = {},
+  directiveComponents: actMarkdown.ComponentMap<actMarkdown.MarkdownDirectiveComponentProps> = {},
   parent: null | Component = null,
   parentId: null | string = null,
 ): DocSheet => {
@@ -93,7 +97,7 @@ export const quickSheet = (
 export const urlSheet = (
   id: string,
   markdownURL: URL, 
-  directiveComponents: ComponentMap<MarkdownDirectiveComponentProps> = {},
+  directiveComponents: actMarkdown.ComponentMap<actMarkdown.MarkdownDirectiveComponentProps> = {},
   parent: null | Component = null,
   parentId: null | string = null,
 ): DocSheet => {

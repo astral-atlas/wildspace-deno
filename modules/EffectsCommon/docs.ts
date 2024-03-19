@@ -5,7 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 import { act, actThree, componentDoc, three, threeCommon } from "./deps.ts";
 
 // @deno-types="vite-text"

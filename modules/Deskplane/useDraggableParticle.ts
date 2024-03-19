@@ -2,7 +2,7 @@ import {
  Ref,
   useContext,
   useRef,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
 import { Particle2D, ParticleSettings } from "../BoxParticle/particle.ts";
 import { simulateParticle2D } from "../BoxParticle/mod.ts";

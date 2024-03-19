@@ -1,4 +1,4 @@
-import { h, useContext, useEffect, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { h, useContext, useEffect, useRef } from "@lukekaalim/act";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { useKeyboardElementRef } from "./mod.ts";
 import { keyboardStateControllerContext } from "./keyboardStateController.ts";

@@ -1,4 +1,4 @@
-import { Ref, useEffect, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Ref, useEffect, useRef, useState } from "@lukekaalim/act";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
 import { actCommon, rxjs, three } from "./deps.ts";
 

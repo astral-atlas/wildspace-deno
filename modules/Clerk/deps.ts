@@ -1,6 +1,6 @@
 export * as m from '../Models/mod.ts';
 export * as data from '../Data/mod.ts';
-export { nanoid } from 'https://esm.sh/nanoid@4.0.2'
+export { nanoid } from '../DepsCommon/mod.ts';
 
 export { act, curve } from '../AtlasRenderer/mod.ts';
 

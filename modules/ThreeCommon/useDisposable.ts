@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useEffect, useRef } from "@lukekaalim/act";
 import { act } from "./deps.ts";
 
 export const useDisposable = <T extends { dispose: () => unknown }>(

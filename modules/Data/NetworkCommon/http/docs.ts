@@ -1,4 +1,4 @@
-import { Component, h, useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Component, h, useEffect } from "@lukekaalim/act";
 import { DocSheet } from "../../../ComponentDoc/DocElement.ts";
 import { markdownToSheet } from "../../../ComponentDoc/markdown.ts";
 

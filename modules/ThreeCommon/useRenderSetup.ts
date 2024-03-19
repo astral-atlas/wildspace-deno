@@ -1,4 +1,4 @@
-import { useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useRef } from "@lukekaalim/act";
 import { rxjs } from "./deps.ts";
 import { act, css2d, schedule, three } from "./deps.ts"
 import { useOverridableRef } from "./useOverridableRef.ts";

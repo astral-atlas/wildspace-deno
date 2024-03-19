@@ -1,4 +1,4 @@
-export { nanoid } from 'https://esm.sh/nanoid@4.0.2';
+export { nanoid } from '../DepsCommon/mod.ts';
 
 export * as service from '../Data/ServiceCommon/mod.ts';
 export * as storage from '../Data/StorageCommon/mod.ts';

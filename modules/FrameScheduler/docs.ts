@@ -1,10 +1,9 @@
-import { Component } from "https://esm.sh/v126/@lukekaalim/act@2.6.0";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
-import { useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { useRef } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useState } from "@lukekaalim/act";
+import { useRef } from "@lukekaalim/act";
 import { createFrameScheduler } from "./FrameScheduler.ts";
-import { useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { h } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useEffect } from "@lukekaalim/act";
+import { h } from "@lukekaalim/act";
 
 // @deno-types="vite-text"
 import readme from './readme.md?raw';

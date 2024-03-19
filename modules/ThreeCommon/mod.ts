@@ -7,4 +7,4 @@ export * from './ResourceSet.ts';
 export * from './ObjectAttacher.ts';
 export * from './SceneTree.ts';
 
-export { gltf, three } from './deps.ts';
+export { gltf, three, css2d } from './deps.ts';

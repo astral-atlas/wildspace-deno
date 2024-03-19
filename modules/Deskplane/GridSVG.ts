@@ -1,5 +1,5 @@
-import { createId } from "https://esm.sh/@lukekaalim/act@2.6.0";
-import { Component, Ref, h, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { createId } from "@lukekaalim/act";
+import { Component, Ref, h, useState } from "@lukekaalim/act";
 
 export type GridSVGInterval = {
   size: number,

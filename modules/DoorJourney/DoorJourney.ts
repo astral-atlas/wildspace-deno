@@ -1,4 +1,4 @@
-import { useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useState } from "@lukekaalim/act";
 import { act, threeCommon, three } from "./deps.ts";
 import { randomElement, randomIntRange } from "../RandomThingGenerator/random.ts";
 import { RoomObjectTree } from "./RoomObjectTree.ts";

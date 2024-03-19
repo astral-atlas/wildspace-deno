@@ -1,0 +1,7 @@
+{
+  "name": "effects-common",
+  "dependencies": {
+    "three": ">= 0.162.0",
+    "@types/three": ">= 0.162.0"
+  }
+}

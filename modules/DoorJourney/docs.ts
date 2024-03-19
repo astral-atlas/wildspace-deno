@@ -1,4 +1,4 @@
-import { useEffect } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { useEffect } from "@lukekaalim/act";
 import { FramePresenter } from "../ComponentDoc/FramePresenter.ts";
 import { DocSheet, markdownToSheet } from "../ComponentDoc/mod.ts";
 import { SimpleCanvas } from "../ThreeCommon/SimpleCanvas.ts";

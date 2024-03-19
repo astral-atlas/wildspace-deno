@@ -1,4 +1,4 @@
-import { createContext, h, useContext, useEffect, useRef, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { createContext, h, useContext, useEffect, useRef, useState } from "@lukekaalim/act";
 import { markdownToSheet, DocSheet } from "../../ComponentDoc/mod.ts";
 
 // @deno-types="vite-text"
@@ -13,7 +13,7 @@ import { MemorySesameStore, createMemorySesameStore } from "./stores.ts";
 import { DynamoMemoryStoreExtension, DynamoPartitionType } from "../StorageCommon/dynamo/mod.ts";
 import { StoreVisualzer } from "../DataDoc/mod.ts";
 
-import { MarkdownDirectiveComponentProps, ComponentMap } from "https://esm.sh/@lukekaalim/act-markdown@1.8.0";
+import { DirectiveMap } from "../../ComponentDoc/mod.ts";
 
 const demoContext = createContext<{
   store: MemorySesameStore,
@@ -44,7 +44,7 @@ const StoreDemo = () => {
   ];
 };
 
-const demos: ComponentMap<MarkdownDirectiveComponentProps> = {
+const demos: DirectiveMap = {
   service_action({ node }) {
     const { store, setOutput } = useDemoContext();
     const sesame = useRef(createStoredSesameDataService(store, { type: 'guest' })).current;

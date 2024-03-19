@@ -1,13 +1,5 @@
-import { h, Component } from "https://esm.sh/v126/@lukekaalim/act@2.6.0";
 import { DocSheet } from "../ComponentDoc/DocElement.ts";
 import { GridSVG } from "./GridSVG.ts";
-import {
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
 import { useKeyboardElementRef } from "../Keyboard/useKeyboardElementRef.ts";
 import { keyboardStateControllerContext } from "../Keyboard/keyboardStateController.ts";
 import { useAnimation } from "../FrameScheduler/useAnimation.ts";
@@ -18,11 +10,20 @@ import { markdownToSheet } from "../ComponentDoc/markdown.ts";
 
 // @deno-types="vite-text"
 import readme from "./readme.md?raw";
-import { three } from "./deps.ts";
+import { three, act } from "./deps.ts";
 import { DraggableSurface2Demo } from "./docs/DraggableSurface2Doc.ts";
 import { ResizeRectDemo } from "./docs/ResizeRectDemo.ts";
 
-export const GridSVGDemo: Component = () => {
+const {
+  h,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} = act;
+
+export const GridSVGDemo: act.Component = () => {
   const ref = useRef(null);
 
   const position = useRef(new three.Vector2()).current;

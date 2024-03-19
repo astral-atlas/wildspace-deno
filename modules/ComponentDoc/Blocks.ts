@@ -1,4 +1,4 @@
-import { Component, h, useState } from "https://esm.sh/@lukekaalim/act@2.6.0";
+import { Component, h, useState } from "@lukekaalim/act";
 
 // @deno-types="vite-css"
 import styles from './Blocks.module.css';

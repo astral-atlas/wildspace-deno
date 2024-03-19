@@ -14,7 +14,7 @@ export const NumberEditor: act.Component<EditorProps<number>> = ({ label, ...pro
   const id = useId();
 
   return [
-    h(LabelBlock, { label: { ...label, type: 'number' }, id }),
+    h(LabelBlock, { label: { ...label, type: label.type || 'number' }, id }),
     h(inputs.NumberInput, { ...props, className: classes.number, id })
   ]
 };
@@ -23,7 +23,7 @@ export const TextEditor: act.Component<EditorProps<string>> = ({ label, ...props
   const id = useId();
 
   return [
-    h(LabelBlock, { label: { ...label, type: 'text' }, id }),
+    h(LabelBlock, { label: { ...label, type: label.type || 'text' }, id }),
     h(inputs.TextInput, { ...props, className: classes.text, id })
   ]
 };

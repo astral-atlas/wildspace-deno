@@ -6,7 +6,7 @@ import {
   useState,
   useEffect,
   useRef,
-} from "https://esm.sh/@lukekaalim/act@2.6.0";
+} from "@lukekaalim/act";
 
 // @deno-types="vite-css"
 import styles from "./FramePresenter.module.css";

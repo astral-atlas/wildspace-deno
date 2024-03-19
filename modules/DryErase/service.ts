@@ -1,6 +1,7 @@
 import { ModelOf, ModeledType } from "../Models/model.ts";
 import { vectorDefinition } from "../TheaterModels/space.ts";
-import { m, service, sesame, storage, nanoid, channel, artifact } from "./deps.ts";
+import { m, service, sesame, storage, nanoid, channel, } from "./deps.ts";
+import * as d from './deps.ts'
 import {
   Whiteboard,
   noteDefinition,
@@ -144,7 +145,7 @@ export type Meta = {
   },
   SpecialDependencies: {
     updates: channel.Band<Meta["UpdateBandType"]>,
-    artifact: artifact.ArtifactService,
+    artifact: d.artifact.Service,
   },
   ServiceDependencies: {
     [system in keyof WhiteboardTypes]:
@@ -211,7 +212,7 @@ export const createMemoryDeps = (
   };
   
   return {
-    artifact: artifact.createMemoryService().service,
+    artifact: d.artifact.createMemoryService().service,
     updates: channel.createMemoryBand<Meta["UpdateBandType"]>(({ whiteboardId }) => whiteboardId),
     whiteboard: createMemoryDep(defs.system.whiteboard, inputs.whiteboard),
     sticker: createMemoryDep(defs.system.sticker, inputs.sticker),
@@ -225,7 +226,7 @@ const expressionThrow = (error: unknown) => { throw error };
 
 export const createInsecureImplementation = (
   userId: sesame.SesameUserID,
-  artifact: artifact.ArtifactService,
+  artifact: d.artifact.Service,
 ): Meta["ServiceInput"] => {
   return {
     whiteboard: {
