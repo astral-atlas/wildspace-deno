@@ -1,0 +1,6 @@
+{
+  "name": "@astral-atlas/pancake",
+  "dependencies": {
+    "ts-toolbelt": "^9.6.0"
+  }
+}

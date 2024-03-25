@@ -8,3 +8,4 @@ export * as gltf from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 
 export * as kayo from '../Kayo/mod.ts';
+export * as desk from '../Deskplane/mod.ts';

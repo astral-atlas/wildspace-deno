@@ -58,4 +58,5 @@ td, th {
 
 table {
   border-collapse: collapse;
+  margin: 2px;
 }

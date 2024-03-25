@@ -35,6 +35,7 @@ import { pancakeDocs } from "../modules/Pancake/docs.ts";
 import { universeDocs } from "../modules/Universe/docs.ts";
 import '../modules/Wizard/docs.ts';
 import 'deps-common/docs.ts';
+import '@astral-atlas/three-common/docs.ts';
 
 
 export const DocsApp: Component<{ sheets: DocSheet[] }> = ({ sheets }) => {

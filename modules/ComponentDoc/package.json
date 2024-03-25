@@ -1,5 +1,5 @@
 {
-  "name": "component-doc",
+  "name": "@astral-atlas/component-doc",
   "dependencies": {
     "@lukekaalim/act-markdown": "^1.8.1",
     "@lukekaalim/act-navigation": "^1.2.1"

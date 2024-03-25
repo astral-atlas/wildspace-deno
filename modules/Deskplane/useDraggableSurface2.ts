@@ -14,6 +14,7 @@ export type DragMovement = {
   delta: three.Vector2;
 
   changes: rxjs.Observable<DragMovementEvent>;
+  finish: rxjs.Observable<null>;
 
   move: (change: three.Vector2) => void;
   set: (position: three.Vector2) => void;
@@ -24,27 +25,29 @@ const createDragSurface = (): DragSurface2 => {
   const onDragStart = new rxjs.Subject<DragMovement>();
   const startDrag = (start: three.Vector2) => {
     const changes = new rxjs.Subject<DragMovementEvent>();
+    const finish = new rxjs.Subject<null>();
     const current = start.clone();
     const delta = new three.Vector2();
 
     const move = (change: three.Vector2) => {
       current.add(change);
       delta.add(change);
-      changes.next({ type: "move", change });
+      changes.next({ change });
     };
     const set = (newCurrent: three.Vector2) => {
       const change = newCurrent.clone().sub(current);
       move(change);
     };
     const end = () => {
-      changes.next({ type: "end" });
       changes.complete();
+      finish.next(null);
     };
     const movement = {
       move,
       end,
       set,
       start,
+      finish,
       delta,
       changes,
       current,
@@ -56,8 +59,7 @@ const createDragSurface = (): DragSurface2 => {
 };
 
 type DragMovementEvent =
-  | { type: "move"; change: three.Vector2 }
-  | { type: "end" };
+  | { change: three.Vector2 };
 
 export const useDraggableSurface2 = (
   elementRef: act.Ref<Element | null>,

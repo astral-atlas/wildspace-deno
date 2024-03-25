@@ -10,8 +10,6 @@ import styles from './styles.module.css';
 
 const bgURL = new URL('./bg.png', import.meta.url).href;
 
-console.log(styles);
-
 const { h, useState, useEffect } = act;
 
 export type JournalScreenEvent =

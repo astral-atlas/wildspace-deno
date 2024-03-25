@@ -61,10 +61,8 @@ export const ModelWizard: act.Component<WizardAssetProps> = ({ content }) => {
     
     dragSurface.onDragStart.subscribe(drag => {
       drag.changes.subscribe((move) => {
-        if (move.type === 'move') {
-          x += move.change.x / 500;
-          y += move.change.y / 500;
-        }
+        x += move.change.x / 500;
+        y += move.change.y / 500;
       });
     })
 

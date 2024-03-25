@@ -39,6 +39,7 @@ export const OrbitSceneCanvas: act.Component<OrbitSceneCanvasProps> = ({
       overrides: { ...overrides, ...simpleCanvas.overrides, cameraRef },
     }, [
       h(actThree.perspectiveCamera, { ref: cameraRef }),
+      h(actThree.directionalLight, {  }),
       children,
     ])
   ]);

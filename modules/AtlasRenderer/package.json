@@ -6,9 +6,9 @@
     "@lukekaalim/act-curve": "^3.2.0",
     "@lukekaalim/act-reconciler": "^3.7.5",
     "@lukekaalim/act-renderer-core": "^3.5.5",
-    "@lukekaalim/act-three": "^5.15.0",
+    "@lukekaalim/act-three": "^5.15.1",
     "@lukekaalim/act-web": "^2.5.5",
-    "@types/three": "^0.162.0",
-    "three": "^0.162.0"
+    "@types/three": ">= 0.162.0",
+    "three": ">= 0.162.0"
   }
 }

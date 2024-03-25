@@ -6,6 +6,6 @@
   "dependencies": {
     "@lukekaalim/act": "^2.6.0",
     "@lukekaalim/act-navigation": "^1.2.1",
-    "@lukekaalim/act-three": "^5.15.0"
+    "@lukekaalim/act-three": "^5.15.1"
   }
 }

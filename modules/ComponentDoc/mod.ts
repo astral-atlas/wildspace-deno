@@ -9,6 +9,8 @@ export * from './DocContext.ts';
 export * from './DocSite2.ts';
 export * from './global.ts';
 
+export * from './common/mod.ts';
+
 import { actMarkdown, act } from './deps.ts';
 
 export const { h, useEffect, useRef, useContext, useState, useMemo } = act

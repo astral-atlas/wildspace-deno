@@ -104,9 +104,9 @@ export const useRenderSetup = (
     resizeObserver.observe(canvas);
 
     const renderSubscription = scheduler.animation.subscribe('3DRender', onRender);
-    console.log('Renderer created')
+    console.debug('Renderer created')
     return () => {
-      console.log("Renderer disposed")
+      console.debug("Renderer disposed")
       renderer.dispose();
       resizeObserver.disconnect();
       

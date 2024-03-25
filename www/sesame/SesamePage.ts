@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "@lukekaalim/act";
 import { atlasRenderer, threeCommon, effectsCommon, three } from "./deps.ts";
 import { useAnimation } from "../../modules/FrameScheduler/useAnimation.ts";
-import { MeshBasicMaterial } from "https://esm.sh/three@0.155.0";
+
 import { useGeometryResource, useTextureResource } from "../../modules/ThreeCommon/ResourceSet.ts";
 
 const {
@@ -48,7 +48,7 @@ const Floor = ({ floorMesh }) => {
   const concreteTexture = useTextureResource('concrete')
   const [spawnTime] = useState(performance.now());
   const material = threeCommon.useDisposable(
-    () => new MeshBasicMaterial()
+    () => new three.MeshBasicMaterial()
   );
   const pillarGeo = useGeometryResource('Pillar')
   useEffect(() => {

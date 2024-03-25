@@ -52,8 +52,6 @@ export const DocSite2: act.Component<DocSite2Props> = ({
   const selectedSheet = calculateSelectedSheet(navigation, sheets, basePath) || sheets[0];
   const selectedSheetId = selectedSheet.id;
 
-  console.log(navigation, selectedSheet)
-
   useSmoothHashScroll(ref, navigation);
   useAnchorNavigation(ref, navigation);
   

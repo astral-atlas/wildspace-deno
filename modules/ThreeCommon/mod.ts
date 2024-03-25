@@ -7,4 +7,6 @@ export * from './ResourceSet.ts';
 export * from './ObjectAttacher.ts';
 export * from './SceneTree.ts';
 
+export * from './useDragRotate.ts';
+
 export { gltf, three, css2d } from './deps.ts';
