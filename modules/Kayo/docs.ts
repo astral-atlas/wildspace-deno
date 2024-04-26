@@ -13,6 +13,7 @@ import { TreeNode } from "./mod.ts";
 
 const { h, useState, useRef, useEffect } = act;
 const { useDraggableSurface2 } = desk;
+import "./menubar/docs.ts";
 
 export const treeLayout: act.Component = () => {
   const [hidden, setHidden] = useState(new Set<number>());

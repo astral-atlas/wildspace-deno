@@ -1,4 +1,4 @@
-import { act } from "../deps"
+import { act } from "../deps.ts"
 
 export type MenuID = string;
 

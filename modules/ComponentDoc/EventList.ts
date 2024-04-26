@@ -27,6 +27,7 @@ export const EventRecordProvider: act.Component = ({ children }) => {
 };
 
 export type EventRecord<T> = {
+  renderer: (func: (event: T) => act.ElementNode) => { [type: string]: (event: T) => act.ElementNode }
   submit: (event: T) => void,
   list: T[],
 }
@@ -42,6 +43,9 @@ export const useEventRecord = <T>(type: string): EventRecord<T> => {
     submit(event) {
       ctx.submitNewEvent(type, event);
     },
+    renderer(func) {
+      return { [type]: func };
+    },
     list
   }
 };
@@ -54,7 +58,7 @@ export const useRecordedEventTypes = (): string[] => {
 }
 
 export type EventListProps = {
-  renderEvent: Record<string, <T>(event: T) => act.ElementNode>,
+  renderEvent: Record<string, (event: any) => act.ElementNode>,
 }
 
 export const EventList: act.Component<EventListProps> = ({ renderEvent }) => {

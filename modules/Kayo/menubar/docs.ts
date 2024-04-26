@@ -1,3 +1,4 @@
+import { OverlayRoot } from "kayo/mod.ts";
 import { DirectiveComponent, FramePresenter, doc, useEventRecord, EventList } from "../../ComponentDoc/mod";
 import { act } from "../deps";
 import { MenuBar } from "./MenuBar";
@@ -17,19 +18,31 @@ const menu_demo: DirectiveComponent = () => {
           { type: 'action', content: 'Another one!', onClick: () => actions.submit('Another one!') }
         ]
       } },
+      { type: 'submenu', content: 'Different actions', submenu: {
+        id: 'glup',
+        items: [
+          { type: 'submenu', content: 'Woo sub sub menu!', submenu: {
+            id: 'zip',
+            items: [
+              { type: 'action', content: 'Hard-to-find action', onClick: () => actions.submit('Hard-to-find action') },
+              { type: 'action', content: 'Save file', onClick: () => actions.submit('Save') },
+              { type: 'action', content: 'Delete File', onClick: () => actions.submit('Delete File') },
+            ]
+          } },
+        ]
+      } },
     ]
   }
-  const action = (e: string) => {
-    return e;
-  };
-  return act.h(FramePresenter, { events: { renderEvent: { action } } }, [
-    act.h(MenuBar, { menu })
+  return act.h(FramePresenter, { events: { renderEvent: actions.renderer(e => e) } }, [
+    act.h(OverlayRoot, {}, [
+      act.h(MenuBar, { menu })
+    ])
   ]);
 }
 
 doc({
-  id: "Wizard Staff",
-  parentId: 'Wizard',
+  id: "Kayo Menubar",
+  parentId: 'Kayo',
   readmeURL: new URL('./readme.md', import.meta.url),
   directiveComponents: {
     menu_demo

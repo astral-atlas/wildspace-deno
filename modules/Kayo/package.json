@@ -1,4 +1,7 @@
 {
   "name": "kayo",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "space": "*"
+  }
 }
