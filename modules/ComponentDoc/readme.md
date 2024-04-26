@@ -22,6 +22,14 @@ navigation as well as a heiarchy view.
 
 ::DocSite2Demo
 
+## FramePresenter
+
+A "Frame Presenter" creates a frame on the screen, and displays
+some other content inside it - allowing you to put demos or isolated
+components inside this space to view them under different settings.
+
+::frame_presenter_demo
+
 ## DocSite {#docsite}
 
 > This is a legacy component

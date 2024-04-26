@@ -10,6 +10,7 @@ export * from './DocSite2.ts';
 export * from './global.ts';
 
 export * from './common/mod.ts';
+export * from './EventList.ts';
 
 import { actMarkdown, act } from './deps.ts';
 

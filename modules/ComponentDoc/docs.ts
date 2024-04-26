@@ -7,6 +7,15 @@ import { DocSite, DocSite2 } from "./mod.ts";
 import { FramePresenter } from "./FramePresenter.ts";
 import { quickSheet } from "./markdown.ts";
 
+export const frame_presenter_demo = () => {
+  return h(FramePresenter, {}, [
+    h('div', {}, [
+      h('h3', {}, 'A title!'),
+      h('button', {}, 'A button!')
+    ])
+  ])
+}
+
 const DocSiteDemo = () => {
   const embeddedComponents = {
     demo() {
@@ -71,6 +80,7 @@ const DocSite2Demo = () => {
 }
 
 const demos = {
+  frame_presenter_demo,
   'docsite': DocSiteDemo,
   DocSite2Demo,
 }

@@ -1,6 +1,7 @@
 import { doc } from "../ComponentDoc/mod.ts";
 
 import "./asset/docs.ts";
+import "./staff/docs.ts";
 
 doc({
   id: 'Wizard',

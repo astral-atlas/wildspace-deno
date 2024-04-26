@@ -1,0 +1,9 @@
+{
+  "name": "wizard",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "space": "*",
+    "kayo": "*"
+  }
+}

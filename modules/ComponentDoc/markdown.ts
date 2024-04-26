@@ -7,6 +7,7 @@ import {
 import { DocElement, DocSheet } from "./DocElement.ts";
 import { Component, h, useMemo } from "@lukekaalim/act";
 import { useAsync } from "../ActCommon/mod.ts";
+import { EventRecordProvider } from "./EventList.ts";
 
 const {
   MarkdownASTRenderer, parseMarkdown,
@@ -124,9 +125,10 @@ export const urlSheet = (
     elements: [
       {
         type: 'rich',
-        richElement: parent
+        richElement: h(EventRecordProvider, {}, parent
           ? h(parent, {}, h(DocComponent))
           : h(DocComponent)
+        )
       }
     ]
   }

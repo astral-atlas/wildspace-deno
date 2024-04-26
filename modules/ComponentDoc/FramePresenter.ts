@@ -11,12 +11,14 @@ import {
 // @deno-types="vite-css"
 import styles from "./FramePresenter.module.css";
 import { randomSoftColor } from "../RandomThingGenerator/random.ts";
+import { EventList, EventListProps, EventRecordProvider } from "./EventList.ts";
 
 export type FramePresenterProps = {
   height?: string;
   negativeMargin?: number;
   padding?: string;
   backgroundColor?: string;
+  events?: false | EventListProps,
 };
 
 export const FramePresenter: Component<FramePresenterProps> = ({
@@ -26,6 +28,7 @@ export const FramePresenter: Component<FramePresenterProps> = ({
   negativeMargin = 0,
   padding = "0px",
   backgroundColor = randomSoftColor(),
+  events = false
 }) => {
   const ref = useRef<null | HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -43,7 +46,7 @@ export const FramePresenter: Component<FramePresenterProps> = ({
 
   const contentRef = useRef<HTMLDivElement | null>(null);
 
-  return h("div",
+  return h(EventRecordProvider, {}, h("div",
     {
       ref,
       style: { display: 'flex', flexDirection: 'column' }
@@ -90,8 +93,11 @@ export const FramePresenter: Component<FramePresenterProps> = ({
          } },
          fullscreen ? "Exit Fullscreen" : "Fullscreen"
       ),
+      events && [
+        h(EventList, events)
+      ]
     ]
-  );
+  ));
 };
 
 export type ScalableFramePresenterProps = {};

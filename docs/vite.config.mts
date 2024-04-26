@@ -1,12 +1,6 @@
-import { UserConfig, Plugin } from "vite";
-import basicSsl from '@vitejs/plugin-basic-ssl'
+import { UserConfig, Plugin, defineConfig } from "vite";
 
-export default {
-  plugins: [
-    basicSsl({
-      certDir: './certs'
-    }),
-  ],
+export default defineConfig({
   optimizeDeps: {
     include: ['../modules/**.ts']
   },
@@ -17,10 +11,10 @@ export default {
     '**/*.PNG',
   ],
   server: {
-    https: true,
     fs: {
       allow: ['..']
     }
   },
-} as UserConfig;
+});
+
 
