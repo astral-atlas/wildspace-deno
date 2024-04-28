@@ -24,7 +24,7 @@ export const ImageWizard: act.Component<{ content: Blob }> = ({ content }) => {
         style: { height: '300px', width: 'max-content', margin: 'auto', boxShadow: '0 0 8px black' }
       })
     ]),
-    h(CrystalBall, {}, image && [
+    h(CrystalBall, { type: 'image' }, image && [
       h(formula.NumberEditor, {
         label: { name: 'Image Bytes', type: 'Bytes' },
         value: content.size,

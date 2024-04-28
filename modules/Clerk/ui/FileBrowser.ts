@@ -261,7 +261,7 @@ const DropdownMenu: act.Component<DropdownMenuProps> = ({ position, onEvent = _ 
       type: 'create',
       content: {
         type: 'asset',
-        assetId: '???'
+        assetId: null
       },
       name: "New Asset",
       parentId: file.id,

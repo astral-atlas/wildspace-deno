@@ -40,11 +40,6 @@ export const OverlayRoot: act.Component = ({ children }) => {
       setRoot(null);
     }
   }, [])
-  
-  useEffect(() => {
-    console.log('Mounted')
-    return () => console.log('Unmounted')
-  }, [])
 
   return h('div', { class: styles.overlay }, [
     h(overlayRootContext.Provider, { value: root }, children),
