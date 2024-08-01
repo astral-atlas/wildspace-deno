@@ -36,6 +36,7 @@ import { universeDocs } from "../modules/Universe/docs.ts";
 import '../modules/Wizard/docs.ts';
 import 'deps-common/docs.ts';
 import '@astral-atlas/three-common/docs.ts';
+import { pages } from "./pages.ts";
 
 
 export const DocsApp: Component<{ sheets: DocSheet[] }> = ({ sheets }) => {
@@ -56,6 +57,7 @@ const entry = async () => {
   //await Promise.all(Object.values(glob).map(load => load()))
   
   const sheets = [
+    ...pages,
     [markdownToSheet('Changelog', changelog)],
     pancakeDocs,
     universeDocs,

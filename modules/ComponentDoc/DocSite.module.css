@@ -87,6 +87,5 @@
   color: rgb(74, 124, 225);
 }
 .headingLink:hover {
-  transform: scale(1.05);
   color: red;
 }

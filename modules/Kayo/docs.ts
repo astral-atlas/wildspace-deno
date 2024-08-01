@@ -14,6 +14,7 @@ import { TreeNode } from "./mod.ts";
 const { h, useState, useRef, useEffect } = act;
 const { useDraggableSurface2 } = desk;
 import "./menubar/docs.ts";
+import { eyeballDoc } from "./Eyeball/docs.ts";
 
 export const treeLayout: act.Component = () => {
   const [hidden, setHidden] = useState(new Set<number>());
@@ -122,5 +123,6 @@ const demos = {
 };
 
 export const kayoDocs = [
-  markdownToSheet('Kayo', readme, demos)
+  markdownToSheet('Kayo', readme, demos),
+  eyeballDoc,
 ]
