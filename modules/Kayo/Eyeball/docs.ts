@@ -3,6 +3,7 @@ import { urlSheet } from "../../ComponentDoc/markdown";
 import { act } from "../deps";
 import { useEyeballEngine } from "./engine";
 import { Socket } from "./Socket";
+import { TooltipSpan } from "./TooltipProvider";
 
 const EyeballDemo = () => {
   const engine = useEyeballEngine();
@@ -17,7 +18,26 @@ const EyeballDemo = () => {
   }
 
   return act.h(FramePresenter, {}, act.h(Socket, { engine }, [
-    act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue')
+    act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue'),
+    act.h('div', {}, [
+      act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
+        padding: '4px',
+        background: 'black',
+        color: 'white',
+        border: '2px solid black',
+        borderRadius: '4px',
+      } }, 'Tooltip') }, 'Hover for a tooltip'),
+    ]),
+    act.h('div', {}, [
+      'Hover for a ',
+      act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
+        padding: '4px',
+        background: 'blue',
+        color: 'white',
+        border: '2px solid black',
+        borderRadius: '4px',
+      } }, 'Here is a different tooltip') }, act.h('span', { style: { fontWeight: 'bold', textDecoration: 'underline' }}, 'tooltip')),
+    ]),
   ]))
 }
 

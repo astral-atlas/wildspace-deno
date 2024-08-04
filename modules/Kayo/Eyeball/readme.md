@@ -17,6 +17,11 @@ All other elements appear "above" the main content, but are constrained to the s
 thus when selecting where to place the socket in component heirarchy, you should place it
 in such a way where it can take up most (or all) of the screen.
 
+### Socket Space
+
+Most elements inside a eyeball socket are described by their "socket space" - the socket's
+element occupes a rect
+
 ## Dialogue
 
 A Dialogue is an element/component that takes over the regular content of the page,
