@@ -1,5 +1,10 @@
 # Changelog
 
+#### 5th August, 2024
+
+  - Added Tooltips to Eyeball
+  - Some other stuff that I didn't document
+
 #### 20th March, 2024
 
   - We say farewell to HTTPS based imports, and move back to `package.json` and `npm`.
