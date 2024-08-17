@@ -8,19 +8,32 @@ const styles = {
     position: 'absolute',
     top: 0,
     left: 0,
-    backgroundColor: '#00000085'
   }
 };
 
 export type CurtainProps = {
-  dissmissable: boolean,
-  onDismiss: () => void
+  dimBackground: boolean,
+  blockCursor: boolean,
+  pointer: boolean,
+  onClick: () => void,
 };
 
-export const Curtain: act.Component<CurtainProps> = ({ dissmissable, onDismiss }) => {
+export const Curtain: act.Component<CurtainProps> = ({
+  dimBackground,
+  blockCursor,
+  pointer,
+
+  onClick,
+}) => {
+  const style = {
+    ...styles.curtain,
+    backgroundColor: dimBackground && '#00000085',
+    pointerEvents: !blockCursor && 'none' ,
+    cursor: pointer && 'pointer'
+  };
+
   return act.h('div', {
-    style: { ...styles.curtain, cursor: dissmissable ? 'pointer' : 'auto' },
-    onClick: onDismiss,
-    disabled: !dissmissable
+    style,
+    onClick
   });
 };

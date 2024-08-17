@@ -17,6 +17,10 @@ const EyeballDemo = () => {
     })
   }
 
+  const onOpenContextClick = (e: MouseEvent) => {
+    engine.newDropdown(() => act.h('button', {}, 'Dropdown!'), engine.pointerPositionRef.current)
+  }
+
   return act.h(FramePresenter, {}, act.h(Socket, { engine }, [
     act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue'),
     act.h('div', {}, [
@@ -38,6 +42,8 @@ const EyeballDemo = () => {
         borderRadius: '4px',
       } }, 'Here is a different tooltip') }, act.h('span', { style: { fontWeight: 'bold', textDecoration: 'underline' }}, 'tooltip')),
     ]),
+
+    act.h('button', { onClick: onOpenContextClick }, 'Open Context Menu')
   ]))
 }
 
