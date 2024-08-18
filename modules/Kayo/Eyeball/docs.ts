@@ -16,34 +16,36 @@ const EyeballDemo = () => {
       ])
     })
   }
-
   const onOpenContextClick = (e: MouseEvent) => {
-    engine.newDropdown(() => act.h('button', {}, 'Dropdown!'), engine.pointerPositionRef.current)
+    e.preventDefault()
+    engine.newDropdown(() => act.h('button', { onClick: onOpenContextClick }, 'Dropdown!'), { ...engine.pointerPositionRef.current }).id
   }
 
   return act.h(FramePresenter, {}, act.h(Socket, { engine }, [
-    act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue'),
-    act.h('div', {}, [
-      act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
-        padding: '4px',
-        background: 'black',
-        color: 'white',
-        border: '2px solid black',
-        borderRadius: '4px',
-      } }, 'Tooltip') }, 'Hover for a tooltip'),
-    ]),
-    act.h('div', {}, [
-      'Hover for a ',
-      act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
-        padding: '4px',
-        background: 'blue',
-        color: 'white',
-        border: '2px solid black',
-        borderRadius: '4px',
-      } }, 'Here is a different tooltip') }, act.h('span', { style: { fontWeight: 'bold', textDecoration: 'underline' }}, 'tooltip')),
-    ]),
+    act.h('div', { onContextMenu: onOpenContextClick, style: { flex: 1 } }, [
+      act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue'),
+      act.h('div', {}, [
+        act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
+          padding: '4px',
+          background: 'black',
+          color: 'white',
+          border: '2px solid black',
+          borderRadius: '4px',
+        } }, 'Tooltip') }, 'Hover for a tooltip'),
+      ]),
+      act.h('div', {}, [
+        'Hover for a ',
+        act.h(TooltipSpan, { renderTooltip: () => act.h('div', { style: {
+          padding: '4px',
+          background: 'blue',
+          color: 'white',
+          border: '2px solid black',
+          borderRadius: '4px',
+        } }, 'Here is a different tooltip') }, act.h('span', { style: { fontWeight: 'bold', textDecoration: 'underline' }}, 'tooltip')),
+      ]),
 
-    act.h('button', { onClick: onOpenContextClick }, 'Open Context Menu')
+      act.h('button', { onClick: onOpenContextClick }, 'Open Context Menu')
+    ]),
   ]))
 }
 

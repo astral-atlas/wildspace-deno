@@ -60,7 +60,7 @@ mouseY: ${mouseSSY}
     }
   };
 
-  return act.h('div', { style: { flex: 1 }, onPointerMove, ref: engine.screenspaceElementRef }, [
+  return act.h('div', { style: { flex: 1, display: 'flex', flexDirection: 'column' }, onPointerMove, ref: engine.screenspaceElementRef }, [
     act.h(socketContext.Provider, { value: engine }, [
       children,
       showDialogueCurtain && act.h(Curtain, {
@@ -79,7 +79,7 @@ mouseY: ${mouseSSY}
         dimBackground: false
       }),
       act.h('div', { style: { position: 'absolute', top: 0, left: 0 } }, [
-        engine.dropdowns.map(dropdown => act.h(Dropdown, { engine, dropdown })),
+        engine.dropdowns.map(dropdown => act.h(Dropdown, { engine, dropdown, key: dropdown.id })),
   
         engine.tooltips.map(tooltip => act.h(Tooltip, { tooltip, key: tooltip.id, engine })),
       ]),
@@ -92,6 +92,7 @@ mouseY: ${mouseSSY}
 const Dropdown = ({ dropdown, engine }: { engine: EyeballEngine, dropdown: DropdownEntry }) => {
   return act.h('div', {
     style: {
+      position: 'absolute',
       transform: `translate(${dropdown.position.x}px, ${dropdown.position.y}px)`
     }
   }, dropdown.render(dropdown))

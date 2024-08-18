@@ -87,6 +87,10 @@ export type DropdownEngine = {
     render: (entry: DropdownEntry) => ElementNode,
     position: Vector<2>
   ) => DropdownEntry,
+  replaceDropdown: (
+    render: (entry: DropdownEntry) => ElementNode,
+    position: Vector<2>
+  ) => DropdownEntry
   closeDropdown: (id: OpaqueID<"DropdownID">) => void,
   clearDropdowns: () => void,
 }
@@ -102,6 +106,16 @@ export const useDropdownEngine = (): DropdownEngine => {
         id: createID<"DropdownID">(),
       }
       setDropdowns(d => [...d, entry]);
+
+      return entry;
+    },
+    replaceDropdown(render, position) {
+      const entry = {
+        render,
+        position,
+        id: createID<"DropdownID">(),
+      }
+      setDropdowns([entry]);
 
       return entry;
     },
