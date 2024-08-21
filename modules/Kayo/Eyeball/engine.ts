@@ -1,6 +1,6 @@
 import { useState, useMemo, Component, ElementNode } from '@lukekaalim/act';
 import { nanoid } from 'nanoid';
-import { Rect } from 'space/rects';
+import { Rect, rect2 } from 'space/rects';
 import { vec2, Vector } from 'space/vectors';
 import { m } from '../../SesameModels/deps';
 import { act } from '../deps';
@@ -29,7 +29,7 @@ export type DialogueEntry = {
 export type DropdownEntry = {
   id: OpaqueID<"DropdownID">,
   /** A dropdown is placed in "socket space" rather than element space */
-  position: Vector<2>,
+  placementRect: Rect<2>,
   render: (entry: DropdownEntry) => ElementNode
 };
 
@@ -85,11 +85,11 @@ export type DropdownEngine = {
 
   newDropdown: (
     render: (entry: DropdownEntry) => ElementNode,
-    position: Vector<2>
+    position: Rect<2>
   ) => DropdownEntry,
   replaceDropdown: (
     render: (entry: DropdownEntry) => ElementNode,
-    position: Vector<2>
+    position: Rect<2>
   ) => DropdownEntry
   closeDropdown: (id: OpaqueID<"DropdownID">) => void,
   clearDropdowns: () => void,
@@ -99,20 +99,20 @@ export const useDropdownEngine = (): DropdownEngine => {
 
   return {
     dropdowns,
-    newDropdown(render, position) {
+    newDropdown(render, placementRect) {
       const entry = {
         render,
-        position,
+        placementRect,
         id: createID<"DropdownID">(),
       }
       setDropdowns(d => [...d, entry]);
 
       return entry;
     },
-    replaceDropdown(render, position) {
+    replaceDropdown(render, placementRect) {
       const entry = {
         render,
-        position,
+        placementRect,
         id: createID<"DropdownID">(),
       }
       setDropdowns([entry]);
@@ -157,3 +157,15 @@ export const useEyeballEngine = (): EyeballEngine => {
     },
   }
 };
+
+export const getScreenspaceRect = (engine: EyeballEngine, domElement: HTMLElement) => {
+  if (!engine.screenspaceElementRef.current)
+    return null;
+  const ssBoundaryDomRect = engine.screenspaceElementRef.current.getBoundingClientRect();
+  const elementBoundaryDomRect = domElement.getBoundingClientRect();
+
+  return rect2(
+    vec2(elementBoundaryDomRect.left - ssBoundaryDomRect.left, elementBoundaryDomRect.top - ssBoundaryDomRect.top),
+    vec2(elementBoundaryDomRect.width, elementBoundaryDomRect.height)
+  )
+}

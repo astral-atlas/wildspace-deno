@@ -2,6 +2,7 @@
   "name": "kayo",
   "type": "module",
   "dependencies": {
-    "space": "*"
+    "space": "*",
+    "@lukekaalim/act-curve": "*"
   }
 }

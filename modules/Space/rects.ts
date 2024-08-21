@@ -31,3 +31,18 @@ export const rectContains = <D extends VectorDimensions>(rect: Rect<D>, point: V
       throw new Error();
   }
 }
+
+/**
+ * Check if one rect "contains" another rect inside it.
+ * 
+ * The second rect must be fully enclosed - an intersection
+ * will return false
+ */
+export const rect2WithinRect = (outer: Rect<2>, inner: Rect<2>): boolean => {
+  return (
+    outer.position.x < inner.position.x &&
+    outer.position.x + outer.size.x > inner.position.x + inner.size.x &&
+    outer.position.y < inner.position.y &&
+    outer.position.y + outer.size.y > inner.position.y + inner.size.y
+  )
+}

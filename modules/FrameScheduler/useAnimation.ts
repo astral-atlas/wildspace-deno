@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "@lukekaalim/act";
+import { useContext, useEffect, Deps } from "@lukekaalim/act";
 import { AnimationFrame } from "./FrameScheduler.ts";
 import { FrameSchedulerCallback } from "./FrameSchedulerEmitter.ts";
 import { frameSchedulerContext, useFrameScheduler } from "./FrameSchedulerContext.ts";
@@ -6,7 +6,7 @@ import { frameSchedulerContext, useFrameScheduler } from "./FrameSchedulerContex
 export const useAnimation = (
   key: string,
   onAnimationFrame: FrameSchedulerCallback<AnimationFrame>,
-  deps: unknown[] = []
+  deps: Deps = []
 ) => {
   const scheduler = useFrameScheduler();
 
@@ -14,5 +14,5 @@ export const useAnimation = (
     const subscription = scheduler.animation.subscribe(key, onAnimationFrame);
     onAnimationFrame(scheduler.currentFrame);
     return subscription.unsubscribe;
-  }, [key, scheduler, ...deps]);
+  }, [key, scheduler, ...deps || []]);
 };
