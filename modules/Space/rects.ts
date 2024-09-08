@@ -46,3 +46,10 @@ export const rect2WithinRect = (outer: Rect<2>, inner: Rect<2>): boolean => {
     outer.position.y + outer.size.y > inner.position.y + inner.size.y
   )
 }
+
+
+export const rect = {
+  new2: rect2,
+  new3: rect3,
+  within: rect2WithinRect,
+} as const;

@@ -6,9 +6,11 @@ import { getScreenspaceRect, useEyeballEngine } from "./engine";
 import { Socket } from "./Socket";
 import { TooltipSpan } from "./TooltipProvider";
 import { vec2 } from "space/vectors";
+import { DropdownCandidateDemo } from "./Dropdown.docs";
+import { EngineDemo } from "./engine.doc";
 
 const EyeballDemo = () => {
-  const engine = useEyeballEngine();
+  const [ref, engine] = useEyeballEngine();
 
   const onOpenDialogueClick = () => {
     engine.newDialogue((d) => {
@@ -47,7 +49,7 @@ const EyeballDemo = () => {
     ]), target).id
   }
 
-  return act.h(FramePresenter, {}, act.h(Socket, { engine }, [
+  return act.h(FramePresenter, {}, act.h(Socket, { ref, engine }, [
     act.h('div', { onContextMenu: onOpenContextClick, style: { flex: 1 } }, [
       act.h('button', { onClick: onOpenDialogueClick }, 'Open optional Dialogue'),
       act.h('div', {}, [
@@ -106,5 +108,7 @@ const TooltipContent = () => {
 }
 
 export const eyeballDoc = urlSheet('Eyeball', new URL('./readme.md', import.meta.url), {
-  EyeballDemo
+  EyeballDemo,
+  DropdownCandidateDemo,
+  EngineDemo,
 }, null, 'Kayo');

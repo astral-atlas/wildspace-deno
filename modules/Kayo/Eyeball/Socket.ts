@@ -7,7 +7,8 @@ import { vec2, Vector } from "space/vectors";
 import { mergeTimeSpans, useArrayAnimation, useTimeSpan } from '../Action/mod.ts';
 
 export type SocketProps = {
-  engine: EyeballEngine,
+  engine: null | EyeballEngine,
+  ref: act.Ref<HTMLElement | null>,
 };
 
 const DOMRectToSpaceRect = (rect: DOMRect): Rect<2> => {
@@ -33,8 +34,12 @@ const useFlowAnimation = (ref: act.Ref<HTMLElement | null>, flow: curve.CubicBez
   })
 }
 
-export const Socket: act.Component<SocketProps> = ({ engine, children }) => {
+export const Socket: act.Component<SocketProps> = ({ engine, children, ref }) => {
   const debugRef = act.useRef<HTMLElement | null>(null);
+
+  if (!engine)
+    return act.h('div', { ref }, children)
+
   const showDialogueCurtain = engine.dialogues.length > 0;
   const showDropdownCurtain = engine.dropdowns.length > 0;
 
@@ -85,7 +90,7 @@ mouseY: ${mouseSSY}
     durationMs: 200
   });
 
-  return act.h('div', { style: { flex: 1, display: 'flex', flexDirection: 'column' }, onPointerMove, ref: engine.screenspaceElementRef }, [
+  return act.h('div', { style: { flex: 1, display: 'flex', flexDirection: 'column' }, onPointerMove, ref }, [
     act.h(socketContext.Provider, { value: engine }, [
       children,
       showDialogueCurtain && act.h(Curtain, {

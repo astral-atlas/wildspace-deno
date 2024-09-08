@@ -3,6 +3,7 @@
   "type": "module",
   "dependencies": {
     "space": "*",
-    "@lukekaalim/act-curve": "*"
+    "@lukekaalim/act-curve": "*",
+    "ts-common": "*"
   }
 }

@@ -1,4 +1,5 @@
 {
   "name": "space",
-  "type": "module"
+  "type": "module",
+  "main": "mod.ts"
 }

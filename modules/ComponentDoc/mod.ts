@@ -12,6 +12,8 @@ export * from './global.ts';
 export * from './common/mod.ts';
 export * from './EventList.ts';
 
+export * from './story/inputs.ts';
+
 import { actMarkdown, act } from './deps.ts';
 
 export const { h, useEffect, useRef, useContext, useState, useMemo } = act

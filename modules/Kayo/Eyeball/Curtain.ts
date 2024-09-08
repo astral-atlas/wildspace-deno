@@ -12,10 +12,10 @@ const styles = {
 };
 
 export type CurtainProps = {
-  dimBackground: boolean,
-  blockCursor: boolean,
-  pointer: boolean,
-  onClick: () => void,
+  dimBackground?: boolean,
+  blockCursor?: boolean,
+  pointer?: boolean,
+  onClick?: () => void,
 };
 
 export const Curtain: act.Component<CurtainProps> = ({

@@ -1,5 +1,9 @@
 # Eyeball
 
+::EngineDemo
+
+::DropdownCandidateDemo
+
 Eyeball is the kayo engine for displaying dialogues, overlays, dropdowns
 and tooltips.
 
@@ -58,6 +62,8 @@ navigated "passivley".
 
 A dropdown has a "Dropdown Provider", an anchor element that the tooltip is positioned around - either
 "within" or "around". Dropdowns can also be created without an anchor element - floating in place.
+
+### Candidate Positions
 
 ## Curtain
 

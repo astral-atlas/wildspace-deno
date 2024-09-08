@@ -1,12 +1,10 @@
 import { useState, useMemo, Component, ElementNode } from '@lukekaalim/act';
 import { nanoid } from 'nanoid';
-import { Rect, rect2 } from 'space/rects';
-import { vec2, Vector } from 'space/vectors';
+import { rect, Rect, rect2 } from 'space/rects';
+import { vec, vec2, Vector } from 'space/vectors';
 import { m } from '../../SesameModels/deps';
 import { act } from '../deps';
-
-declare const idType: unique symbol;
-export type OpaqueID<T extends string> = string & { [idType]: T };
+import { OpaqueID } from 'ts-common';
 
 export const createID = <T extends string>(): OpaqueID<T> => {
   return nanoid() as OpaqueID<T>;
@@ -38,6 +36,8 @@ export type EyeballEngine = {
   dialogues: DialogueEntry[],
 
   pointerPositionRef: act.Ref<Vector<2>>,
+
+  screenSpaceRect: Rect<2>,
 
   newDialogue: (render: (entry: DialogueEntry) => ElementNode, required?: boolean) => DialogueEntry,
   closeDialogue: (id: OpaqueID<"DialogueID">) => void,
@@ -128,15 +128,30 @@ export const useDropdownEngine = (): DropdownEngine => {
   }
 };
 
-export const useEyeballEngine = (): EyeballEngine => {
+export const useEyeballEngine = (): [act.Ref<HTMLElement | null>, null | EyeballEngine] => {
   const [dialogues, setDialogues] = useState<DialogueEntry[]>([]);
+
+  const [screenSpaceRect, setScreenSpaceRect] = useState<null | Rect<2>>(null);
   
   const tooltipEngine = useTooltipEngine();
   const dropdownEngine = useDropdownEngine();
   const screenspaceElementRef = act.useRef<HTMLElement | null>(null);
   const pointerPositionRef = act.useRef<Vector<2>>(vec2(0, 0));
 
-  return {
+  act.useEffect(() => {
+    const { current: screenscpaceElement } = screenspaceElementRef;
+    if (!screenscpaceElement)
+      return;
+    const domRect = screenscpaceElement.getBoundingClientRect();
+    setScreenSpaceRect(rect.new2(vec.new2(0, 0), vec.new2(domRect.width, domRect.height)));
+  }, [])
+
+  if (!screenSpaceRect)
+    return [screenspaceElementRef, null];
+
+  const engine: EyeballEngine = {
+    screenSpaceRect,
+
     screenspaceElementRef,
     pointerPositionRef,
     ...tooltipEngine,
@@ -156,6 +171,8 @@ export const useEyeballEngine = (): EyeballEngine => {
       setDialogues(dialogues.filter(d => d.id !== id));
     },
   }
+
+  return [screenspaceElementRef, engine];
 };
 
 export const getScreenspaceRect = (engine: EyeballEngine, domElement: HTMLElement) => {
