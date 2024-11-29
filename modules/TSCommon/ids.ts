@@ -8,3 +8,4 @@ export const generateId = <T extends string>(): OpaqueID<T> => nanoid() as Opaqu
 export const ids = {
   new: generateId
 }
+export const OpaqueID = ids;
