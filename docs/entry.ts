@@ -52,9 +52,9 @@ export const DocsApp: Component<{ sheets: DocSheet[] }> = ({ sheets }) => {
 };
 
 const entry = async () => {
-  //const glob = import.meta.glob('../modules/**/docs.ts');
+  const glob = import.meta.glob('../modules/**/docs.ts');
   
-  //await Promise.all(Object.values(glob).map(load => load()))
+  await Promise.all(Object.values(glob).map(load => load()))
   
   const sheets = [
     ...pages,

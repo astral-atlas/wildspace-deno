@@ -1,0 +1,5 @@
+{
+  "name": "frame-scheduler",
+  "version": "1.0.0",
+  "main": "./mod.ts"
+}

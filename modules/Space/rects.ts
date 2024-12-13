@@ -52,4 +52,7 @@ export const rect = {
   new2: rect2,
   new3: rect3,
   within: rect2WithinRect,
+  pointWithin: rectContains,
 } as const;
+
+export const Rect = rect;

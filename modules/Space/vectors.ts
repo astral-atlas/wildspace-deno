@@ -1,3 +1,5 @@
+import { Mutable } from "./modifier";
+
 export type VectorDimensionStructures = {
   1: { x: number },
   2: { x: number, y: number },
@@ -12,8 +14,9 @@ export type V<D extends VD> = Vector<D>
 export type Vec<D extends VD> = Vector<D>;
 
 declare const mutType: unique symbol;
-export type MutableVec<D extends VD> = Vec<D> & { [mutType]: "mutable" };
-export type MutVec<D extends VD> = MutableVec<D>;
+export type MutableVec<D extends VD> = Mutable<Vec<D>>;
+export type MutVec<D extends VD> = Mutable<Vec<D>>;
+
 
 export const vec2 = (x: number = 0, y: number = 0): Vector<2> => ({ x, y });
 export const vec3 = (x: number = 0, y: number = 0, z: number = 0): Vector<3> => ({ x, y, z });
@@ -87,3 +90,5 @@ export const vec = {
   zero: { x: 0, y: 0, z: 0, w: 0 },
   one: { x: 1, y: 1, z: 1, w: 1 },
 };
+
+export const Vec = vec;

@@ -7,6 +7,8 @@ export type ScreenElement = {
   node: act.ElementNode
 }
 
+export type ScreenElementService = ReturnType<typeof createScreenElementService>;
+
 export const createScreenElementService = () => {
   const elements = new Map<ScreenElementID, ScreenElement>();
   const updates = new rxjs.Subject<void>()
@@ -27,6 +29,7 @@ export const createScreenElementService = () => {
   };
 
   return {
+    elements,
     updates,
     add,
     remove,

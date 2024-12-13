@@ -1,0 +1,11 @@
+{
+  "name": "laminate",
+  "version": "1.0.0",
+  "main": "./mod.ts",
+  "dependencies": {
+    "act-common": "^1.0.0",
+    "atlas-renderer": "*",
+    "frame-scheduler": "^1.0.0",
+    "rxjs": "^7.8.1"
+  }
+}
