@@ -13,14 +13,14 @@ export const useSmoothHashScroll = (
   // If there is a hash as part of the URL,
   // try to scroll it into view
   useEffect(() => {
-    const { current: pageContainer } = pageContainerRef;
-    if (!pageContainer) return;
-
     if (!hash) {
+      const { current: pageContainer } = pageContainerRef;
+      if (!pageContainer) return;
       pageContainer.scrollTo({ top: 0 });
       return;
     }
     const hashElement = document.getElementById(hash.slice(1));
+    console.log({ hashElement })
     if (!hashElement) return;
     hashElement.scrollIntoView({
       block: "center",

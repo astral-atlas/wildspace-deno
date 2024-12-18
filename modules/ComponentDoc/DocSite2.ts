@@ -11,6 +11,7 @@ import { useAnchorNavigation } from './useAnchorNavigation.ts';
 // @deno-types="vite-css"
 import classes from './DocSite2.module.css';
 import { calculateSheetPath } from "./DocElement.ts";
+import { navigationContext } from "@lukekaalim/act-navigation";
 
 const { h, useRef } = act;
 
@@ -55,15 +56,17 @@ export const DocSite2: act.Component<DocSite2Props> = ({
   useSmoothHashScroll(ref, navigation);
   useAnchorNavigation(ref, navigation);
   
-  return h('div', { ref, className: classes.root }, [
-    h(TopBar),
-    h('div', { className: classes.main }, [
-      h(DocSidebar, { allSheets: sheets, selectedSheetId }, sidebarHero),
-      h('div', { className: classes.pageContainter },
-        h('div', { className: classes.page },
-          h(DocPage, { elements: selectedSheet.elements }),
+  return h('div', { ref, className: classes.root },
+    act.h(navigationContext.Provider, { value: navigation }, [
+      h(TopBar),
+      h('div', { className: classes.main }, [
+        h(DocSidebar, { allSheets: sheets, selectedSheetId }, sidebarHero),
+        h('div', { className: classes.pageContainter },
+          h('div', { className: classes.page },
+            h(DocPage, { elements: selectedSheet.elements }),
+          )
         )
-      )
+      ])
     ])
-  ]);
+  );
 }

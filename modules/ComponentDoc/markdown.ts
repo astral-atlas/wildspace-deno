@@ -2,12 +2,15 @@
 import docSiteStyles from "./DocSite.module.css";
 
 import {
+  act,
   actMarkdown
 } from "./deps.ts";
 import { DocElement, DocSheet } from "./DocElement.ts";
 import { Component, h, useMemo } from "@lukekaalim/act";
 import { useAsync } from "../ActCommon/mod.ts";
 import { EventRecordProvider } from "./EventList.ts";
+import { useSmoothHashScroll } from "./useSmoothHashScroll.ts";
+import { navigationContext } from "@lukekaalim/act-navigation";
 
 const {
   MarkdownASTRenderer, parseMarkdown,
@@ -107,8 +110,19 @@ export const urlSheet = (
     const markdownContent = useAsync(() =>
       fetch(markdownURL.href).then(f => f.text()), [markdownURL]);
 
-      if (!markdownContent)
-        return null;
+    if (!markdownContent)
+      return null;
+
+
+    // since content is not known until after the async,
+    // we need to retry the scrolling
+
+    const ref = act.useRef(null);
+    const nav = act.useContext(navigationContext);
+    if (!nav)
+      return null;
+
+    useSmoothHashScroll(ref, nav);
   
     const ast = parseMarkdown(markdownContent);
 

@@ -13,6 +13,8 @@ export type ScreenElement = {
  * and overlay elements
  */
 export type ScreenSpaceService = {
+  rootDomElement: null | HTMLElement,
+
   /** Position of the "Screen" in document coordinates */
   rect: Mut<Rect<2>>,
 
@@ -27,8 +29,29 @@ export const createScreenspaceService = (): ScreenSpaceService => {
   const elements = ObservableMap.create<ScreenElementID, ScreenElement>();
 
   return {
+    rootDomElement: null,
+
     rect,
     mousePosition,
     elements,
   }
 };
+
+export const ScreenSpaceService = {
+  getDomElementRect(screen: ScreenSpaceService, element: HTMLElement) {
+    const elRect = element.getBoundingClientRect();
+
+    const screenDomRect = screen.rootDomElement && screen.rootDomElement.getBoundingClientRect();
+    if (!screenDomRect)
+      return Rect.new2(Vec.new2(), Vec.new2());
+
+    return Rect.new2(
+      Vec.new2(elRect.x - screenDomRect.x, elRect.y - screenDomRect.y),
+      Vec.new2(elRect.width, elRect.height),
+    )
+  }
+}
+
+export const useScreenspaceService = () => {
+  
+}
